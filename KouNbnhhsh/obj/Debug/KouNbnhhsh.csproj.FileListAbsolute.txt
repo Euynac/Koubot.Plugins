@@ -1,0 +1,7 @@
+C:\Users\dell\Desktop\项目\LittleKou\Koubot\KoubotPlugin\KouNbnhhsh\obj\Debug\KouNbnhhsh.csproj.CopyComplete
+C:\Users\dell\Desktop\项目\LittleKou\Koubot\KoubotPlugin\KouNbnhhsh\obj\Debug\KouNbnhhsh.dll
+C:\Users\dell\Desktop\项目\LittleKou\Koubot\KoubotPlugin\KouNbnhhsh\obj\Debug\KouNbnhhsh.pdb
+C:\Users\dell\Desktop\项目\LittleKou\KouBot\KoubotPlugin\KouNbnhhsh.dll
+C:\Users\dell\Desktop\项目\LittleKou\KouBot\KoubotPlugin\KouNbnhhsh.pdb
+C:\Users\dell\Desktop\项目\LittleKou\KouBot\KoubotPlugin\KouNbnhhsh\obj\Debug\KouNbnhhsh.csproj.CoreCompileInputs.cache
+C:\Users\dell\Desktop\项目\LittleKou\KouBot\KoubotPlugin\KouNbnhhsh\obj\Debug\KouNbnhhsh.csprojAssemblyReference.cache
