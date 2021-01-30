@@ -1,8 +1,0 @@
-C:\Users\dell\Desktop\项目\LittleKou\Koubot\KoubotPlugin\KouMarketingGenerator\obj\Debug\KouMarketingGenerator.csproj.CopyComplete
-C:\Users\dell\Desktop\项目\LittleKou\Koubot\KoubotPlugin\KouMarketingGenerator\obj\Debug\KouMarketingGenerator.dll
-C:\Users\dell\Desktop\项目\LittleKou\Koubot\KoubotPlugin\KouMarketingGenerator\obj\Debug\KouMarketingGenerator.pdb
-C:\Users\dell\Desktop\项目\LittleKou\KouBot\KoubotPlugin\KouMarketingGenerator.dll
-C:\Users\dell\Desktop\项目\LittleKou\KouBot\KoubotPlugin\KouMarketingGenerator.pdb
-C:\Users\dell\Desktop\项目\LittleKou\KouBot\KoubotPlugin\KouMarketingGenerator\obj\Debug\KouMarketingGenerator.csprojAssemblyReference.cache
-C:\Users\dell\Desktop\项目\LittleKou\KouBot\KoubotPlugin\KouMarketingGenerator\obj\Debug\KouMarketingGenerator.csproj.CoreCompileInputs.cache
-C:\Users\dell\Desktop\项目\LittleKou\KouBot\KoubotPlugin\KouMarketingGenerator.dll.config

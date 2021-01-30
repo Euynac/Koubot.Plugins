@@ -1,29 +1,42 @@
-﻿using System;
+﻿using Koubot.SDK.Interface;
+using Koubot.SDK.Models.Entities;
+using Koubot.SDK.Protocol;
+using Koubot.SDK.Services;
+using Koubot.SDK.Tool.Web.APILimiting;
+using Koubot.Tool.Expand;
+using Koubot.Tool.Web;
+using Koubot.Tool.Web.APILimiting;
+using KouFunctionPlugin.Romaji.Models;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using KouFunctionPlugin.Romaji.Models;
-using System.IO;
-using System.Reflection;
 using System.Web;
 using System.Xml;
-using Xyz.Koubot.AI.SDK.General;
-using Xyz.Koubot.AI.SDK.Interface;
-using Xyz.Koubot.AI.SDK.General.Mysql;
-using Xyz.Koubot.AI.SDK.Protocol;
-using Xyz.Koubot.AI.SDK.Models.Sql.PlugIn;
-using Xyz.Koubot.AI.SDK.Tool;
-using Xyz.Koubot.AI.SDK.Tool.Web;
+
 namespace KouRomajiHelper
 {
     /// <summary>
     /// 内部RomajiHelper，低耦合
     /// </summary>
-    public class RomajiHelper : IErrorAvailable
+    public class RomajiHelper : IKouError
     {
-        public static Dictionary<string, string> RomajiToZhDict { get; set; } = new Dictionary<string, string>();
-        public static Dictionary<string, int> RomajiIDDict { get; set; } = new Dictionary<string, int>();
+        private static Dictionary<string, string> RomajiToZhDict;
+        public readonly KouContext kouContext = new KouContext();
+
+        public RomajiHelper()
+        {
+            if (RomajiToZhDict == null)
+            {
+                RomajiToZhDict = new Dictionary<string, string>();
+                foreach (var pluginRomajiPair in kouContext.Set<PluginRomajiPair>().ToList())
+                {
+                    RomajiToZhDict.Add(pluginRomajiPair.RomajiKey, pluginRomajiPair.ZhValue);
+                }
+            }
+        }
+        public void Dispose()
+        {
+            kouContext.Dispose();
+        }
         public ErrorCodes ErrorCode { get; set; }
         public string ExtraErrorMessage { get; set; }
 
@@ -32,17 +45,13 @@ namespace KouRomajiHelper
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public bool DeletePair(int id, string romaji)
+        public bool DeletePair(int id)
         {
-            RomajiModel romajiModel = new RomajiModel { Id = id };
-            using (MysqlDataService mysqlDataService = new MysqlDataService())
-            {
-                int result = mysqlDataService.AlterModelIntoSql<RomajiModel>(RomajiModel.ROMAJI_PAIR, romajiModel, SqlOperation.DELETE);
-                if (result <= 0) return false;
-            }
-            RomajiToZhDict.Remove(romaji);
-            RomajiIDDict.Remove(romaji);
-            return true;
+            var pair = kouContext.Set<PluginRomajiPair>().SingleOrDefault(x => x.Id == id);
+            if (pair == null) return false;
+            kouContext.Remove(pair);
+            RomajiToZhDict.Remove(pair.RomajiKey);
+            return kouContext.SaveChanges() > 0;
         }
 
 
@@ -54,64 +63,22 @@ namespace KouRomajiHelper
         /// <returns></returns>
         public bool AddPair(string key, string value, out string sqlValue, out int id)
         {
-            try
+            var pair = kouContext.Set<PluginRomajiPair>().SingleOrDefault(x => x.RomajiKey == key);
+            if (pair == null)
             {
-                RomajiModel romajiModel = new RomajiModel
-                {
-                    Romaji_key = key,
-                    Zh_value = value
-                };
-
-                using (MysqlDataService mysqlDataService = new MysqlDataService())
-                {
-                    //检查是否存在
-                    var list = mysqlDataService.FetchModelListFromSql<RomajiModel>($"select * from {RomajiModel.ROMAJI_PAIR} where {nameof(RomajiModel.Romaji_key).ToLower()} = \"{key}\"");
-                    if (list != null && list.Count > 0)
-                    {
-                        sqlValue = list[0].Zh_value;
-                        id = list[0].Id;
-                        return false;
-                    }
-                    //不存在再增加
-                    int result = mysqlDataService.AlterModelIntoSql(RomajiModel.ROMAJI_PAIR, romajiModel, SqlOperation.INSERT);
-                    sqlValue = null;
-                    if (result <= 0)
-                    {
-                        id = -1;
-                        return false;
-                    }
-                    RomajiToZhDict.AddOrReplace(key, value);
-                    RomajiIDDict.AddOrReplace(key, result);
-                    id = result;
-                    return true;
-                }
+                PluginRomajiPair pluginRomajiPair = new PluginRomajiPair { RomajiKey = key, ZhValue = value };
+                kouContext.Add(pluginRomajiPair);
+                bool result = kouContext.SaveChanges() > 0;
+                if (result) RomajiToZhDict.Add(key, value);
+                id = pluginRomajiPair.Id;
+                sqlValue = key;
+                return result;
             }
-            catch (Exception e)
+            else
             {
-                throw new KouException(ErrorCodes.Plugin_FatalError, "RomajiHelper Addpair出错", e);
-            }
-
-        }
-        static RomajiHelper()
-        {
-            LoadRomajiToZh();
-        }
-
-
-        /// <summary>
-        /// 加载RomajiToZhList数据
-        /// </summary>
-        private static void LoadRomajiToZh()
-        {
-            MysqlDataService mysqlData = new MysqlDataService();
-            var list = mysqlData.FetchModelListFromSql<RomajiModel>($"select * from {RomajiModel.ROMAJI_PAIR}");
-            if (list != null)
-            {
-                foreach (var item in list)
-                {
-                    RomajiToZhDict.Add(item.Romaji_key, item.Zh_value);
-                    RomajiIDDict.Add(item.Romaji_key, item.Id);
-                }
+                sqlValue = pair.RomajiKey;
+                id = pair.Id;
+                return false;
             }
         }
 
@@ -124,11 +91,10 @@ namespace KouRomajiHelper
         public string CallAPI(string japanese)
         {
             if (japanese.IsNullOrWhiteSpace()) return null;
-            ApiCallLimiter apiCallLimiter = new ApiCallLimiter(nameof(KouRomajiHelper), LimitingType.LeakyBucket, 1);
+            APICallLimitingService apiCallLimiter = new APICallLimitingService(nameof(KouRomajiHelper), LimitingType.LeakyBucket, 1);
             if (!apiCallLimiter.RequestWithRetry())
             {
-                ErrorService.InheritError(this, apiCallLimiter);
-                ExtraErrorMessage += " 发生在" + nameof(KouRomajiHelper) + "中的" + nameof(CallAPI);
+                this.InheritError(apiCallLimiter, "发生在" + nameof(KouRomajiHelper) + "中的" + nameof(CallAPI));
                 return null;
             }
             string data = "mode=japanese&q=" + HttpUtility.UrlEncode(japanese);
@@ -143,7 +109,7 @@ namespace KouRomajiHelper
         /// <returns></returns>
         public List<List<KeyValuePair<string, string>>> ParseXml(string xmlResult)
         {
-            if (xmlResult.IsNullOrWhiteSpace()) return null; 
+            if (xmlResult.IsNullOrWhiteSpace()) return null;
             List<List<KeyValuePair<string, string>>> romajiResults = new List<List<KeyValuePair<string, string>>>();
             XmlDocument xmlDocument = new XmlDocument();
             xmlDocument.LoadXml(xmlResult);
@@ -178,7 +144,7 @@ namespace KouRomajiHelper
         public string ToZhHomophonic(string str)
         {
             List<string> romajiList = str.Split(' ').ToList();
-            if (romajiList != null)
+            if (!romajiList.IsNullOrEmptySet())
             {
                 string ret = "";
                 foreach (var romaji in romajiList)

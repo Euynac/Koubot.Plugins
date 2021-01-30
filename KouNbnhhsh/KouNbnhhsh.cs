@@ -1,42 +1,45 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using Koubot.SDK.Protocol.Plugin;
+using Koubot.SDK.Services;
+using Koubot.SDK.Tool.Web.APILimiting;
+using Koubot.Tool.Expand;
+using Koubot.Tool.Random;
+using Koubot.Tool.Web;
+using Koubot.Tool.Web.APILimiting;
+using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Xyz.Koubot.AI.SDK.General;
-using Xyz.Koubot.AI.SDK.Interface;
-using Xyz.Koubot.AI.SDK.Protocol;
-using Xyz.Koubot.AI.SDK.Models.Sql.PlugIn;
-using Xyz.Koubot.AI.SDK.Tool;
-using Xyz.Koubot.AI.SDK.Tool.Web;
+using static Koubot.SDK.Protocol.KouEnum;
 
 namespace KouFunctionPlugin
 {
     /// <summary>
     /// 第三方api测试 能不能好好说话
     /// </summary>
-    public class KouNbnhhsh : IKouPlugin
+    [KouPluginClass(
+        Introduction = "首字母缩写翻译工具；源项目地址https://github.com/itorr/nbnhhsh\n输入带首字母缩写的文字，返回结果（多个则随机）",
+        Author = "7zou",
+        ActivateName = "nbnhhsh",
+        Title = "能不能好好说话",
+        PluginType = PluginType.Function)]
+    public class KouNbnhhsh : KouPlugin
     {
-        [KouPluginParameter(nameof(All), ActivateKeyword = "all", Help = "默认功能中使用会将所有结果输出", Attributes = KouParameterAttribute.Bool)]
+        [KouPluginParameter(ActivateKeyword = "all", Help = "默认功能中使用会将所有结果输出")]
         public bool All { get; set; }
-        public ErrorCodes ErrorCode { get; set; }
-        public string ExtraErrorMessage { get; set; }
 
-        [KouPluginFunction(nameof(Default), Name = "能不能好好说话的默认功能", Help = "输入带缩写的文字，返回一个结果（多个则随机）\n支持all参数")]
-        public string Default(string str = null)
+        [KouPluginFunction(Name = "能不能好好说话的默认功能", Help = "输入带缩写的文字，返回一个结果（多个则随机）\n支持all参数")]
+        public override object Default(string str = null)
         {
             if (str.IsNullOrWhiteSpace()) return "输入带首字母缩写的一段话";
             var root = CallAPI(str);
-            if (root != null && !root.Result.IsEmpty())
+            if (root != null && !root.Result.IsNullOrEmptySet())
             {
                 if (All)
                 {
                     StringBuilder result = new StringBuilder();
                     foreach (var item in root.Result)
                     {
-                        if (!item.Trans.IsEmpty())
+                        if (!item.Trans.IsNullOrEmptySet())
                         {
                             result.Append(item.Name + "：");
                             foreach (var word in item.Trans)
@@ -52,7 +55,7 @@ namespace KouFunctionPlugin
                 {
                     foreach (var item in root.Result)
                     {
-                        if (item.Trans.IsEmpty()) continue;
+                        if (item.Trans.IsNullOrEmptySet()) continue;
                         Regex regex1 = new Regex(item.Name);
                         str = regex1.Replace(str, item.Trans.RandomGetOne(), 1);
                     }
@@ -64,29 +67,17 @@ namespace KouFunctionPlugin
         }
 
 
-        public PlugInInfoModel GetPluginInfo()
-        {
-            PlugInInfoModel plugInInfoModel = new PlugInInfoModel
-            {
-                Plugin_reflection = nameof(KouNbnhhsh),
-                Introduction = "首字母缩写翻译工具；源项目地址https://github.com/itorr/nbnhhsh\n输入带首字母缩写的文字，返回结果（多个则随机）",
-                Plugin_author = "7zou",
-                Plugin_activate_name = "nbnhhsh",
-                Plugin_zh_name = "能不能好好说话",
-                Plugin_type = PluginType.Function
-            };
-            return plugInInfoModel;
-        }
+
 
 
 
         public Root CallAPI(string str)
         {
             if (str.IsNullOrWhiteSpace()) return null;
-            ApiCallLimiter apiCallLimiter = new ApiCallLimiter(nameof(KouNbnhhsh), LimitingType.LeakyBucket, 2);
+            APICallLimitingService apiCallLimiter = new APICallLimitingService(nameof(KouNbnhhsh), LimitingType.LeakyBucket, 2);
             if (!apiCallLimiter.RequestWithRetry())
             {
-                ErrorService.InheritError(this, apiCallLimiter);
+                this.InheritError(apiCallLimiter);
                 ExtraErrorMessage += " 发生在" + nameof(KouNbnhhsh) + "中的" + nameof(CallAPI);
                 return null;
             }
