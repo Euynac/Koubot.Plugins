@@ -11,11 +11,9 @@ namespace KouFunctionPlugin.Romaji
     /// <summary>
     /// Kou专用RomajiHelper
     /// </summary>
-    [KouPluginClass(
+    [KouPluginClass("romaji", "罗马音助手",
         Introduction = "罗马音助手",
         Author = "7zou",
-        ActivateName = "romaji",
-        Title = "罗马音助手",
         PluginType = PluginType.Function)]
     public class KouRomajiHelper : KouPlugin
     {

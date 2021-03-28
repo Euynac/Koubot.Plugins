@@ -2,10 +2,9 @@
 using Koubot.SDK.Models.Entities;
 using Koubot.SDK.Protocol;
 using Koubot.SDK.Services;
-using Koubot.SDK.Tool.Web.APILimiting;
 using Koubot.Tool.Expand;
 using Koubot.Tool.Web;
-using Koubot.Tool.Web.APILimiting;
+using Koubot.Tool.Web.RateLimiter;
 using KouFunctionPlugin.Romaji.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +37,7 @@ namespace KouRomajiHelper
             kouContext.Dispose();
         }
         public ErrorCodes ErrorCode { get; set; }
-        public string ExtraErrorMessage { get; set; }
+        public string ErrorMsg { get; set; }
 
         /// <summary>
         /// 删除罗马音-谐音键值对
@@ -91,14 +90,16 @@ namespace KouRomajiHelper
         public string CallAPI(string japanese)
         {
             if (japanese.IsNullOrWhiteSpace()) return null;
-            APICallLimitingService apiCallLimiter = new APICallLimitingService(nameof(KouRomajiHelper), LimitingType.LeakyBucket, 1);
-            if (!apiCallLimiter.RequestWithRetry())
+            string result;
+            using (var limiter = new LeakyBucketRateLimiter(nameof(KouRomajiHelper), 1))
             {
-                this.InheritError(apiCallLimiter, "发生在" + nameof(KouRomajiHelper) + "中的" + nameof(CallAPI));
-                return null;
+                if (!limiter.CanRequest())
+                {
+                    this.InheritError(limiter, "发生在" + nameof(KouRomajiHelper) + "中的" + nameof(CallAPI));
+                }
+                string data = "mode=japanese&q=" + HttpUtility.UrlEncode(japanese);
+                result = WebHelper.HttpPost("http://www.kawa.net/works/ajax/romanize/romanize.cgi ", data, WebHelper.WebContentType.General);
             }
-            string data = "mode=japanese&q=" + HttpUtility.UrlEncode(japanese);
-            var result = WebHelper.HttpPost("http://www.kawa.net/works/ajax/romanize/romanize.cgi ", data, WebHelper.WebContentType.General);
             return result;
         }
 

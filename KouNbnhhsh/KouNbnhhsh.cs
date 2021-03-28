@@ -1,10 +1,9 @@
 ﻿using Koubot.SDK.Protocol.Plugin;
 using Koubot.SDK.Services;
-using Koubot.SDK.Tool.Web.APILimiting;
 using Koubot.Tool.Expand;
 using Koubot.Tool.Random;
 using Koubot.Tool.Web;
-using Koubot.Tool.Web.APILimiting;
+using Koubot.Tool.Web.RateLimiter;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;
@@ -16,11 +15,9 @@ namespace KouFunctionPlugin
     /// <summary>
     /// 第三方api测试 能不能好好说话
     /// </summary>
-    [KouPluginClass(
+    [KouPluginClass("nbnhhsh", "能不能好好说话",
         Introduction = "首字母缩写翻译工具；源项目地址https://github.com/itorr/nbnhhsh\n输入带首字母缩写的文字，返回结果（多个则随机）",
         Author = "7zou",
-        ActivateName = "nbnhhsh",
-        Title = "能不能好好说话",
         PluginType = PluginType.Function)]
     public class KouNbnhhsh : KouPlugin
     {
@@ -49,7 +46,7 @@ namespace KouFunctionPlugin
                             result.Append("\n");
                         }
                     }
-                    return result.ToString()?.Trim() ?? "不懂";
+                    return result.ToString().Trim();
                 }
                 else
                 {
@@ -74,14 +71,17 @@ namespace KouFunctionPlugin
         public Root CallAPI(string str)
         {
             if (str.IsNullOrWhiteSpace()) return null;
-            APICallLimitingService apiCallLimiter = new APICallLimitingService(nameof(KouNbnhhsh), LimitingType.LeakyBucket, 2);
-            if (!apiCallLimiter.RequestWithRetry())
+            string result;
+            using (var limiter = new LeakyBucketRateLimiter(nameof(KouNbnhhsh), 2))
             {
-                this.InheritError(apiCallLimiter);
-                ExtraErrorMessage += " 发生在" + nameof(KouNbnhhsh) + "中的" + nameof(CallAPI);
-                return null;
+                if (!limiter.CanRequest())
+                {
+                    this.InheritError(limiter, "发生在" + nameof(KouNbnhhsh) + "中的" + nameof(CallAPI));
+                    return null;
+                }
+                result = WebHelper.HttpPost("https://lab.magiconch.com/api/nbnhhsh/guess/", "{\"text\":\"" + str + "\"}", WebHelper.WebContentType.Json);
             }
-            var result = WebHelper.HttpPost("https://lab.magiconch.com/api/nbnhhsh/guess/", "{\"text\":\"" + str + "\"}", WebHelper.WebContentType.Json);
+
             result = "{\"result\":" + result + "}";
             Root root = JsonConvert.DeserializeObject<Root>(result);
             return root;

@@ -1,23 +1,63 @@
 ﻿using Koubot.SDK.Interface;
+using Koubot.SDK.Models.System;
 using Koubot.SDK.Protocol.AutoModel;
 using Koubot.Tool.Expand;
+using Koubot.Tool.String;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace KouGamePlugin.Arcaea.Models
 {
     public partial class PluginArcaeaSong : KouAutoModel<PluginArcaeaSong>
     {
+        [NotMapped]
+        [KouAutoModelField(ActivateKeyword = "别名", Name = "曲名俗称")]
+        public string SongAlias { get; set; }
 
-        public override string ToString(FormatType format)
+        static PluginArcaeaSong()
+        {
+            AddCustomFunc(nameof(SongAlias), (song, o) =>
+            {
+                if (o is string input)
+                {
+                    return song.PluginArcaeaSong2anothername.Any(n => n.AnotherName.AnotherName.Equals(input));
+                }
+
+                return false;
+            });
+        }
+        public override List<PluginArcaeaSong> ModelCacheIncludedList(DbSet<PluginArcaeaSong> set)
+        {
+            return set.Include(p => p.PluginArcaeaSong2anothername)
+                .ThenInclude(p => p.AnotherName).ToList();
+        }
+
+        public override bool IsAutoItemIDEnabled() => true;
+        public override bool IsTheItemID(int id) => SongId == id;
+        public override KouMessage ReplyOnFailingToSearch()
+        {
+            return "未找到符合条件的歌曲";
+        }
+
+        public override string GetAutoCitedSupplement(List<string> citedFieldNames)
+        {
+            return $"{citedFieldNames.ContainsReturnCustomOrNull(nameof(SongArtist), $"\n   曲师：{SongArtist}")}" +
+                   $"{citedFieldNames.ContainsReturnCustomOrNull(nameof(ChartDesigner), $"\n   谱师：{ChartDesigner}")}" +
+                   $"{citedFieldNames.ContainsReturnCustomOrNull(nameof(SongBpm), $"\n   BPM：{SongBpm}")}" +
+                   $"{citedFieldNames.ContainsReturnCustomOrNull(nameof(SongLength), $"\n   长度：{SongLength}")}" +
+                   $"{citedFieldNames.ContainsReturnCustomOrNull(nameof(JacketDesigner), $"\n   画师：{JacketDesigner}")}";
+        }
+
+        public override string ToString(FormatType format, object supplement = null)
         {
             switch (format)
             {
                 case FormatType.Brief:
-                    return $"{SongTitle} [{ChartRatingClass} {ChartRating}({ChartConstant})]";
+                    return $"{SongId}.{SongTitle} [{ChartRatingClass} {ChartRating}({ChartConstant})]";
 
                 case FormatType.Detail:
                     //获取所有歌曲别名
@@ -28,15 +68,15 @@ namespace KouGamePlugin.Arcaea.Models
                     }
                     allAnotherName = allAnotherName.TrimEnd('，');
                     if (allAnotherName.IsNullOrWhiteSpace()) allAnotherName = null;
-                    return $"{SongTitle} [{ChartRatingClass} {ChartConstant}]\n" +
-                        allAnotherName.BeNullOr($"别名：{allAnotherName}\n") +
-                        SongArtist.BeNullOr($"曲师：{SongArtist}\n") +
-                        JacketDesigner.BeNullOr($"画师：{JacketDesigner}\n") +
-                        SongBpm.BeNullOr($"BPM：{SongBpm}\n") +
-                        SongLength.BeNullOr($"歌曲长度：{SongLength}\n") +
-                        SongPack.BeNullOr($"曲包：{SongPack}\n") +
-                        ChartDesigner.BeNullOr($"谱师：{ChartDesigner}\n") +
-                        ChartAllNotes.BeNullOr($"note总数：{ChartAllNotes}\n地键：{ChartFloorNotes}\n天键：{ChartSkyNotes}\n蛇：{ChartArcNotes}\n长条：{ChartHoldNotes}");
+                    return $"{SongId}.{SongTitle} [{ChartRatingClass} {ChartConstant}]\n" +
+                        allAnotherName?.Be($"别名：{allAnotherName}\n") +
+                        SongArtist?.Be($"曲师：{SongArtist}\n") +
+                        JacketDesigner?.Be($"画师：{JacketDesigner}\n") +
+                        SongBpm?.Be($"BPM：{SongBpm}\n") +
+                        SongLength?.Be($"歌曲长度：{SongLength}\n") +
+                        SongPack?.Be($"曲包：{SongPack}\n") +
+                        ChartDesigner?.Be($"谱师：{ChartDesigner}\n") +
+                        ChartAllNotes?.Be($"note总数：{ChartAllNotes}\n地键：{ChartFloorNotes}\n天键：{ChartSkyNotes}\n蛇：{ChartArcNotes}\n长条：{ChartHoldNotes}");
             }
             return null;
         }
@@ -112,10 +152,15 @@ namespace KouGamePlugin.Arcaea.Models
         /// </summary>
         public enum RatingClass
         {
+            [KouEnumName("pst")]
             Past,
+            [KouEnumName("prs")]
             Present,
+            [KouEnumName("ftr")]
             Future,
+            [KouEnumName("byd", "byn")]
             Beyond,
+            [KouEnumName("all")]
             Random
         }
 

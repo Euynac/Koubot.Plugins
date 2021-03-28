@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "k1DZ7vpZ3/nYFsZt68IoRP985bbzV2aTz/20NiKnlJSiBqHcG9qYoF4uJJDdI11405J9TWWnJf+NSxKwwmd1zw==",
+  "dgSpecHash": "s1DO+ISG9KCHLW88qjDBE5nyHf2lNPGD1+Qv8tm3gr5NIRKoFjv6QyJNlKqTXTCSM5/gGsoBgihQGvVCTwMJMw==",
   "success": true,
   "projectFilePath": "C:\\Users\\dell\\Desktop\\Project\\LittleKou\\Koubot\\KoubotPlugin\\KouMarketingGenerator\\KouMarketingGenerator.csproj",
   "expectedPackageFiles": [
@@ -18,6 +18,7 @@
     "C:\\Users\\dell\\.nuget\\packages\\microsoft.entityframeworkcore\\3.1.11\\microsoft.entityframeworkcore.3.1.11.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\3.1.11\\microsoft.entityframeworkcore.abstractions.3.1.11.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\microsoft.entityframeworkcore.analyzers\\3.1.11\\microsoft.entityframeworkcore.analyzers.3.1.11.nupkg.sha512",
+    "C:\\Users\\dell\\.nuget\\packages\\microsoft.entityframeworkcore.dynamiclinq\\3.2.7\\microsoft.entityframeworkcore.dynamiclinq.3.2.7.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\microsoft.entityframeworkcore.proxies\\3.1.11\\microsoft.entityframeworkcore.proxies.3.1.11.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\microsoft.entityframeworkcore.relational\\3.1.11\\microsoft.entityframeworkcore.relational.3.1.11.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\microsoft.extensions.caching.abstractions\\3.1.11\\microsoft.extensions.caching.abstractions.3.1.11.nupkg.sha512",
@@ -134,7 +135,8 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\system.xml.xdocument\\4.3.0\\system.xml.xdocument.4.3.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\system.xml.xmldocument\\4.3.0\\system.xml.xmldocument.4.3.0.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\system.xml.xpath\\4.0.1\\system.xml.xpath.4.0.1.nupkg.sha512",
-    "C:\\Users\\dell\\.nuget\\packages\\system.xml.xpath.xmldocument\\4.0.1\\system.xml.xpath.xmldocument.4.0.1.nupkg.sha512"
+    "C:\\Users\\dell\\.nuget\\packages\\system.xml.xpath.xmldocument\\4.0.1\\system.xml.xpath.xmldocument.4.0.1.nupkg.sha512",
+    "C:\\Users\\dell\\.nuget\\packages\\toolgood.words\\3.0.2.4\\toolgood.words.3.0.2.4.nupkg.sha512"
   ],
   "logs": []
 }

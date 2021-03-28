@@ -32,7 +32,7 @@ namespace KouGamePlugin.Arcaea.Models
         [InverseProperty(nameof(PluginArcaeaSong.PluginArcaeaPlayRecord))]
         public virtual PluginArcaeaSong Song { get; set; }
 
-        public override string ToString(FormatType formatType)
+        public override string ToString(FormatType formatType, object supplement = null)
         {
             throw new NotImplementedException();
         }

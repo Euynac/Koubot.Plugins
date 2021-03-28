@@ -21,19 +21,18 @@ namespace KouGamePlugin.Arcaea
     /// <summary>
     /// KouArcaea歌曲数据类
     /// </summary>
-    [KouPluginClass(
+    [KouPluginClass("arcinfo", "[obsolete]Arcaea歌曲数据服务",
         Introduction = "提供歌曲详细信息查询、随机歌曲功能，可限定条件",
         Author = "7zou",
-        ActivateName = "arcinfo",
-        Title = "Arcaea歌曲数据服务",
         PluginType = PluginType.Game)]
+    [Obsolete("已经升级到AutoModel")]
     public class KouArcaeaInfo : KouPlugin, IDisposable
     {
         private readonly KouContext _kouContext = new KouContext();
         #region Kou插件方法
         [KouPluginParameter(Name = "难度类型", ActivateKeyword = "type|class|难度类型", DefaultContent = "future", Help = "指定谱面难度类型")]
         public string RatingClass { get; set; }
-        [KouPluginParameter(ActivateKeyword = "rating|难度", Name = "谱面难度", Help = "指定谱面难度(9、9+、10等)", Attributes = KouParameterAttribute.Multi)]
+        [KouPluginParameter(ActivateKeyword = "rating|难度", Name = "谱面难度", Help = "指定谱面难度(9、9+、10等)")]
         public string Rating { get; set; }
         [KouPluginParameter(ActivateKeyword = "designer|谱师", Name = "谱师", Help = "指定谱面的作者")]
         public string ChartDesigner { get; set; }
@@ -43,17 +42,17 @@ namespace KouGamePlugin.Arcaea
         public string JacketDesigner { get; set; }
         [KouPluginParameter(ActivateKeyword = "name|歌名|曲名", Name = "曲名", Help = "指定歌曲的名字")]
         public string SongName { get; set; }
-        [KouPluginParameter(ActivateKeyword = "const|定数", Name = "定数", Help = "指定谱面定数", Attributes = KouParameterAttribute.Range | KouParameterAttribute.Sort)]
+        [KouPluginParameter(ActivateKeyword = "const|定数", Name = "定数", Help = "指定谱面定数")]
         public string ChartConstant { get; set; }
         [KouPluginParameter(ActivateKeyword = "count", Name = "结果数量", Help = "获取数量，最多20个，详细最多7个")]
         public int Count { get; set; } = -1;
         [KouPluginParameter(ActivateKeyword = "all", Name = "详细", Help = "显示详细")]
         public bool All { get; set; }
-        [KouPluginParameter(ActivateKeyword = "notes", Name = "总键数", Help = "指定键数", Attributes = KouParameterAttribute.Range | KouParameterAttribute.Sort)]
+        [KouPluginParameter(ActivateKeyword = "notes", Name = "总键数", Help = "指定键数")]
         public string NotesCount { get; set; }
-        [KouPluginParameter(ActivateKeyword = "length|time", Name = "歌曲长度", Help = "指定歌曲长度", Attributes = KouParameterAttribute.Sort | KouParameterAttribute.Range)]
+        [KouPluginParameter(ActivateKeyword = "length|time", Name = "歌曲长度", Help = "指定歌曲长度")]
         public string SongLength { get; set; }
-        [KouPluginParameter(ActivateKeyword = "bpm", Name = "BPM", Help = "指定歌曲bpm", Attributes = KouParameterAttribute.Range | KouParameterAttribute.Sort)]
+        [KouPluginParameter(ActivateKeyword = "bpm", Name = "BPM", Help = "指定歌曲bpm")]
         public string SongBPM { get; set; }
 
         /// <summary>
@@ -64,7 +63,7 @@ namespace KouGamePlugin.Arcaea
         [KouPluginFunction(Name = "查询歌曲信息", Help = "<歌曲名/别名[+难度类型]> 默认功能，按照歌曲名查询")]
         public override object Default(string name = null)
         {
-            if (_kouContext.Set<PluginArcaeaSong>().IsNullOrEmptySet()) return "曲库为空";
+            if (_kouContext.Set<PluginArcaeaSong>().IsNullOrEmptySet()) return "曲库为空";//BUG 更新后无法进行判断是否为空
             if (SystemExpand.All(string.IsNullOrWhiteSpace, name, ChartConstant,
                 SongName, SongArtist, ChartDesigner, RatingClass, Rating, NotesCount, JacketDesigner, SongLength,
                 SongBPM)) return "嗯？";
@@ -272,13 +271,13 @@ namespace KouGamePlugin.Arcaea
         {
             if (song == null) return null;
             string info = $"{song.SongTitle} [{song.ChartRatingClass} {song.ChartConstant}]\n" +
-            (SongArtist.IsNullOrWhiteSpace() ? null : song.SongArtist.BeNullOr($"曲师：{song.SongArtist}\n")) +
-            (JacketDesigner.IsNullOrWhiteSpace() ? null : song.JacketDesigner.BeNullOr($"画师：{song.JacketDesigner}\n")) +
-            (SongBPM.IsNullOrWhiteSpace() ? null : song.SongBpm.BeNullOr($"BPM：{song.SongBpm}\n")) +
-            (SongLength.IsNullOrWhiteSpace() ? null : song.SongLength.BeNullOr($"歌曲长度：{ song.SongLength}\n")) +
-            //(song.Song_pack.BeNullOr($"曲包：{song.Song_pack}\n")) +
-            (ChartDesigner.IsNullOrWhiteSpace() ? null : song.ChartDesigner.BeNullOr($"谱师：{song.ChartDesigner}\n")) +
-            (NotesCount.IsNullOrWhiteSpace() ? null : song.ChartAllNotes.BeNullOr($"note总数：{song.ChartAllNotes}\n"));
+            (SongArtist.IsNullOrWhiteSpace() ? null : song.SongArtist?.Be($"曲师：{song.SongArtist}\n")) +
+            (JacketDesigner.IsNullOrWhiteSpace() ? null : song.JacketDesigner?.Be($"画师：{song.JacketDesigner}\n")) +
+            (SongBPM.IsNullOrWhiteSpace() ? null : song.SongBpm?.Be($"BPM：{song.SongBpm}\n")) +
+            (SongLength.IsNullOrWhiteSpace() ? null : song.SongLength?.Be($"歌曲长度：{ song.SongLength}\n")) +
+            //(song.Song_pack?.Be($"曲包：{song.Song_pack}\n")) +
+            (ChartDesigner.IsNullOrWhiteSpace() ? null : song.ChartDesigner?.Be($"谱师：{song.ChartDesigner}\n")) +
+            (NotesCount.IsNullOrWhiteSpace() ? null : song.ChartAllNotes?.Be($"note总数：{song.ChartAllNotes}\n"));
             return info.ToString().Trim();
         }
 
@@ -295,7 +294,7 @@ namespace KouGamePlugin.Arcaea
             {
                 var songs = _kouContext.Set<PluginArcaeaSong>().Where(s => s.SongTitle.Contains(songName) && s.ChartRatingClass == PluginArcaeaSong.RatingClass.Future);
                 if (songs.Count() == 0) return $"找不到是哪个歌叫做{SongName}";
-                if (songs.Count() > 1) return $"具体是指哪首歌可以叫{songAnotherName}？\n{songs.ToPageSetString<PluginArcaeaSong>()}";
+                if (songs.Count() > 1) return $"具体是指哪首歌可以叫{songAnotherName}？\n{songs.ToSetString<PluginArcaeaSong>()}";
                 songEnID = songs.First().SongEnId;
             }
             var allRatingSongs = _kouContext.Set<PluginArcaeaSong>().Where(s => s.SongEnId == songEnID);
@@ -346,7 +345,7 @@ namespace KouGamePlugin.Arcaea
             else if (_kouContext.Set<PluginArcaeaSongAnotherName>().Any(x => x.AnotherName == NameOrID))
             {
                 var names = _kouContext.Set<PluginArcaeaSongAnotherName>().Where(x => x.AnotherName == NameOrID);
-                if (names.Count() > 1) return $"具体是删除哪个？\n{names.ToPageSetString<PluginArcaeaSongAnotherName>()}";
+                if (names.Count() > 1) return $"具体是删除哪个？\n{names.ToSetString<PluginArcaeaSongAnotherName>()}";
                 songAnotherName = names.First();
             }
             else return "我没学过这个的吧";

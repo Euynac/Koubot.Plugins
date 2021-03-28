@@ -21,5 +21,16 @@
             double value = constant + (score - 9500000) / 300000.0;
             return value < 0 ? 0 : value;
         }
+        /// <summary>
+        /// 根据ptt和分数计算谱面定数
+        /// </summary>
+        /// <returns></returns>
+        public static double CalSongChartConstant(double ptt, int score)
+        {
+            if (score >= 10000000) return ptt - 2;
+            else if (score > 9800000) return ptt - (1 + (score - 9800000) / 200000.0);
+            double value = ptt - ((score - 9500000) / 300000.0);
+            return value < 0 ? 0 : value;
+        }
     }
 }

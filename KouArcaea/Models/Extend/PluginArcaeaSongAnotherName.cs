@@ -12,7 +12,7 @@ namespace KouGamePlugin.Arcaea.Models
     /// </summary>
     public partial class PluginArcaeaSongAnotherName : KouAutoModel<PluginArcaeaSongAnotherName>
     {
-        public override string ToString(FormatType format)
+        public override string ToString(FormatType format, object supplement = null)
         {
             switch (format)
             {

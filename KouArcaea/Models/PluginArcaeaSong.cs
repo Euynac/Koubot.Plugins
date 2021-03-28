@@ -1,21 +1,16 @@
-﻿using System;
+﻿using Koubot.SDK.Protocol.AutoModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Koubot.SDK.Protocol.AutoModel;
+
 
 namespace KouGamePlugin.Arcaea.Models
 {
     [Table("plugin_arcaea_song")]
-    [KouAutoModelTable(ActivateName = "song")]
+    [KouAutoModelTable("song", new[] { nameof(KouArcaea) }, Name = "Arcaea歌曲")]
     public partial class PluginArcaeaSong
     {
-        public PluginArcaeaSong()
-        {
-            PluginArcaeaPlayRecord = new HashSet<PluginArcaeaPlayRecord>();
-            PluginArcaeaSong2anothername = new HashSet<PluginArcaeaSong2anothername>();
-        }
-
         [Key]
         [Column("song_id")]
         public int SongId { get; set; }
@@ -24,12 +19,15 @@ namespace KouGamePlugin.Arcaea.Models
         public string SongEnId { get; set; }
         [Column("song_title")]
         [StringLength(500)]
+        [KouAutoModelField(ActivateKeyword = "曲名")]
         public string SongTitle { get; set; }
         [Column("song_artist")]
         [StringLength(200)]
+        [KouAutoModelField(ActivateKeyword = "曲师")]
         public string SongArtist { get; set; }
         [Column("song_bpm")]
         [StringLength(20)]
+        [KouAutoModelField(ActivateKeyword = "bpm", FilterSetting = FilterType.NumericInterval)]
         public string SongBpm { get; set; }
         [Column("song_bpm_base")]
         public double? SongBpmBase { get; set; }
@@ -40,6 +38,7 @@ namespace KouGamePlugin.Arcaea.Models
         [StringLength(255)]
         public string SongBgUrl { get; set; }
         [Column("song_length")]
+        [KouAutoModelField(ActivateKeyword = "长度")]
         public TimeSpan? SongLength { get; set; }
         [Column("song_side")]
         public Side? SongSide { get; set; }
@@ -56,19 +55,24 @@ namespace KouGamePlugin.Arcaea.Models
         [Column("notes_per_second")]
         public double? NotesPerSecond { get; set; }
         [Column("chart_rating_class")]
+        [KouAutoModelField(ActivateKeyword = "难度类别")]
         public RatingClass? ChartRatingClass { get; set; }
         [Column("chart_rating")]
         [StringLength(10)]
+        [KouAutoModelField(ActivateKeyword = "难度")]
         public string ChartRating { get; set; }
         [Column("chart_constant")]
+        [KouAutoModelField(ActivateKeyword = "定数", FilterSetting = FilterType.NumericInterval)]
         public double? ChartConstant { get; set; }
         [Column("chart_designer")]
         [StringLength(200)]
+        [KouAutoModelField(ActivateKeyword = "谱师")]
         public string ChartDesigner { get; set; }
         [Column("plus_fingers", TypeName = "tinyint(1)")]
         public bool? PlusFingers { get; set; }
         [Column("jacket_designer")]
         [StringLength(200)]
+        [KouAutoModelField(ActivateKeyword = "画师")]
         public string JacketDesigner { get; set; }
         [Column("jacket_url")]
         [StringLength(255)]
@@ -93,6 +97,12 @@ namespace KouGamePlugin.Arcaea.Models
         public virtual ICollection<PluginArcaeaPlayRecord> PluginArcaeaPlayRecord { get; set; }
         [InverseProperty("Song")]
         public virtual ICollection<PluginArcaeaSong2anothername> PluginArcaeaSong2anothername { get; set; }
+        public PluginArcaeaSong()
+        {
+            PluginArcaeaPlayRecord = new HashSet<PluginArcaeaPlayRecord>();
+            PluginArcaeaSong2anothername = new HashSet<PluginArcaeaSong2anothername>();
+        }
+
 
     }
 }

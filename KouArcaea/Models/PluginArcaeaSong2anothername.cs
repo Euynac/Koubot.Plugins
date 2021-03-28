@@ -9,7 +9,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace KouGamePlugin.Arcaea.Models
 {
     [Table("plugin_arcaea_song2anothername")]
-    [KouAutoModelTable(IsEnabled = false)]
     public partial class PluginArcaeaSong2anothername : KouAutoModel<PluginArcaeaSong2anothername>
     {
         [Key]
@@ -26,7 +25,7 @@ namespace KouGamePlugin.Arcaea.Models
         [InverseProperty(nameof(PluginArcaeaSong.PluginArcaeaSong2anothername))]
         public virtual PluginArcaeaSong Song { get; set; }
 
-        public override string ToString(FormatType formatType)
+        public override string ToString(FormatType formatType, object supplement = null)
         {
             throw new NotImplementedException();
         }

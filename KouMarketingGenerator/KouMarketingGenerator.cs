@@ -8,11 +8,9 @@ namespace KouFunctionPlugin
     /// <summary>
     /// Kou营销号生成器
     /// </summary>
-    [KouPluginClass(
+    [KouPluginClass("yingxiao", "营销号生成器",
         Introduction = "营销号生成器\n使用方法：<主体> <事件> <另一种说法>",
         Author = "7zou",
-        ActivateName = "yingxiao",
-        Title = "营销号生成器",
         PluginType = PluginType.Function)]
     public class KouMarketingGenerator : KouPlugin
     {
@@ -22,10 +20,10 @@ namespace KouFunctionPlugin
             "大家有什么想法呢，欢迎在评论区告诉小编一起讨论哦！"
         };
 
-        [KouPluginFunction(Name = "营销号话术生成", Help = "<主体> <事件> <另一种说法>")]
-        public string Default([KouPluginArgument(Name = "主体")]string main, 
-            [KouPluginArgument(Name = "事件")]string events, 
-            [KouPluginArgument(Name = "另一种说法")]string anotherEvent)
+        [KouPluginFunction(Name = "营销号话术生成")]
+        public string Default([KouPluginArgument(Name = "主体")] string main,
+            [KouPluginArgument(Name = "事件")] string events,
+            [KouPluginArgument(Name = "另一种说法")] string anotherEvent)
         {
             if (string.IsNullOrWhiteSpace(main) || string.IsNullOrWhiteSpace(events) || string.IsNullOrWhiteSpace(anotherEvent)) return "使用方法：<主体> <事件> <另一种说法>";
             return Generate(main, events, anotherEvent);

@@ -5,26 +5,21 @@ using Koubot.SDK.Services;
 using Koubot.Tool.Expand;
 using Koubot.Tool.General;
 using Koubot.Tool.Random;
-using Koubot.Tool.String;
 using Koubot.Tool.Web;
 using System;
 using System.Text;
+using ToolGood.Words;
 using static Koubot.SDK.API.BaiduTranslateAPI;
 using static Koubot.SDK.Protocol.KouEnum;
 
 namespace KouFunctionPlugin
 {
-    [KouPluginClass(
+    [KouPluginClass("trans|翻译|translate", "翻译器",
         Introduction = "提供多种翻译、转换功能",
         Author = "7zou",
-        ActivateName = "trans|翻译|translate",
-        Title = "翻译器",
         PluginType = PluginType.Function)]
-    public class KouTranslator : KouPlugin, IKouError
+    public class KouTranslator : KouPlugin
     {
-        //维持，你说一句机器人翻译一句
-        public bool Sustain { get; set; }
-
         [KouPluginParameter(ActivateKeyword = "l", Name = "英文转小写", Help = "返回的结果中的英文全部转为大写小写")]
         public bool Lower { get; set; } = false;
         [KouPluginParameter(ActivateKeyword = "u", Name = "英文转大写", Help = "返回的结果中的英文全部转为大写")]
@@ -43,15 +38,22 @@ namespace KouFunctionPlugin
         [KouPluginParameter(ActivateKeyword = "带空格", Name = "说 话 带 空 格", Help = "返回的结果中字符间带空格")]
         public bool SpeakWithWhiteSpace { get; set; }
 
+        [KouPluginParameter(ActivateKeyword = "逆序", Name = "逆序", Help = "逆序输出结果，默认从尾到头逆序，赋值row按行逆序",
+            DefaultContent = "all")]
+        public string Reverse { get; set; }
+        [KouPluginParameter(ActivateKeyword = "简体", Name = "转简体")]
+        public bool ToSimplifiedChinese { get; set; }
+        [KouPluginParameter(ActivateKeyword = "繁体", Name = "转简体")]
+        public bool ToTraditionalChinese { get; set; }
+        [KouPluginParameter(ActivateKeyword = "拼音", Name = "转拼音", Help = "带声调赋值tone", DefaultContent = "")]
+        public string ToPinyin { get; set; }
+        [KouPluginParameter(ActivateKeyword = "首拼音", Name = "转首字母拼音")]
+        public bool ToFirstPinyin { get; set; }
 
-        [KouPluginFunction(Help = "默认翻译")]
+        [KouPluginFunction(Help = "基本复述", SupportedParameters = new []{nameof(Lower), nameof(From), nameof(To), nameof(Upper), nameof(Reverse), nameof(ToTraditionalChinese), nameof(ToPinyin), nameof(ToFirstPinyin), nameof(ToSimplifiedChinese), nameof(SpeakWithWhiteSpace)})]
         public override object Default(string str = null)
         {
             if (str.IsNullOrWhiteSpace()) return null;
-            if (Lower)
-            {
-                str = str.ToLower();
-            }
             Language fromLanguage = Language.auto, toLanguage = Language.zh;
             bool translateFlag = false; //指示是否需要翻译语言
             if (!string.IsNullOrWhiteSpace(From))
@@ -205,13 +207,13 @@ namespace KouFunctionPlugin
         [KouPluginFunction(ActivateKeyword = "转繁体|fanti", Help = "转繁体")]
         public string ToTraditional(string str = null)
         {
-            return ResultPipe(StringTool.ToTraditional(str));
+            return ResultPipe(WordsHelper.ToTraditionalChinese(str));
         }
 
         [KouPluginFunction(ActivateKeyword = "转简体|jianti", Help = "转简体")]
         public string ToSimplified(string str = null)
         {
-            return ResultPipe(StringTool.ToSimplified(str));
+            return ResultPipe(WordsHelper.ToSimplifiedChinese(str));
         }
 
         [KouPluginFunction(ActivateKeyword = "转全角", Help = "转全角")]
@@ -262,18 +264,19 @@ namespace KouFunctionPlugin
             }
             return str.ToUnixTimeStamp(timeStampType).ToString();
         }
-        [KouPluginFunction(ActivateKeyword = "转秒数", Help = "将输入的时间转换为对应秒数")]
-        public string ToTotalSecond(string time)
+        [KouPluginFunction(ActivateKeyword = "转秒数", Help = "将输入的时间转换为对应秒数，-to可以相应使用分钟、小时、天数")]
+        public string ToTotalSecond(TimeSpan time)
         {
-            if (time.IsNullOrWhiteSpace()) return 0.ToString();
-            TimeSpan timeSpan = new TimeSpan();
-            if (time.TryGetTimeSpan(out TimeSpan timeSpanFormal, false)) timeSpan += timeSpanFormal;
-            if (ZhNumber.IsContainZhNumber(time)) time = ZhNumber.ToArabicNumber(time);
-            if (KouStringTool.TryGetTimeSpanFromStr(time, out TimeSpan timeSpanModern)) timeSpan += timeSpanModern;
-            if (KouStringTool.TryGetTimeSpanFromAncientStr(time, out TimeSpan timeSpanAncient)) timeSpan += timeSpanAncient;
-            return timeSpan.TotalSeconds.ToString();
+            if (To.EqualsAny("min", "分钟")) return time.TotalMinutes.ToString();
+            if (To.EqualsAny("hour", "小时")) return time.TotalHours.ToString();
+            if (To.EqualsAny("day", "天数")) return time.TotalDays.ToString();
+            return time.TotalSeconds.ToString();
         }
-
+        [KouPluginFunction(ActivateKeyword = "转人民币", Help = "将输入的数字转中文大写")]
+        public string ToChineseRMB(double number)
+        {
+            return ResultPipe(WordsHelper.ToChineseRMB(number));
+        }
         /// <summary>
         /// 结果管道
         /// </summary>
@@ -282,13 +285,55 @@ namespace KouFunctionPlugin
         public string ResultPipe(string result)
         {
             if (result.IsNullOrWhiteSpace()) return result;
+            if (Reverse == "all") result = ReverseStr(result);
+            else if (Reverse == "row") result = ReverseStr(result, true);
+            if (WordsHelper.HasChinese(result))
+            {
+                if (ToTraditionalChinese) result = WordsHelper.ToTraditionalChinese(result);
+                else if (ToSimplifiedChinese) result = WordsHelper.ToSimplifiedChinese(result);
+                else if (ToPinyin != null)
+                {
+                    result =
+                        WordsHelper.GetPinyin(result, ToPinyin.Equals("tone", StringComparison.OrdinalIgnoreCase));
+                }
+                else if (ToFirstPinyin) result = WordsHelper.GetFirstPinyin(result)?.ToLower();
+            }
             if (Lower)
-                result = result.ToLower();
+                result = result?.ToLower();
             else if (Upper)
-                result = result.ToUpper();
+                result = result?.ToUpper();
             if (SpeakWithWhiteSpace)
                 result = ToSpeakWithWhiteSpace(result);
             return result;
+        }
+        /// <summary>
+        /// 反转字符串
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public string ReverseStr(string input, bool row = false)
+        {
+            if (input.IsNullOrWhiteSpace()) return input;
+            if (row)
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+                foreach (var s in input.Split('\n', '\r'))
+                {
+                    stringBuilder.Append(ReverseStr(s));
+                    stringBuilder.Append("\n");
+                }
+
+                return stringBuilder.ToString();
+            }
+
+            StringBuilder stringBuilder2 = new StringBuilder();
+            for (int i = input.Length - 1; i >= 0; i--)
+            {
+                stringBuilder2.Append(input[i]);
+            }
+
+            return stringBuilder2.ToString();
         }
         /// <summary>
         /// 每个字符间都带空格

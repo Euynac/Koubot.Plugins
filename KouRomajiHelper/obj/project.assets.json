@@ -194,6 +194,19 @@
           "lib/netstandard2.0/_._": {}
         }
       },
+      "Microsoft.EntityFrameworkCore.DynamicLinq/3.2.7": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "3.1.0",
+          "System.Linq.Dynamic.Core": "1.2.7"
+        },
+        "compile": {
+          "lib/netstandard2.0/Microsoft.EntityFrameworkCore.DynamicLinq.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.EntityFrameworkCore.DynamicLinq.dll": {}
+        }
+      },
       "Microsoft.EntityFrameworkCore.Proxies/3.1.11": {
         "type": "package",
         "dependencies": {
@@ -2065,19 +2078,30 @@
           "lib/netstandard1.3/System.Xml.XPath.XmlDocument.dll": {}
         }
       },
+      "ToolGood.Words/3.0.2.4": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.1/ToolGood.Words.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/ToolGood.Words.dll": {}
+        }
+      },
       "Koubot.SDK/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
           "Autofac": "6.1.0",
           "DeepCloner": "0.10.2",
-          "Koubot.Tool": "1.0.2",
+          "Koubot.Tool": "1.0.4",
           "Microsoft.EntityFrameworkCore": "3.1.11",
+          "Microsoft.EntityFrameworkCore.DynamicLinq": "3.2.7",
           "Microsoft.EntityFrameworkCore.Proxies": "3.1.11",
           "Microsoft.EntityFrameworkCore.Relational": "3.1.11",
           "MySql.Data.EntityFrameworkCore": "8.0.22",
           "Newtonsoft.Json": "12.0.3",
-          "System.Linq.Dynamic.Core": "1.2.7"
+          "System.Linq.Dynamic.Core": "1.2.7",
+          "ToolGood.Words": "3.0.2.4"
         },
         "compile": {
           "bin/placeholder/Koubot.SDK.dll": {}
@@ -2086,7 +2110,7 @@
           "bin/placeholder/Koubot.SDK.dll": {}
         }
       },
-      "Koubot.Tool/1.0.2": {
+      "Koubot.Tool/1.0.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "compile": {
@@ -2415,6 +2439,20 @@
         "lib/netstandard2.0/_._",
         "microsoft.entityframeworkcore.analyzers.3.1.11.nupkg.sha512",
         "microsoft.entityframeworkcore.analyzers.nuspec"
+      ]
+    },
+    "Microsoft.EntityFrameworkCore.DynamicLinq/3.2.7": {
+      "sha512": "Fz+Ke++6zBwBqrAbKdiGZr2lf39OtFvnoyTfrAwMtad9rswmtWOs0GwjFCEyyyeb7uQ2UeGpT5qeYn44AdZllw==",
+      "type": "package",
+      "path": "microsoft.entityframeworkcore.dynamiclinq/3.2.7",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/Microsoft.EntityFrameworkCore.DynamicLinq.dll",
+        "lib/netstandard2.0/Microsoft.EntityFrameworkCore.DynamicLinq.pdb",
+        "lib/netstandard2.0/Microsoft.EntityFrameworkCore.DynamicLinq.xml",
+        "microsoft.entityframeworkcore.dynamiclinq.3.2.7.nupkg.sha512",
+        "microsoft.entityframeworkcore.dynamiclinq.nuspec"
       ]
     },
     "Microsoft.EntityFrameworkCore.Proxies/3.1.11": {
@@ -7057,12 +7095,30 @@
         "system.xml.xpath.xmldocument.nuspec"
       ]
     },
+    "ToolGood.Words/3.0.2.4": {
+      "sha512": "F64G0iAKXPsaVv1GVmTgUCgX1Rk+XKueWRhLL7UHGrqTgVc7FZkHj7lQzszQ1RjNKMQ9JBpC18QrHTMxGg6u8g==",
+      "type": "package",
+      "path": "toolgood.words/3.0.2.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "lib/net40/ToolGood.Words.dll",
+        "lib/net40/ToolGood.Words.xml",
+        "lib/netstandard2.0/ToolGood.Words.dll",
+        "lib/netstandard2.0/ToolGood.Words.xml",
+        "lib/netstandard2.1/ToolGood.Words.dll",
+        "lib/netstandard2.1/ToolGood.Words.xml",
+        "toolgood.words.3.0.2.4.nupkg.sha512",
+        "toolgood.words.nuspec"
+      ]
+    },
     "Koubot.SDK/1.0.0": {
       "type": "project",
       "path": "../../Koubot.SDK/Koubot.SDK.csproj",
       "msbuildProject": "../../Koubot.SDK/Koubot.SDK.csproj"
     },
-    "Koubot.Tool/1.0.2": {
+    "Koubot.Tool/1.0.4": {
       "type": "project",
       "path": "../../Koubot.Tool/Koubot.Tool.csproj",
       "msbuildProject": "../../Koubot.Tool/Koubot.Tool.csproj"
@@ -7134,7 +7190,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.102\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }
