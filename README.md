@@ -10,9 +10,7 @@ Koubot是基于.NET（C#）的跨平台插件式聊天机器人框架，支持�
 
 目前未开放服务端下载，且适配器也仅适配了QQ平台（Mirai）。未来将会开放相应服务端+平台适配器微服务程序下载，在自己的服务器启动上并选用安装所需要的插件，就可以得到属于自己的机器人了。
 
-## 目录
 
-[TOC]
 
 ## 开发教程
 
@@ -303,3 +301,10 @@ See: https://docs.microsoft.com/en-us/dotnet/standard/assembly/reference-assembl
 <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 ```
 
+
+
+## 鸣谢/引用
+
+[miraiQQ 机器人](https://github.com/mamoe/mirai)
+
+[「能不能好好说话？」拼音首字母缩写翻译工具](https://github.com/itorr/nbnhhsh)
