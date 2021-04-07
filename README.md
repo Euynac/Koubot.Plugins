@@ -106,7 +106,7 @@ VS新建一个.NET 5类库项目（编译出来是.dll），从nuget上搜索Kou
 
 > 可以设置私人alias、群组alias与全局alias。（具体看使用文档）
 
-写好的插件还支持各种内置参数，如自动生成相应帮助的`/cal add --help` 、延时10分钟执行1+1`/cal add 1 1 --sleep 10min` （详见[Koubot使用文档](Koubot 使用文档.md)的内置参数章节）
+写好的插件还支持各种内置参数，如自动生成相应帮助的`/cal add --help` 、延时10分钟执行1+1`/cal add 1 1 --sleep 10min` （详见[Koubot使用文档](Koubot使用文档.md)的内置参数章节）
 
 
 
