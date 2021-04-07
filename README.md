@@ -61,16 +61,16 @@ VS新建一个.NET 5类库项目（编译出来是.dll），从nuget上搜索Kou
 如果要实现命令`/cal add 5 10`或`/cal a 5 10`返回结果为15
 
 ```c#
-[KouPluginClass("cal", "计算器")]
+	[KouPluginClass("cal", "计算器")]//设置插件激活名为cal
     public class KouCalculator : KouPlugin
     {
-		[KouPluginFunction(ActivateKeyword = "add|a")]
-        public int KouAddAlias(int a, int b)
+		[KouPluginFunction(ActivateKeyword = "add|a")]//设置功能激活名为add或a
+        public int KouAddAlias(int a, int b)//接收两个整型参数（自动转换输入的stirng到int）
         {
            return a + b;
         }
 
-        [KouPluginFunction(Help = "默认功能，如果/cal str str，则str str会传入该方法")]
+        [KouPluginFunction(Help = "默认功能，如果/cal str str，则'str str'会传入该方法")]
         public override object Default(string str = null)
         {
            return new EventPluginHelp();//返回自动生成的插件帮助
@@ -106,7 +106,7 @@ VS新建一个.NET 5类库项目（编译出来是.dll），从nuget上搜索Kou
 
 > 可以设置私人alias、群组alias与全局alias。（具体看使用文档）
 
-写好的插件还支持各种内置参数，如延时10分钟执行1+1`/cal add 1 1 --sleep 10min` （详见[Koubot使用文档](.\Koubot 使用文档)的内置参数章节）
+写好的插件还支持各种内置参数，如自动生成相应帮助的`/cal add --help` 、延时10分钟执行1+1`/cal add 1 1 --sleep 10min` （详见[Koubot使用文档](Koubot 使用文档)的内置参数章节）
 
 
 
