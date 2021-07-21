@@ -12,7 +12,7 @@ namespace KouFunctionPlugin.Romaji.Models
 {
     [KouAutoModelTable("list", new[] { nameof(KouRomajiHelper) }, Name = "罗马音-中文谐音表")]
     [Table("plugin_romaji_pair")]
-    public partial class PluginRomajiPair : KouAutoModel<PluginRomajiPair>
+    public partial class RomajiPair : KouFullAutoModel<RomajiPair>
     {
         [Column("id")]
         [KouAutoModelField(IsPrimaryKey = true,
@@ -35,12 +35,11 @@ namespace KouFunctionPlugin.Romaji.Models
         }
 
 
-        public override Action<EntityTypeBuilder<PluginRomajiPair>> ModelSetup()
+        public override Action<EntityTypeBuilder<RomajiPair>> ModelSetup()
         {
             return entity =>
             {
                 entity.HasIndex(e => e.RomajiKey)
-                    .HasName("romaji_key")
                     .IsUnique();
             };
         }

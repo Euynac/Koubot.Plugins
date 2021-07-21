@@ -7,17 +7,21 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace KouGamePlugin.Maimai.Models
 {
     [Table("plugin_maimai_song")]
-    [KouAutoModelTable("song", new[] { nameof(KouMaimai) }, Name = "Maimai歌曲", Help = "当前表版本1.0.1 C + 萌娘wiki + 日服数据")]
-    public partial class PluginMaimaiSong
+    [KouAutoModelTable("song", 
+        new[] { nameof(KouMaimai) }, 
+        Name = "Maimai歌曲", 
+        Help = "萌娘wiki + 日服数据")]
+    public partial class MaiSong
     {
         [Key]
         [Column("song_id")]
         [KouAutoModelField(ActivateKeyword = "id", UnsupportedActions = AutoModelActions.CannotAlter)]
         public int SongId { get; set; }
-
+        [Column("song_title_kana")]
+        public string SongTitleKaNa { get; set; }
         [Column("song_title")]
         [StringLength(500)]
-        [KouAutoModelField(ActivateKeyword = "曲名")]
+        [KouAutoModelField(ActivateKeyword = "曲名", Features = AutoModelFieldFeatures.IsDefaultField)]
         public string SongTitle { get; set; }
         [Column("song_artist")]
         [StringLength(200)]
@@ -25,10 +29,11 @@ namespace KouGamePlugin.Maimai.Models
         public string SongArtist { get; set; }
         [Column("song_bpm")]
         [StringLength(20)]
+        [KouAutoModelField(ActivateKeyword = "bpm")]
         public string SongBpm { get; set; }
 
         [Column("song_genre")]
-        [KouAutoModelField(ActivateKeyword = "分类")]
+        [KouAutoModelField(ActivateKeyword = "旧分类")]
         public string SongGenre { get; set; }
         [Column("song_type")]
         [StringLength(20)]
@@ -60,7 +65,7 @@ namespace KouGamePlugin.Maimai.Models
         public string ChartRemasterRating { get; set; }
         [Column("chart_remaster_constant")]
         public double? ChartRemasterConstant { get; set; }
-
+        [KouAutoModelField(ActivateKeyword = "版本")]
         [Column("version")]
         public string Version { get; set; }
         [Column("date")]
@@ -71,7 +76,7 @@ namespace KouGamePlugin.Maimai.Models
         [KouAutoModelField(ActivateKeyword = "注|评论")]
         public string Remark { get; set; }
 
-        #region Splash版本 （暂时隐藏）
+        #region Splash版本
 
         [Column("splash_chart_easy_rating")]
         public string SplashChartEasyRating { get; set; }
@@ -97,6 +102,7 @@ namespace KouGamePlugin.Maimai.Models
         public string SplashChartRemasterRating { get; set; }
         [Column("splash_chart_remaster_constant")]
         public double? SplashChartRemasterConstant { get; set; }
+        [KouAutoModelField(ActivateKeyword = "分类")]
         [Column("song_genre_splash")]
         public string SongGenreSplash { get; set; }
         #endregion

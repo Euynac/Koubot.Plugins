@@ -12,7 +12,7 @@ namespace KouFunctionPlugin
         Introduction = "营销号生成器\n使用方法：<主体> <事件> <另一种说法>",
         Author = "7zou",
         PluginType = PluginType.Function)]
-    public class KouMarketingGenerator : KouPlugin
+    public class KouMarketingGenerator : KouPlugin<KouMarketingGenerator>
     {
         private static readonly List<string> Ends = new List<string>()
         {
@@ -29,10 +29,6 @@ namespace KouFunctionPlugin
             return Generate(main, events, anotherEvent);
         }
 
-        public override object Default(string str = null)
-        {
-            return null;
-        }
 
         public string Generate(string main, string events, string anotherEvent)
         {

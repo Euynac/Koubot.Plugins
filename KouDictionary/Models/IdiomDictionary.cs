@@ -7,7 +7,7 @@ namespace KouFunctionPlugin.Models
 {
     [Table("plugin_idiom_dict")]
     [KouAutoModelTable("idiom", new[] { nameof(KouDictionary) }, Name = "成语词典")]
-    public partial class PluginIdiomDictionary
+    public partial class IdiomDictionary
     {
 
         [Key]
@@ -18,7 +18,10 @@ namespace KouFunctionPlugin.Models
         [Key]
         [Column("word")]
         [StringLength(255)]
-        [KouAutoModelField(ActivateKeyword = "word", FilterSetting = FilterType.Fuzzy)]
+        [KouAutoModelField(
+            ActivateKeyword = "word",
+            FilterSetting = FilterType.Fuzzy,
+            Features = AutoModelFieldFeatures.IsDefaultField)]
         public string Word { get; set; }
 
         [Column("derivation")]

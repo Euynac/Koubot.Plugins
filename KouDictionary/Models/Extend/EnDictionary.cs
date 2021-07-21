@@ -6,20 +6,26 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
+using Koubot.Tool.Extensions;
 
 namespace KouFunctionPlugin.Models
 {
-    public partial class PluginEnDictionary : KouAutoModel<PluginEnDictionary>
+    public partial class EnDictionary : KouFullAutoModel<EnDictionary>
     {
-        public override KouMessage ReplyOnFailingToSearch()
+        protected override KouMessage ReplyOnFailingToSearch()
         {
             return "未找到符合条件的单词";
         }
-
         public override string GetAutoCitedSupplement(List<string> citedFieldNames)
         {
-            return $"{citedFieldNames.ContainsReturnCustomOrNull(nameof(Population), $"\n   词频：{Population}")}";
+            return $"{citedFieldNames.BeIfContains(nameof(Population), $"\n   词频：{Population}")}";
         }
+
+        public override Action<EntityTypeBuilder<EnDictionary>> ModelSetup()
+        {
+            return builder => builder.HasKey(p => p.Word);
+        }
+
         public override string ToString(FormatType format, object supplement = null)
         {
             switch (format)
@@ -33,17 +39,5 @@ namespace KouFunctionPlugin.Models
             }
             return null;
         }
-
-        public override Action<EntityTypeBuilder<PluginEnDictionary>> ModelSetup()
-        {
-            return entity =>
-            {
-                entity.HasKey(e => e.Word)
-                    .HasName("PRIMARY");
-            };
-        }
-
-
-
     }
 }

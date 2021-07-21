@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace KouGamePlugin.Arcaea.Models
 {
     [Table("plugin_arcaea_play_record")]
-    public partial class PluginArcaeaPlayRecord : KouAutoModel<PluginArcaeaPlayRecord>
+    public partial class PlayRecord : KouFullAutoModel<PlayRecord>
     {
         [Key]
         [Column("id")]
@@ -29,27 +29,23 @@ namespace KouGamePlugin.Arcaea.Models
         public double? PlayTp { get; set; }
 
         [ForeignKey(nameof(SongId))]
-        [InverseProperty(nameof(PluginArcaeaSong.PluginArcaeaPlayRecord))]
-        public virtual PluginArcaeaSong Song { get; set; }
+        [InverseProperty(nameof(Models.Song.PluginArcaeaPlayRecord))]
+        public virtual Song Song { get; set; }
 
         public override string ToString(FormatType formatType, object supplement = null)
         {
             throw new NotImplementedException();
         }
 
-        public override Action<EntityTypeBuilder<PluginArcaeaPlayRecord>> ModelSetup()
+        public override Action<EntityTypeBuilder<PlayRecord>> ModelSetup()
         {
             return entity =>
             {
-                entity.HasIndex(e => e.SongId)
-                    .HasName("song_id");
-
-                entity.Property(e => e.UserId).IsUnicode(false);
+                entity.HasIndex(e => e.SongId);
 
                 entity.HasOne(d => d.Song)
                     .WithMany(p => p.PluginArcaeaPlayRecord)
-                    .HasForeignKey(d => d.SongId)
-                    .HasConstraintName("plugin_arcaea_play_record_ibfk_1");
+                    .HasForeignKey(d => d.SongId);
             };
         }
     }

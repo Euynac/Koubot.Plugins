@@ -2,7 +2,6 @@
 using Koubot.SDK.Models.Entities;
 using Koubot.SDK.Protocol;
 using Koubot.SDK.Services;
-using Koubot.Tool.Expand;
 using Koubot.Tool.Web;
 using Koubot.Tool.Web.RateLimiter;
 using KouFunctionPlugin.Romaji.Models;
@@ -10,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Xml;
+using Koubot.SDK.Tool;
+using Koubot.Tool.Extensions;
 
 namespace KouRomajiHelper
 {
@@ -20,13 +21,12 @@ namespace KouRomajiHelper
     {
         private static Dictionary<string, string> RomajiToZhDict;
         public readonly KouContext kouContext = new KouContext();
-
         public RomajiHelper()
         {
             if (RomajiToZhDict == null)
             {
                 RomajiToZhDict = new Dictionary<string, string>();
-                foreach (var pluginRomajiPair in kouContext.Set<PluginRomajiPair>().ToList())
+                foreach (var pluginRomajiPair in kouContext.Set<RomajiPair>().ToList())
                 {
                     RomajiToZhDict.Add(pluginRomajiPair.RomajiKey, pluginRomajiPair.ZhValue);
                 }
@@ -46,7 +46,7 @@ namespace KouRomajiHelper
         /// <returns></returns>
         public bool DeletePair(int id)
         {
-            var pair = kouContext.Set<PluginRomajiPair>().SingleOrDefault(x => x.Id == id);
+            var pair = kouContext.Set<RomajiPair>().SingleOrDefault(x => x.Id == id);
             if (pair == null) return false;
             kouContext.Remove(pair);
             RomajiToZhDict.Remove(pair.RomajiKey);
@@ -62,14 +62,14 @@ namespace KouRomajiHelper
         /// <returns></returns>
         public bool AddPair(string key, string value, out string sqlValue, out int id)
         {
-            var pair = kouContext.Set<PluginRomajiPair>().SingleOrDefault(x => x.RomajiKey == key);
+            var pair = kouContext.Set<RomajiPair>().SingleOrDefault(x => x.RomajiKey == key);
             if (pair == null)
             {
-                PluginRomajiPair pluginRomajiPair = new PluginRomajiPair { RomajiKey = key, ZhValue = value };
-                kouContext.Add(pluginRomajiPair);
+                RomajiPair romajiPair = new RomajiPair { RomajiKey = key, ZhValue = value };
+                kouContext.Add(romajiPair);
                 bool result = kouContext.SaveChanges() > 0;
                 if (result) RomajiToZhDict.Add(key, value);
-                id = pluginRomajiPair.Id;
+                id = romajiPair.Id;
                 sqlValue = key;
                 return result;
             }

@@ -2,12 +2,13 @@
 using Koubot.SDK.Interface;
 using Koubot.SDK.Protocol.Plugin;
 using Koubot.SDK.Services;
-using Koubot.Tool.Expand;
 using Koubot.Tool.General;
 using Koubot.Tool.Random;
 using Koubot.Tool.Web;
 using System;
 using System.Text;
+using Koubot.SDK.Tool;
+using Koubot.Tool.Extensions;
 using ToolGood.Words;
 using static Koubot.SDK.API.BaiduTranslateAPI;
 using static Koubot.SDK.Protocol.KouEnum;
@@ -18,7 +19,7 @@ namespace KouFunctionPlugin
         Introduction = "提供多种翻译、转换功能",
         Author = "7zou",
         PluginType = PluginType.Function)]
-    public class KouTranslator : KouPlugin
+    public class KouTranslator : KouPlugin<KouTranslator>
     {
         [KouPluginParameter(ActivateKeyword = "l", Name = "英文转小写", Help = "返回的结果中的英文全部转为大写小写")]
         public bool Lower { get; set; } = false;
@@ -240,11 +241,11 @@ namespace KouFunctionPlugin
             {
                 return DateTime.Now.ToString();
             }
-            TimeStampType timeStampType = TimeStampType.Unix;
+            TimeExtensions.TimeStampType timeStampType = TimeExtensions.TimeStampType.Unix;
             if (!Type.IsNullOrWhiteSpace())
             {
                 if (str.Equals("js", StringComparison.OrdinalIgnoreCase) || str.Equals("javascript", StringComparison.OrdinalIgnoreCase))
-                    timeStampType = TimeStampType.Javascript;
+                    timeStampType = TimeExtensions.TimeStampType.Javascript;
             }
             return str.ToDateTime(timeStampType).ToString();
         }
@@ -256,11 +257,11 @@ namespace KouFunctionPlugin
             {
                 return DateTime.Now.ToTimeStamp().ToString();
             }
-            TimeStampType timeStampType = TimeStampType.Unix;
+            TimeExtensions.TimeStampType timeStampType = TimeExtensions.TimeStampType.Unix;
             if (!Type.IsNullOrWhiteSpace())
             {
                 if (str.Equals("js", StringComparison.OrdinalIgnoreCase) || str.Equals("javascript", StringComparison.OrdinalIgnoreCase))
-                    timeStampType = TimeStampType.Javascript;
+                    timeStampType = TimeExtensions.TimeStampType.Javascript;
             }
             return str.ToUnixTimeStamp(timeStampType).ToString();
         }

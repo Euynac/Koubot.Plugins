@@ -1,9 +1,10 @@
 ﻿using Koubot.SDK.Protocol.Plugin;
 using Koubot.SDK.Services;
-using Koubot.Tool.Expand;
 using KouFunctionPlugin.Romaji.Models;
 using KouRomajiHelper;
 using System.Linq;
+using Koubot.SDK.Tool;
+using Koubot.Tool.Extensions;
 using static Koubot.SDK.Protocol.KouEnum;
 
 namespace KouFunctionPlugin.Romaji
@@ -15,7 +16,7 @@ namespace KouFunctionPlugin.Romaji
         Introduction = "罗马音助手",
         Author = "7zou",
         PluginType = PluginType.Function)]
-    public class KouRomajiHelper : KouPlugin
+    public class KouRomajiHelper : KouPlugin<KouRomajiHelper>
     {
         [KouPluginParameter(ActivateKeyword = "all", Help = "输出带原日文")]
         public bool All { get; set; }
@@ -73,7 +74,7 @@ namespace KouFunctionPlugin.Romaji
         {
             if (!int.TryParse(idStr, out int id))
             {
-                var pair = romajiHelper.kouContext.Set<PluginRomajiPair>().SingleOrDefault(x => x.RomajiKey == idStr);
+                var pair = romajiHelper.kouContext.Set<RomajiPair>().SingleOrDefault(x => x.RomajiKey == idStr);
                 if (pair != null)
                 {
                     id = pair.Id;
@@ -81,7 +82,7 @@ namespace KouFunctionPlugin.Romaji
             }
             if (id != 0)
             {
-                var pair = romajiHelper.kouContext.Set<PluginRomajiPair>().SingleOrDefault(x => x.Id == id);
+                var pair = romajiHelper.kouContext.Set<RomajiPair>().SingleOrDefault(x => x.Id == id);
                 if (romajiHelper.DeletePair(id))
                 {
                     return $"我好像忘了{pair.RomajiKey}读{pair.ZhValue}";

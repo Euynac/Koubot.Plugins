@@ -7,12 +7,16 @@ namespace KouFunctionPlugin.Models
 {
     [Table("plugin_en_dict")]
     [KouAutoModelTable("en", new[] { nameof(KouDictionary) }, Name = "英文词典")]
-    public partial class PluginEnDictionary
+    public partial class EnDictionary
     {
         [Key]
         [Column("word")]
         [StringLength(25)]
-        [KouAutoModelField(ActivateKeyword = "word", FilterSetting = FilterType.IgnoreCase)]
+        [KouAutoModelField(
+            ActivateKeyword = "word",
+            FilterSetting = FilterType.IgnoreCase |
+                            FilterType.DisableLike,
+            Features = AutoModelFieldFeatures.IsDefaultField)]
         public string Word { get; set; }
 
         [Column("uk_pron")]

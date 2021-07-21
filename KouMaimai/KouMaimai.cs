@@ -13,7 +13,7 @@ namespace KouGamePlugin.Maimai
         Author = "7zou",
         PluginType = PluginType.Game,
         CanUseProxy = true)]
-    public class KouMaimai : KouPlugin, IWantKouMessage
+    public class KouMaimai : KouPlugin<KouMaimai>, IWantKouMessage
     {
         public KouMessage Message { get; set; }
         [KouPluginFunction]

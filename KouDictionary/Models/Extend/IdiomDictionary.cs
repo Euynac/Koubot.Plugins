@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
-using Koubot.Tool.Expand;
+using Koubot.Tool.Extensions;
 
 namespace KouFunctionPlugin.Models
 {
-    public partial class PluginIdiomDictionary : KouAutoModel<PluginIdiomDictionary>
+    public partial class IdiomDictionary : KouFullAutoModel<IdiomDictionary>
     {
         public override bool IsTheItemID(int id)
         {
@@ -22,17 +22,17 @@ namespace KouFunctionPlugin.Models
             return true;
         }
 
-        public override KouMessage ReplyOnFailingToSearch()
+        protected override KouMessage ReplyOnFailingToSearch()
         {
             return "未找到符合条件的成语";
         }
 
         public override string GetAutoCitedSupplement(List<string> citedFieldNames)
         {
-            return $"{citedFieldNames.ContainsReturnCustomOrNull(nameof(Derivation), $"\n   来源：{Derivation}")}" + 
-                   $"{citedFieldNames.ContainsReturnCustomOrNull(nameof(Pinyin), $"\n   拼音：{Pinyin}")}" + 
-                   $"{citedFieldNames.ContainsReturnCustomOrNull(nameof(Explanation), $"\n   解释：{Explanation}")}" +
-                   $"{citedFieldNames.ContainsReturnCustomOrNull(nameof(Abbreviation), $"\n   缩写：{Abbreviation}")}";
+            return $"{citedFieldNames.BeIfContains(nameof(Derivation), $"\n   来源：{Derivation}")}" + 
+                   $"{citedFieldNames.BeIfContains(nameof(Pinyin), $"\n   拼音：{Pinyin}")}" + 
+                   $"{citedFieldNames.BeIfContains(nameof(Explanation), $"\n   解释：{Explanation}")}" +
+                   $"{citedFieldNames.BeIfContains(nameof(Abbreviation), $"\n   缩写：{Abbreviation}")}";
         }
         public override string ToString(FormatType format, object supplement = null)
         {
@@ -48,7 +48,7 @@ namespace KouFunctionPlugin.Models
             return null;
         }
 
-        public override Action<EntityTypeBuilder<PluginIdiomDictionary>> ModelSetup()
+        public override Action<EntityTypeBuilder<IdiomDictionary>> ModelSetup()
         {
             return entity =>
             {

@@ -3,7 +3,6 @@ using Koubot.SDK.Models.System;
 using Koubot.SDK.Protocol;
 using Koubot.SDK.Protocol.Plugin;
 using Koubot.SDK.Services.Interface;
-using Koubot.Tool.Expand;
 using Koubot.Tool.KouData;
 using Koubot.Tool.Math;
 using Koubot.Tool.Random;
@@ -14,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Koubot.SDK.API;
+using Koubot.Tool.Extensions;
 
 namespace KouFunctionPlugin
 {
@@ -22,7 +22,7 @@ namespace KouFunctionPlugin
         Authority = KouEnum.Authority.NormalUser,
         Introduction = "抽奖机",
         PluginType = KouEnum.PluginType.Function)]
-    public class KouLottery : KouPlugin, IWantKouMessage, IWantKouSession
+    public class KouLottery : KouPlugin<KouLottery>, IWantKouMessage, IWantKouSession
     {
         [KouPluginParameter(ActivateKeyword = "count|c", Name = "抽签数量", Help = "范围在1-100",
             NumberMin = 1, NumberMax = 100)]
@@ -57,8 +57,7 @@ namespace KouFunctionPlugin
             "不选！",
             "我才不选！",
             "嗯...让我也犹豫一下",
-            "好难，选不出来"
-            ,
+            "好难，选不出来",
             "小孩子才做选择，我全都要！",
             "Kou建议你选择我",
             "Kou建议你都不选",
@@ -92,21 +91,21 @@ namespace KouFunctionPlugin
         };
         private static readonly List<string> speakList = new()
         {
-            "Kou建议你选择：",
-            "Kou建议你$1：",
-            "Kou会$1：",
-            "Kou才不会$1",
-            "Kou帮你选了：",
-            "Kou认为你该：",
-            "我觉得你该$1",
-            "我猜的没错的话，你其实想$1$0，对吧？",
-            "反正我才不会$1$0！",
-            "$1$0的话还不如去睡觉",
-            "我觉得$1$0也许不错",
-            "$1$0，不好别怪我555",
-            "$0",
-            "不如$1$0吧？",
-            "Kou抽出了："
+            "Kou建议你选择：{0}",
+            "Kou建议你{1}：{0}",
+            "Kou会{1}：{0}",
+            "Kou才不会{1}{0}",
+            "Kou帮你选了：{0}",
+            "Kou认为你该：{0}",
+            "我觉得你该{1}{0}",
+            "我猜的没错的话，你其实想{1}{0}，对吧？",
+            "反正我才不会{1}{0}！",
+            "{1}{0}的话还不如去睡觉",
+            "我觉得{1}{0}也许不错",
+            "{1}{0}，不好别怪我555",
+            "{0}",
+            "不如{1}{0}吧？",
+            "Kou抽出了：{0}"
         };
 
 
@@ -129,13 +128,12 @@ namespace KouFunctionPlugin
                     result.Append(lotList.RandomGetOne() + "、");
                 }
             }
-            else result.Append(lotList.RandomGetItems(Count).ToIListString("、"));
+            else result.Append(lotList.RandomGetItems(Count).ToStringJoin("、"));
 
             string verb = prepList.RandomGetOne() + (KouStaticData.Verb.Any(s => result.ToString().StartsWith(s)) ?
                 null : verbList.ProbablyDo(0.35)?.RandomGetOne());
-            return speakList.RandomGetOne()
-                .SmartConcat(0, verb)
-                .SmartConcat(result.ToString().TrimEnd('、')).ProbablyBe(rejectList.RandomGetOne(), 0.05);
+            return string.Format(speakList.RandomGetOne(), result.ToString().TrimEnd('、'), verb)
+                .ProbablyBe(rejectList.RandomGetOne(), 0.05);
         }
         /// <summary>
         /// 算出事情发生概率
@@ -190,7 +188,7 @@ namespace KouFunctionPlugin
                 int minValue = interval.GetLeftIntervalNearestNumber();
                 int maxValue = interval.GetRightIntervalNearestNumber();
                 var generator = new LotteryGenerator(Count, minValue, maxValue);
-                return result + generator.DrawLottery().ToIListString("、");
+                return result + generator.DrawLottery().ToStringJoin("、");
             }
             return result.TrimEnd('、');
         }

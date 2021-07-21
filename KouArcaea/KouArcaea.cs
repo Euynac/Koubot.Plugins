@@ -1,7 +1,12 @@
-﻿using Koubot.SDK.Interface;
+﻿using System;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Koubot.SDK.Interface;
+using Koubot.SDK.Models.Entities;
 using Koubot.SDK.Models.System;
 using Koubot.SDK.Protocol.Plugin;
 using Koubot.SDK.Tool;
+using Koubot.Tool.Extensions;
 using Koubot.Tool.String;
 using KouGamePlugin.Arcaea.Models;
 using static Koubot.SDK.Protocol.KouEnum;
@@ -12,11 +17,10 @@ namespace KouGamePlugin.Arcaea
     /// KouArcaea插件
     /// </summary>
     [KouPluginClass("arc", "Arcaea助手",
-        Introduction = "提供随机歌曲、计算ptt等功能",
         Author = "7zou",
         PluginType = PluginType.Game,
         CanUseProxy = true)]
-    public class KouArcaea : KouPlugin, IWantKouMessage
+    public class KouArcaea : KouPlugin<KouArcaea>, IWantKouMessage
     {
         public KouMessage Message { get; set; }
 
@@ -24,14 +28,6 @@ namespace KouGamePlugin.Arcaea
         public override object Default(string str = null)
         {
             return null;
-            return Message.ToString(FormatType.Detail);
-        }
-        [KouPluginFunction(ActivateKeyword = "info", Help = "<歌曲名/别名> 查询歌曲信息，更先进的功能要使用arcinfo")]
-        public object KouArcInfo(string name = null)
-        {
-            return null;
-            KouArcaeaInfo arcaeaInfo = new KouArcaeaInfo();
-            return arcaeaInfo.Default(name);
         }
         [KouPluginFunction(ActivateKeyword = "bind|绑定", Help = "绑定arc账号(暂时只支持ID不支持名字)")]
         public string KouBindArc(string arcID = null)
@@ -44,35 +40,42 @@ namespace KouGamePlugin.Arcaea
             [KouPluginArgument(Name = "歌曲ptt反推定数")] double? ptt = null)
         {
             if (score < 0 || score > 11000000) return "这个分数怎么有点奇怪呢";
+            string songName = nameOrConstant;
             if (ptt != null)
             {
                 return $"{score}分的谱面ptt={ptt}时，谱面定数约为{ArcaeaData.CalSongChartConstant(ptt.Value, score):F3}";
             }
-            if (KouStringTool.TryToDouble(nameOrConstant, out double constant))
+
+            Song.RatingClass ratingClass = Song.RatingClass.Future;
+            if (songName.MatchOnceThenReplace(@"[,，]?(ftr|pst|prs|byd|byn|future|past|present|beyond)",
+                out songName, out var matched, RegexOptions.IgnoreCase | RegexOptions.RightToLeft))
             {
-                return $"定数{constant}时，{score}分的ptt为{ArcaeaData.CalSongScorePtt(constant, score):F3}";
+                KouStringTool.TryToEnum(matched[1].Value, out ratingClass);
             }
-            KouArcaeaInfo kouArcaeaInfo = new KouArcaeaInfo
+
+            if (songName.IsNullOrWhiteSpace())
             {
-                SongName = nameOrConstant
-            };
-            var songs = kouArcaeaInfo.GetSatisfiedSong(ratingClass: PluginArcaeaSong.RatingClass.Future);
-            string result = "";
-            if (songs.Count == 0) return $"找不到是哪个歌";
-            else if (songs.Count > 4)
-            {
-                result = $"具体是指下面哪个歌呢？\n{songs.ToSetString()}";
+                return "你在说哪首歌呢";
             }
-            else
+
+            var satisfiedSongs = Song.Find(s => 
+                s.SongTitle.Contains(songName,
+                    StringComparison.OrdinalIgnoreCase)
+                || s.Aliases?.Any(alias => alias.Alias == songName) ==
+                true);
+            if (satisfiedSongs.Count > 1) return $"具体是以下哪一首歌呢（暂时不支持选择id）：\n{satisfiedSongs.ToSetString()}";
+            if (satisfiedSongs.Count == 0)
             {
-                foreach (var song in songs)
+                if (KouStringTool.TryToDouble(nameOrConstant, out double constant))
                 {
-                    if (song.ChartConstant == null) continue;
-                    double con = song.ChartConstant.Value;
-                    result += $"{song.ToString(FormatType.Brief)} {score}分的ptt为{ArcaeaData.CalSongScorePtt(con, score):F3}\n";
+                    return $"定数{constant}时，{score}分的ptt为{ArcaeaData.CalSongScorePtt(constant, score):F3}";
                 }
+                return $"找不到哪个歌叫{songName}哦...";
             }
-            return result.Trim();
+            var song = satisfiedSongs[0];
+            var songConstant = song.MoreInfo.FirstOrDefault(p => p.ChartRatingClass == ratingClass)?.ChartConstant;
+            if (songConstant == null) return $"{song.SongTitle}还没有{ratingClass}的定数信息呢...";
+            return $"{song.SongTitle}[{ratingClass}{songConstant.Value:0.#}]{score}分的ptt为{ArcaeaData.CalSongScorePtt(songConstant.Value, score):F3}";
         }
     }
 }

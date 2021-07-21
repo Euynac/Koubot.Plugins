@@ -2,9 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+        <ProduceReferenceAssembly>false
+</ProduceReferenceAssembly>
     <AssemblyVersion>1.0.*</AssemblyVersion>
-    <Deterministic>false</Deterministic>
+        <Deterministic>false</Deterministic>
   </PropertyGroup>
 
   <ItemGroup>

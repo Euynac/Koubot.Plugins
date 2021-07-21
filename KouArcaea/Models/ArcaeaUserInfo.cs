@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace KouGamePlugin.Arcaea.Models
 {
     [Table("plugin_arcaea_userinfo")]
-    public partial class PluginArcaeaUserinfo : KouAutoModel<PluginArcaeaUserinfo>
+    public partial class ArcaeaUserInfo : KouFullAutoModel<ArcaeaUserInfo>
     {
         [Column("user_id")]
         [StringLength(50)]
@@ -20,9 +20,9 @@ namespace KouGamePlugin.Arcaea.Models
         [Column("arcaea_official_ptt")]
         public double? ArcaeaOfficialPtt { get; set; }
         [Column("arcaea_ptt")]
-        public double? ArcaeaPtt { get; set; }
-        [Column("arceaa_avg_tp")]
-        public double? ArceaaAvgTp { get; set; }
+        public double? ArcaeaKouPtt { get; set; }
+        [Column("arcaea_avg_tp")]
+        public double? ArcaeaAvgTp { get; set; }
         [Column("arcaea_username")]
         [StringLength(20)]
         public string ArcaeaUsername { get; set; }
@@ -32,19 +32,13 @@ namespace KouGamePlugin.Arcaea.Models
             throw new NotImplementedException();
         }
 
-        public override Action<EntityTypeBuilder<PluginArcaeaUserinfo>> ModelSetup()
+        public override Action<EntityTypeBuilder<ArcaeaUserInfo>> ModelSetup()
         {
             return entity =>
             {
-                entity.HasKey(e => e.ArcaeaId)
-                    .HasName("PRIMARY");
+                entity.HasKey(e => e.ArcaeaId);
 
-                entity.HasIndex(e => e.ArcaeaUsername)
-                    .HasName("plugin_Arcaea_userinfo_index_4");
-
-                entity.Property(e => e.ArcaeaUsername).IsUnicode(false);
-
-                entity.Property(e => e.UserId).IsUnicode(false);
+                entity.HasIndex(e => e.ArcaeaUsername);
             };
         }
     }
