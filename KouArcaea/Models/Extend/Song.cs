@@ -55,7 +55,8 @@ namespace KouGamePlugin.Arcaea.Models
                 return false;
             });
         }
-        public override dynamic ModelCacheIncludeConfig(IQueryable<Song> set)
+
+        protected override dynamic ModelCacheIncludeConfig(IQueryable<Song> set)
         {
             return set.Include(p=>p.MoreInfo)
                 .Include(p => p.Aliases)

@@ -30,7 +30,8 @@ namespace KouFunctionPlugin
 
         public override bool IsTheItemID(int id) => id == ID;
         public override bool IsAutoItemIDEnabled() => true;
-        public override dynamic ModelCacheIncludeConfig(IQueryable<TickleReply> set)
+
+        protected override dynamic ModelCacheIncludeConfig(IQueryable<TickleReply> set)
         {
             return set.Include(p => p.SourceUser);
         }
