@@ -186,11 +186,10 @@ namespace KouFunctionPlugin
             string reply)
         {
             if (reply.IsNullOrWhiteSpace()) return "好好教我嘛";
-            var sourceUser = CurrentPlatformUser.FindThis(KouContext);
             var success = TickleReply.Add(almanac =>
             {
                 almanac.Reply = reply;
-                almanac.SourceUser = sourceUser;
+                almanac.SourceUser = CurrentPlatformUser.FindThis(KouContext);
             }, out var added, out var error, KouContext);
             if (success)
             {

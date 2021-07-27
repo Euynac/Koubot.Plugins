@@ -115,14 +115,13 @@ namespace KouFunctionPlugin.LuckMachine
             {
                 item = item.Substring(1);
             }
-
-            var sourceUser = CurrentPlatformUser.FindThis(KouContext);
+            
             var success = Almanac.Add(almanac =>
             {
                 almanac.Content = itemIntro;
                 almanac.Title = item;
                 almanac.IsOminous = isOminous;
-                almanac.SourceUser = sourceUser;
+                almanac.SourceUser = CurrentPlatformUser.FindThis(KouContext);
             }, out var added, out var error, KouContext);
             if (success)
             {
