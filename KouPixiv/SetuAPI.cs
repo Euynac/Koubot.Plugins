@@ -17,15 +17,16 @@ namespace KouFunctionPlugin.Pixiv
         public Error ErrorCode { get; set; }
         public string ErrorMsg { get; set; }
 
-        public ResponseDto.Root? Call()
+        public ResponseDto.Root? Call(int num = 10)
         {
             var body = new RequestDto()
             {
-                Num = 2,
+                Num = num,
+                R18 = 2
             };
             var jsonSerializeSetting = new JsonSerializerSettings
             {
-                NullValueHandling = NullValueHandling.Ignore, 
+                NullValueHandling = NullValueHandling.Ignore,
                 DefaultValueHandling = DefaultValueHandling.Ignore,
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };

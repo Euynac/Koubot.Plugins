@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using Koubot.SDK.Models.Entities;
 using Koubot.Tool.Extensions;
 
 namespace KouFunctionPlugin.Pixiv
@@ -56,30 +59,33 @@ namespace KouFunctionPlugin.Pixiv
             /// </summary>
             public Dictionary<string, string> Urls { get; set; }
 
-            public PixivWork ToModel()
+            public PixivWork ToModel(KouContext context)
             {
-                var tagList = PixivTag.GetAutoModelCache();
-                List<PixivTag> tags = new List<PixivTag>();
+                var R18Flag = false;
+                List<PixivTag> tags = new();
                 if (!Tags.IsNullOrEmptySet())
                 {
                     foreach (var tagName in Tags)
                     {
+                        if (R18 || tagName.IsMatch("r.*(18|17).*", RegexOptions.IgnoreCase)) R18Flag = true;
                         var newTag = new PixivTag {Name = tagName};
-                        if (tagList.Contains(newTag)) continue;
-                        tags.Add(newTag);
-                        tagList.Add(newTag);
+                        var oldTag = newTag.FindThis(context);
+                        tags.Add(oldTag ?? newTag);
                     }
                 }
+
+                var author = new PixivAuthor() {Name = Author, Uid = Uid};
+                var oldAuthor = author.FindThis(context);
+                if (oldAuthor != null) author = oldAuthor;
 
                 if (tags.Count == 0) tags = null;
                 return new PixivWork()
                 {
-                    Author = Author,
+                    Author = author,
                     Pid = Pid,
                     P = P,
-                    Uid = Uid,
                     Title = Title,
-                    R18 = R18,
+                    R18 = R18Flag,
                     Width = Width,
                     Height = Height,
                     Ext = Ext,

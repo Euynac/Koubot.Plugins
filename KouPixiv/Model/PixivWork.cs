@@ -2,16 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using Koubot.SDK.Interface;
 using Koubot.SDK.Protocol.AutoModel;
 using Koubot.Tool.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace KouFunctionPlugin.Pixiv
 {
     [KouAutoModelTable("list", new[] {nameof(KouSetu)}, Name = "作品列表")]
     [Table("plugin_pixiv_works")]
-    public class PixivWork : KouFullAutoModel<PixivWork>
+    public partial class PixivWork : KouFullAutoModel<PixivWork>
     {
         /// <summary>
         /// 库中id
@@ -27,14 +29,14 @@ namespace KouFunctionPlugin.Pixiv
         /// 作品所在页（多张作品时的页数）
         /// </summary>
         public int P { get; set; }
-        /// <summary>
-        /// 作者 uid
-        /// </summary>
-        public long Uid { get; set; }
-        /// <summary>
-        /// 作者名（入库时，并过滤掉 @ 及其后内容）
-        /// </summary>
-        public string Author { get; set; }
+        // /// <summary>
+        // /// 作者 uid
+        // /// </summary>
+        // public long Uid { get; set; }
+        // /// <summary>
+        // /// 作者名（入库时，并过滤掉 @ 及其后内容）
+        // /// </summary>
+        // public string Author { get; set; }
         /// <summary>
         /// 作品标题
         /// </summary>
@@ -65,27 +67,38 @@ namespace KouFunctionPlugin.Pixiv
         [KouAutoModelField(true)]
         [InverseProperty(nameof(PixivTag.Works))]
         public virtual ICollection<PixivTag> Tags { get; set; }
+        [KouAutoModelField(true)]
+        [InverseProperty(nameof(PixivAuthor.Works))]
+        public virtual PixivAuthor Author { get; set; }
+
         /// <summary>
         /// 作品上传日期
         /// </summary>
         [NotMapped]
-        public DateTime UploadDate => UploadDateTimestamp.ToDateTime();
+        public DateTime UploadDate => UploadDateTimestamp.ToDateTime(TimeExtensions.TimeStampType.Javascript).AddHours(9);
         public override Action<EntityTypeBuilder<PixivWork>> ModelSetup()
         {
             return builder =>
             {
                 builder.HasKey(p => p.ID);
+                builder.HasIndex(p => p.Pid);
+                builder.HasIndex(p => p.Title);
             };
+        }
+
+        protected override dynamic ModelCacheIncludeConfig(IQueryable<PixivWork> set)
+        {
+            return set.Include(p => p.Tags);
         }
 
         public override string ToString(FormatType formatType, object supplement = null)
         {
             return formatType switch
             {
-                FormatType.Brief => $"{ID}.{Title}「{Pid}」 —— {Author}",
+                FormatType.Brief => $"{ID}.{Title}「{Pid}」 —— {Author.Name}",
                 FormatType.Detail => $"{ID}.{Title}" +
                                      $"\nPID:{Pid}" +
-                                     $"\nAuthor:{Author}「{Uid}」" +
+                                     $"\nAuthor:{Author.Name}「{Author.Uid}」" +
                                      $"\nSize:{Width}x{Height}" +
                                      Tags?.ToStringJoin(",")?.BeIfNotEmpty("\nTags:{0}", true) +
                                      $"\nTime:{UploadDate}",

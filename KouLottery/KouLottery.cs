@@ -128,7 +128,7 @@ namespace KouFunctionPlugin
                     result.Append(lotList.RandomGetOne() + "、");
                 }
             }
-            else result.Append(lotList.RandomGetItems(Count).ToStringJoin("、"));
+            else result.Append(lotList.RandomGet(Count).ToStringJoin("、"));
 
             string verb = prepList.RandomGetOne() + (KouStaticData.Verb.Any(s => result.ToString().StartsWith(s)) ?
                 null : verbList.ProbablyDo(0.35)?.RandomGetOne());

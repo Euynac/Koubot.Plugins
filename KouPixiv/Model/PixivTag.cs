@@ -30,6 +30,7 @@ namespace KouFunctionPlugin.Pixiv
             return builder =>
             {
                 builder.HasKey(p => p.ID);
+                builder.HasIndex(p => p.Name);
             };
         }
         /// <summary>
