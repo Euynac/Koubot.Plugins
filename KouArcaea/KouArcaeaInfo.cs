@@ -23,7 +23,7 @@ namespace KouGamePlugin.Arcaea
         Introduction = "提供歌曲详细信息查询、随机歌曲功能，可限定条件",
         Author = "7zou",
         PluginType = PluginType.Game)]
-    public class KouArcaeaInfo : KouPlugin<KouArcaeaInfo>, IWantCommandLifeKouContext, IWantKouUser,IWantKouBotSetting
+    public class KouArcaeaInfo : KouPlugin<KouArcaeaInfo>, IWantCommandLifeKouContext, IWantKouUser,IWantKouGlobalConfig
     {
         [KouPluginFunction(Name = "查询歌曲信息", Help = "请使用/arc.song help")]
         public override object Default(string name = null)
@@ -69,7 +69,7 @@ namespace KouGamePlugin.Arcaea
                 CurrentPlatformUser.KouUser.GainCoinFree(reward);
                 return $"学会了，{song.SongTitle}可以叫做{songAnotherName}({added.AliasID})" +
                        $"{havenHadAliases?.Be($"，我知道它还可以叫做{havenHadAliases}！")}（目前暂不会立即同步）\n" +
-                       $"[{CurrentUser.FormatGainFreeCoin(CurrentGlobalKouConfig,reward)}!]";
+                       $"[{CurrentUser.FormatGainFreeCoin(CurrentKouGlobalConfig,reward)}!]";
             }
             return $"没学会，就突然：{error}";
         }
@@ -100,6 +100,6 @@ namespace KouGamePlugin.Arcaea
         public KouContext KouContext { get; set; }
         public PlatformUser CurrentPlatformUser { get; set; }
         public UserAccount CurrentUser { get; set; }
-        public GlobalKouConfig CurrentGlobalKouConfig { get; set; }
+        public KouGlobalConfig CurrentKouGlobalConfig { get; set; }
     }
 }

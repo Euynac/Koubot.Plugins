@@ -16,7 +16,7 @@ namespace KouFunctionPlugin.LuckMachine
         Authority = KouEnum.Authority.NormalUser,
         Introduction = "运势相关功能",
         PluginType = KouEnum.PluginType.Function)]
-    public class KouLuck : KouPlugin<KouLuck>, IWantKouPlatformUser, IWantCommandLifeKouContext, IWantKouBotSetting
+    public class KouLuck : KouPlugin<KouLuck>, IWantKouPlatformUser, IWantCommandLifeKouContext, IWantKouGlobalConfig
     {
         private static List<string> DirectionList { get; } =
             new() {"东", "南", "西", "北", "东南", "东北", "西南", "西北"};
@@ -127,12 +127,12 @@ namespace KouFunctionPlugin.LuckMachine
             {
                 var reward = RandomTool.GenerateRandomInt(1, 3);
                 CurrentPlatformUser.KouUser.GainCoinFree(reward);
-                return $"学会了，ID{added.ToString(FormatType.Brief)}\n您获得了{CurrentGlobalKouConfig.CoinFormat(reward)}!";
+                return $"学会了，ID{added.ToString(FormatType.Brief)}\n您获得了{CurrentKouGlobalConfig.CoinFormat(reward)}!";
             }
             return $"没学会，就突然：{error}";
         }
         public PlatformUser CurrentPlatformUser { get; set; }
         public KouContext KouContext { get; set; }
-        public GlobalKouConfig CurrentGlobalKouConfig { get; set; }
+        public KouGlobalConfig CurrentKouGlobalConfig { get; set; }
     }
 }

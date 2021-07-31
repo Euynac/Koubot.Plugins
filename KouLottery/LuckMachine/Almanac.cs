@@ -42,7 +42,7 @@ namespace KouFunctionPlugin.LuckMachine
         public override bool IsTheItemID(int id) => id == ID;
         public override bool IsAutoItemIDEnabled() => true;
 
-        protected override dynamic ModelCacheIncludeConfig(IQueryable<Almanac> set)
+        protected override dynamic SetModelIncludeConfig(IQueryable<Almanac> set)
         {
             return set.Include(p => p.SourceUser);
         }

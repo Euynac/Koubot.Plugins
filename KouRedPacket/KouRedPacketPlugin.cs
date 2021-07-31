@@ -22,7 +22,7 @@ namespace KouFunctionPlugin
         Introduction = "发各种红包",
         Author = "7zou",
         PluginType = KouEnum.PluginType.System)]
-    public class KouRedPacketPlugin: KouPlugin<KouRedPacketPlugin>, IWantKouUser, IWantKouPlatformUser, IWantKouBotSetting, IWantKouSession, IWantKouPlatformGroup, IWantTargetGroup
+    public class KouRedPacketPlugin: KouPlugin<KouRedPacketPlugin>, IWantKouUser, IWantKouPlatformUser, IWantKouGlobalConfig, IWantKouSession, IWantKouPlatformGroup, IWantTargetGroup
     {
         #region 红包相关
         [KouPluginParameter(
@@ -72,7 +72,7 @@ namespace KouFunctionPlugin
             speedAppend += red.Remark?.Be($"\n红包留言：{red.Remark}");
             if (red.TestIfHaveOpened(CurrentPlatformUser)) return $"{CurrentPlatformUser.Name}已经抢过该红包啦";
             if (!red.Open(CurrentPlatformUser, out var coinsGot)) return "可惜，没有抢到这个红包呢";
-            return $"{CurrentPlatformUser.Name}打开{(red.FromUser.KouUser == CurrentPlatformUser.KouUser ? "自己" : red.FromUser.Name)}的红包获得了{CurrentGlobalKouConfig.CoinFormat(coinsGot)}！{speedAppend}";
+            return $"{CurrentPlatformUser.Name}打开{(red.FromUser.KouUser == CurrentPlatformUser.KouUser ? "自己" : red.FromUser.Name)}的红包获得了{CurrentKouGlobalConfig.CoinFormat(coinsGot)}！{speedAppend}";
         }
 
         private void RedPacketEndAction(KouRedPacket r)
@@ -88,7 +88,7 @@ namespace KouFunctionPlugin
             {
                 reply = $"{CurrentPlatformUser.Name}的口令红包\"{r.Password}\"到期，" +
                         $"共{r.TotalCount - r.RemainCount}人领取，" +
-                        $"剩余{CurrentGlobalKouConfig.CoinFormat(r.RemainCoins)}\n" +
+                        $"剩余{CurrentKouGlobalConfig.CoinFormat(r.RemainCoins)}\n" +
                         $"[获得了{exp}点经验]";
             }
 
@@ -115,13 +115,13 @@ namespace KouFunctionPlugin
                 Remark = Remark
             };
 
-            if (redPacket.TotalCoins / redPacket.TotalCount == 0) return $"每人至少需要有{CurrentGlobalKouConfig.CoinFormat(1)}";
+            if (redPacket.TotalCoins / redPacket.TotalCount == 0) return $"每人至少需要有{CurrentKouGlobalConfig.CoinFormat(1)}";
             var rest = CurrentUser.CoinFree - redPacket.TotalCoins;
             if (rest >= 0)
             {
                 string ask =
-                    $"发送总额为{CurrentGlobalKouConfig.CoinFormat(redPacket.TotalCoins)}的{quantity}个群组{IsCompeteInVelocity.BeIfTrue("竞速")}红包{password?.Be($"(口令为\"{password}\")")}" +
-                    $"(成功后余额为{CurrentGlobalKouConfig.CoinFormat(rest)})\n" +
+                    $"发送总额为{CurrentKouGlobalConfig.CoinFormat(redPacket.TotalCoins)}的{quantity}个群组{IsCompeteInVelocity.BeIfTrue("竞速")}红包{password?.Be($"(口令为\"{password}\")")}" +
+                    $"(成功后余额为{CurrentKouGlobalConfig.CoinFormat(rest)})\n" +
                     $"输入\"y\"确认";
                 if (!SessionService.AskConfirm(ask)) return null;
                 if (IsCompeteInVelocity)
@@ -178,13 +178,13 @@ namespace KouFunctionPlugin
                 Remark = Remark
             };
 
-            if (redPacket.TotalCoins / redPacket.TotalCount == 0) return $"每人至少需要有{CurrentGlobalKouConfig.CoinFormat(1)}";
+            if (redPacket.TotalCoins / redPacket.TotalCount == 0) return $"每人至少需要有{CurrentKouGlobalConfig.CoinFormat(1)}";
             var rest = CurrentUser.CoinFree - redPacket.TotalCoins;
             if (rest >= 0)
             {
                 string ask =
-                    $"发送总额为{CurrentGlobalKouConfig.CoinFormat(redPacket.TotalCoins)}的{quantity}个{IsCompeteInVelocity.BeIfTrue("竞速")}红包{password?.Be($"(口令为\"{password}\")")}" +
-                    $"(成功后余额为{CurrentGlobalKouConfig.CoinFormat(rest)})\n" +
+                    $"发送总额为{CurrentKouGlobalConfig.CoinFormat(redPacket.TotalCoins)}的{quantity}个{IsCompeteInVelocity.BeIfTrue("竞速")}红包{password?.Be($"(口令为\"{password}\")")}" +
+                    $"(成功后余额为{CurrentKouGlobalConfig.CoinFormat(rest)})\n" +
                     $"输入\"y\"确认";
                 if (!SessionService.AskConfirm(ask)) return null;
                 if (IsCompeteInVelocity)
@@ -209,7 +209,7 @@ namespace KouFunctionPlugin
 
         public UserAccount CurrentUser { get; set; }
         public PlatformUser CurrentPlatformUser { get; set; }
-        public GlobalKouConfig CurrentGlobalKouConfig { get; set; }
+        public KouGlobalConfig CurrentKouGlobalConfig { get; set; }
         public IKouSessionService SessionService { get; set; }
         public PlatformGroup CurrentPlatformGroup { get; set; }
         public PlatformGroup TargetGroup { get; set; }

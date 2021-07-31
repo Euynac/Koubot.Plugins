@@ -25,7 +25,7 @@ namespace KouFunctionPlugin
         Author = "7zou")]
     public class KouTickle : KouPlugin<KouTickle>,
         IWantKouPlatformUser,
-        IWantKouBotSetting,
+        IWantKouGlobalConfig,
         IWantCommandLifeKouContext,
         IWantKouPlatformGroup
     {
@@ -60,17 +60,17 @@ namespace KouFunctionPlugin
         {
             if (_rankCD.IsInCd(CurrentPlatformGroup, new TimeSpan(0, 5, 0)))
                 return "在冷却中噢~ (5min)";
-            if (!_pokeInfoDict.ContainsKey(CurrentPlatformGroup)) return $"自从我上次重启以来({GlobalKouConfig.SystemStartTime})，居然没发现有人无聊到玩戳一戳诶";
+            if (!_pokeInfoDict.ContainsKey(CurrentPlatformGroup)) return $"自从我上次重启以来({KouGlobalConfig.SystemStartTime})，居然没发现有人无聊到玩戳一戳诶";
             var groupInfoDict = _pokeInfoDict[CurrentPlatformGroup];
             if (groupInfoDict.Count == 1)
             {
                 var info = groupInfoDict.First();
-                return $"自从我上次重启以来({GlobalKouConfig.SystemStartTime})，居然只有这个人，{info.Key.Name}，" +
+                return $"自从我上次重启以来({KouGlobalConfig.SystemStartTime})，居然只有这个人，{info.Key.Name}，" +
                        $"戳了我{info.Value.TimesOfPokeBot}下，戳了别人{info.Value.TimesOfPokeOthers}下";
             }
             if (groupInfoDict.Count == 2)
             {
-                string reply = $"自从我上次重启以来({GlobalKouConfig.SystemStartTime})，只有两个人：\n";
+                string reply = $"自从我上次重启以来({KouGlobalConfig.SystemStartTime})，只有两个人：\n";
                 foreach (var info in groupInfoDict)
                 {
                     reply += $"{info.Key.Name}，" +
@@ -79,7 +79,7 @@ namespace KouFunctionPlugin
 
                 return reply.TrimEnd();
             }    
-            string prologue = $"接下来公布一下自本Kou上次醒来({GlobalKouConfig.SystemStartTime})，本群最闲着没事干玩戳一戳的人";
+            string prologue = $"接下来公布一下自本Kou上次醒来({KouGlobalConfig.SystemStartTime})，本群最闲着没事干玩戳一戳的人";
             CurrentPlatformGroup.SendGroupMessage(prologue);
             Thread.Sleep(2000);
             var list = groupInfoDict.OrderByDescending(p => p.Value.Total)
@@ -196,12 +196,12 @@ namespace KouFunctionPlugin
                 var reward = RandomTool.GenerateRandomInt(1, 2);
                 CurrentPlatformUser.KouUser.GainCoinFree(reward);
                 return $"学会了，别人戳我我就：\n{added.ToString(FormatType.Brief)}\n" +
-                       $"[您获得了{CurrentGlobalKouConfig.CoinFormat(reward)}!]";
+                       $"[您获得了{CurrentKouGlobalConfig.CoinFormat(reward)}!]";
             }
             return $"没学会，就突然：{error}";
         }
 
-        public GlobalKouConfig CurrentGlobalKouConfig { get; set; }
+        public KouGlobalConfig CurrentKouGlobalConfig { get; set; }
         public KouContext KouContext { get; set; }
         public PlatformUser CurrentPlatformUser { get; set; }
         public PlatformGroup CurrentPlatformGroup { get; set; }

@@ -32,7 +32,7 @@ namespace KouGamePlugin.Arcaea.Models
             return base.Equals(obj);
         }
 
-        protected override dynamic ModelCacheIncludeConfig(IQueryable<SongAlias> set)
+        protected override dynamic SetModelIncludeConfig(IQueryable<SongAlias> set)
         {
             return set.Include(p => p.CorrespondingSong)
                 .Include(p => p.SourceUser);

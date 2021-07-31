@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Koubot.Tool.Extensions;
-using Org.BouncyCastle.Crypto.Parameters;
 
 namespace KouGamePlugin
 {
