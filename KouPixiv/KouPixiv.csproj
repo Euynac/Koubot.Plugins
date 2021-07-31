@@ -6,7 +6,7 @@
 </ProduceReferenceAssembly>
     <Deterministic>false</Deterministic>
     <AssemblyVersion>1.0.*</AssemblyVersion>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>

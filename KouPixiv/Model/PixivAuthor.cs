@@ -23,6 +23,7 @@ namespace KouFunctionPlugin.Pixiv
         /// <summary>
         /// 作者名（入库时，并过滤掉 @ 及其后内容）
         /// </summary>
+        [KouAutoModelField(ActivateKeyword = "作者")]
         public string Name { get; set; }
         /// <summary>
         /// 作者相关的作品

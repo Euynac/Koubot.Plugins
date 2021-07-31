@@ -15,6 +15,11 @@ namespace KouFunctionPlugin.Pixiv
     [Table("plugin_pixiv_works")]
     public partial class PixivWork : KouFullAutoModel<PixivWork>
     {
+        public override bool UseAutoCache()
+        {
+            return false;
+        }
+
         /// <summary>
         /// 库中id
         /// </summary>
@@ -29,14 +34,6 @@ namespace KouFunctionPlugin.Pixiv
         /// 作品所在页（多张作品时的页数）
         /// </summary>
         public int P { get; set; }
-        // /// <summary>
-        // /// 作者 uid
-        // /// </summary>
-        // public long Uid { get; set; }
-        // /// <summary>
-        // /// 作者名（入库时，并过滤掉 @ 及其后内容）
-        // /// </summary>
-        // public string Author { get; set; }
         /// <summary>
         /// 作品标题
         /// </summary>
