@@ -27,7 +27,7 @@ namespace KouFunctionPlugin.Pixiv
         private static readonly KouColdDown<PlatformGroup> _cd = new();
 
         [KouPluginFunction(Name = "随机一张涩图", NeedCoin = WorkFee, OnlyUsefulInGroup = true)]
-        public override object Default(string str = null)
+        public override object Default([KouPluginArgument(Name = "涩图要求")]string str = null)
         {
             if (_cd.IsInCd(CurrentPlatformGroup, new TimeSpan(0, 0, 10), out var remain))
                 return $"大触们还在休息中，剩余{remain.TotalSeconds:0.#}秒";
