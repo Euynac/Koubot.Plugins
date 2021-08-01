@@ -20,7 +20,7 @@ namespace KouRomajiHelper
     public class RomajiHelper : IKouError
     {
         private static Dictionary<string, string> RomajiToZhDict;
-        public readonly KouContext kouContext = new KouContext();
+        public readonly KouContext kouContext = new();
         public RomajiHelper()
         {
             if (RomajiToZhDict == null)

@@ -37,7 +37,7 @@ namespace KouGamePlugin.Arcaea.Models
                 out userInput, out var groupResult, RegexOptions.IgnoreCase | RegexOptions.RightToLeft))
             {
                 var ratingClass = groupResult[1].Value;
-                ruleDictionary.Add(nameof(SongAppend.ChartRatingClass), ratingClass);
+                ruleDictionary.Add($"{nameof(SongAppend)}.{nameof(SongAppend.ChartRatingClass)}", ratingClass);
             }
             ruleDictionary.Add(nameof(SongTitle), userInput);
             ruleDictionary.Add(nameof(SongAlias), userInput);

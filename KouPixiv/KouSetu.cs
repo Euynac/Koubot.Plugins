@@ -30,16 +30,20 @@ namespace KouFunctionPlugin.Pixiv
         public override object Default([KouPluginArgument(Name = "涩图要求")]string str = null)
         {
             if (_cd.IsInCd(CurrentPlatformGroup, new TimeSpan(0, 0, 10), out var remain))
-                return $"大触们还在休息中，剩余{remain.TotalSeconds:0.#}秒";
+                return $"大触们还在休息中（剩余{remain.TotalSeconds:0.#}秒）";
             PixivWork img = str == null
                 ? PixivWork.RandomGetOne(p => !p.R18)
                 : PixivWork.RandomGetOne(p => !p.R18 && (p.Tags.Any(t => t.Name.Contains(str, StringComparison.OrdinalIgnoreCase)) || p.Title.Contains(str, StringComparison.OrdinalIgnoreCase)));
-            if (img == null) return $"Kou找遍了{PixivAuthor.Count()}位大触都画不出你要求的作品";
+            if (img == null)
+            {
+                _cd.ResetCd(CurrentPlatformGroup);
+                return $"Kou找遍了{PixivAuthor.Count()}位大触都画不出你要求的作品";
+            }
             if (!CurrentUser.ConsumeCoinFree(WorkFee)) return $"需要{CurrentKouGlobalConfig.CoinFormat(WorkFee)}来请人画涩图噢";
             CurrentPlatformGroup.SendGroupMessage(
                 $"{CurrentPlatformUser.Name}花费了{CurrentKouGlobalConfig.CoinFormat(WorkFee)}" +
                 $"请来了\"{img.Author.Name}\"画了一张「{img.Title}」(pid{img.Pid})" +
-                $"{img.Tags?.ToStringJoin("、")?.Be("，据说有如下要素：\n{0}", true)}");
+                $"{img.Tags?.ToStringJoin("、")?.BeIfNotEmpty("，据说有如下要素：\n{0}", true)}");
             Thread.Sleep(2000);
             return new KouImage(img.GetUrl());   
         }
