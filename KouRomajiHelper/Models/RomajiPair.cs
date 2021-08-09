@@ -29,7 +29,7 @@ namespace KouFunctionPlugin.Romaji.Models
             Features = AutoModelFieldFeatures.RequiredAdd)]
         public string ZhValue { get; set; }
 
-        public override string ToString(FormatType formatType, object supplement = null)
+        public override string ToString(FormatType formatType, object supplement = null, KouCommand command = null)
         {
             return $"{Id}.{RomajiKey} - {ZhValue}";
         }

@@ -30,7 +30,7 @@ namespace KouGamePlugin.Maimai.Models
         }
 
         
-        public override string ToString(FormatType format, object supplement = null)
+        public override string ToString(FormatType format, object supplement = null, KouCommand command = null)
         {
 
             switch (format)

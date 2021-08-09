@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Koubot.SDK.Interface;
+using Koubot.SDK.Models.System;
 using Koubot.SDK.Protocol.AutoModel;
 using Koubot.Tool.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -88,7 +89,7 @@ namespace KouFunctionPlugin.Pixiv
             return set.Include(p => p.Tags).Include(a => a.Author);
         }
 
-        public override string ToString(FormatType formatType, object supplement = null)
+        public override string ToString(FormatType formatType, object supplement = null, KouCommand command = null)
         {
             return formatType switch
             {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Koubot.SDK.Interface;
+using Koubot.SDK.Models.System;
 using Koubot.SDK.Protocol.AutoModel;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -58,7 +59,7 @@ namespace KouFunctionPlugin.Pixiv
             return Name.GetHashCode();
         }
 
-        public override string ToString(FormatType formatType, object supplement = null)
+        public override string ToString(FormatType formatType, object supplement = null, KouCommand command = null)
         {
             return $"{ID}.{Name}";
         }

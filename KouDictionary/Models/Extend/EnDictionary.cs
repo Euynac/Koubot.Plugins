@@ -26,7 +26,7 @@ namespace KouFunctionPlugin.Models
             return builder => builder.HasKey(p => p.Word);
         }
 
-        public override string ToString(FormatType format, object supplement = null)
+        public override string ToString(FormatType format, object supplement = null, KouCommand command = null)
         {
             switch (format)
             {

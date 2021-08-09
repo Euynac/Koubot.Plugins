@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Koubot.SDK.Interface;
+using Koubot.SDK.Models.System;
 using Koubot.SDK.Protocol.AutoModel;
 using Koubot.Tool.Extensions;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -10,7 +11,7 @@ namespace KouGamePlugin.Arcaea.Models
 {
     public partial class SongAppend : KouFullAutoModel<SongAppend>
     {
-        public override string ToString(FormatType formatType, object supplement = null)
+        public override string ToString(FormatType formatType, object supplement = null, KouCommand command = null)
         {
             return $"[{ChartRatingClass} {ChartConstant}]" + ChartDesigner?.Be($"谱师：{ChartDesigner}\n") +
                    ChartAllNotes?.Be(

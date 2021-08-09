@@ -140,7 +140,7 @@ namespace KouGamePlugin.Maimai.Models
             return $"B{ChartBasicRating}/A{ChartAdvancedRating}/E{ChartExpertRating}/M{ChartMasterRating}{ChartRemasterRating?.Be($"/R{ChartRemasterRating}")}";
         }
 
-        public override string ToString(FormatType format, object supplement = null)
+        public override string ToString(FormatType format, object supplement = null, KouCommand command = null)
         {
 
             bool withoutConstant = SongGenreSplash == null;

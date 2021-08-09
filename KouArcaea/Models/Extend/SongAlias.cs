@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Koubot.SDK.Models.System;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.General;
 
@@ -38,7 +39,7 @@ namespace KouGamePlugin.Arcaea.Models
                 .Include(p => p.SourceUser);
         }
 
-        public override string ToString(FormatType format, object supplement = null)
+        public override string ToString(FormatType format, object supplement = null, KouCommand command = null)
         {
             return format switch
             {

@@ -34,7 +34,7 @@ namespace KouFunctionPlugin.Models
                    $"{citedFieldNames.BeIfContains(nameof(Explanation), $"\n   解释：{Explanation}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(Abbreviation), $"\n   缩写：{Abbreviation}")}";
         }
-        public override string ToString(FormatType format, object supplement = null)
+        public override string ToString(FormatType format, object supplement = null, KouCommand command = null)
         {
             switch (format)
             {

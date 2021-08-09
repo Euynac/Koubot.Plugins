@@ -102,7 +102,7 @@ namespace KouGamePlugin.Arcaea.Models
             MoreInfo?.OrderBy(p => p.ChartRatingClass).Select(p => p.ChartConstant).ToStringJoin('/').TrimEnd('/');
         private string GetBriefAllNotes() =>
             MoreInfo?.OrderBy(p => p.ChartRatingClass).Select(p => p.ChartAllNotes).ToStringJoin('/').TrimEnd('/');
-        public override string ToString(FormatType format, object supplement = null)
+        public override string ToString(FormatType format, object supplement = null, KouCommand command = null)
         {
             string constantDesc = GetBriefConstant();
             string designerDesc = GetBriefChartDesigner();
