@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Koubot.Tool.Extensions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using Koubot.SDK.Interface;
-using Koubot.SDK.Models.Entities;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol.AutoModel;
-using Koubot.Tool.Extensions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Koubot.SDK.AutoModel;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Models;
+using Koubot.Shared.Protocol.AutoModel;
 
 namespace KouFunctionPlugin.LuckMachine
 {
@@ -17,8 +17,8 @@ namespace KouFunctionPlugin.LuckMachine
     /// 黄历
     /// </summary>
     [Table("plugin_luck_almanac")]
-    [KouAutoModelTable("list", new []{nameof(KouLuck)}, Name = "黄历")]
-    public class Almanac: KouFullAutoModel<Almanac>
+    [KouAutoModelTable("list", new[] { nameof(KouLuck) }, Name = "黄历")]
+    public class Almanac : KouFullAutoModel<Almanac>
     {
         [Key]
         public int ID { get; set; }
@@ -67,7 +67,7 @@ namespace KouFunctionPlugin.LuckMachine
                 entity
                     .HasOne(p => p.SourceUser)
                     .WithMany()
-                    .HasPrincipalKey(p =>p.Id)
+                    .HasPrincipalKey(p => p.Id)
                     .HasForeignKey(p => p.SourceUserID)
                     .OnDelete(DeleteBehavior.ClientSetNull);
             };

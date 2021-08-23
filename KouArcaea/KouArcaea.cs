@@ -1,15 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Koubot.SDK.Interface;
-using Koubot.SDK.Models.Entities;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol.Plugin;
-using Koubot.SDK.Tool;
+﻿using Koubot.SDK.Tool;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.String;
 using KouGamePlugin.Arcaea.Models;
-using static Koubot.SDK.Protocol.KouEnum;
+using System;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Plugin;
 
 namespace KouGamePlugin.Arcaea
 {
@@ -18,7 +17,7 @@ namespace KouGamePlugin.Arcaea
     /// </summary>
     [KouPluginClass("arc", "Arcaea助手",
         Author = "7zou",
-        PluginType = PluginType.Game,
+        PluginType = KouEnum.PluginType.Game,
         CanUseProxy = true)]
     public class KouArcaea : KouPlugin<KouArcaea>, IWantKouMessage
     {
@@ -58,7 +57,7 @@ namespace KouGamePlugin.Arcaea
                 return "你在说哪首歌呢";
             }
 
-            var satisfiedSongs = Song.Find(s => 
+            var satisfiedSongs = Song.Find(s =>
                 s.SongTitle.Contains(songName,
                     StringComparison.OrdinalIgnoreCase)
                 || s.Aliases?.Any(alias => alias.Alias == songName) ==

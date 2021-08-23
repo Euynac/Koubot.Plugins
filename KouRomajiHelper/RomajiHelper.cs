@@ -1,7 +1,6 @@
-﻿using Koubot.SDK.Interface;
-using Koubot.SDK.Models.Entities;
-using Koubot.SDK.Protocol;
-using Koubot.SDK.Services;
+﻿using Koubot.SDK.Models.Entities;
+using Koubot.SDK.Tool;
+using Koubot.Tool.Extensions;
 using Koubot.Tool.Web;
 using Koubot.Tool.Web.RateLimiter;
 using KouFunctionPlugin.Romaji.Models;
@@ -9,8 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Xml;
-using Koubot.SDK.Tool;
-using Koubot.Tool.Extensions;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Protocol;
 
 namespace KouRomajiHelper
 {

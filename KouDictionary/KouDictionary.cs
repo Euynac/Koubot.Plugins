@@ -1,5 +1,5 @@
-﻿using Koubot.SDK.Protocol;
-using Koubot.SDK.Protocol.Plugin;
+﻿using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Plugin;
 
 namespace KouFunctionPlugin
 {

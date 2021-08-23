@@ -1,11 +1,12 @@
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Koubot.SDK.Interface;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol.AutoModel;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Koubot.SDK.AutoModel;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Protocol.AutoModel;
 
 namespace KouFunctionPlugin.Pixiv
 {
@@ -13,7 +14,7 @@ namespace KouFunctionPlugin.Pixiv
     /// <summary>
     /// Pixiv中的Tag
     /// </summary>
-    [KouAutoModelTable("tag", new[] {nameof(KouSetu)}, Name = "标签列表")]
+    [KouAutoModelTable("tag", new[] { nameof(KouSetu) }, Name = "标签列表")]
     [Table("plugin_pixiv_tags")]
     public class PixivTag : KouFullAutoModel<PixivTag>
     {
@@ -53,7 +54,7 @@ namespace KouFunctionPlugin.Pixiv
 
             return false;
         }
-        
+
         public override int GetHashCode()
         {
             return Name.GetHashCode();

@@ -1,5 +1,5 @@
-using Koubot.SDK.Protocol;
-using Koubot.SDK.Protocol.Plugin;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Plugin;
 using Koubot.Tool.Extensions;
 
 namespace KouFunctionPlugin.Pixiv
@@ -17,7 +17,7 @@ namespace KouFunctionPlugin.Pixiv
             if (cache.IsNullOrEmptySet()) return "当前没有Pixiv的作品信息";
             return $"现在一共有{cache.Count}个作品信息";
         }
-        
-        
+
+
     }
 }

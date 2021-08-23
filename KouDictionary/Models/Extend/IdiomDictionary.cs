@@ -1,12 +1,11 @@
-﻿using Koubot.SDK.Interface;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol.AutoModel;
-using Koubot.Tool.String;
+﻿using Koubot.Tool.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
-using Koubot.Tool.Extensions;
+using Koubot.SDK.AutoModel;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
 
 namespace KouFunctionPlugin.Models
 {
@@ -29,8 +28,8 @@ namespace KouFunctionPlugin.Models
 
         public override string GetAutoCitedSupplement(List<string> citedFieldNames)
         {
-            return $"{citedFieldNames.BeIfContains(nameof(Derivation), $"\n   来源：{Derivation}")}" + 
-                   $"{citedFieldNames.BeIfContains(nameof(Pinyin), $"\n   拼音：{Pinyin}")}" + 
+            return $"{citedFieldNames.BeIfContains(nameof(Derivation), $"\n   来源：{Derivation}")}" +
+                   $"{citedFieldNames.BeIfContains(nameof(Pinyin), $"\n   拼音：{Pinyin}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(Explanation), $"\n   解释：{Explanation}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(Abbreviation), $"\n   缩写：{Abbreviation}")}";
         }

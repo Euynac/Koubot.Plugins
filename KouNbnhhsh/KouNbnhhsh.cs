@@ -1,5 +1,5 @@
-﻿using Koubot.SDK.Protocol.Plugin;
-using Koubot.SDK.Services;
+﻿using Koubot.SDK.Tool;
+using Koubot.Tool.Extensions;
 using Koubot.Tool.Random;
 using Koubot.Tool.Web;
 using Koubot.Tool.Web.RateLimiter;
@@ -7,9 +7,8 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using Koubot.SDK.Tool;
-using Koubot.Tool.Extensions;
-using static Koubot.SDK.Protocol.KouEnum;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Plugin;
 
 namespace KouFunctionPlugin
 {
@@ -19,7 +18,7 @@ namespace KouFunctionPlugin
     [KouPluginClass("nbnhhsh", "能不能好好说话",
         Introduction = "首字母缩写翻译工具；源项目地址https://github.com/itorr/nbnhhsh\n输入带首字母缩写的文字，返回结果（多个则随机）",
         Author = "7zou",
-        PluginType = PluginType.Function)]
+        PluginType = KouEnum.PluginType.Function)]
     public class KouNbnhhsh : KouPlugin<KouNbnhhsh>
     {
         [KouPluginParameter(ActivateKeyword = "all", Help = "默认功能中使用会将所有结果输出")]

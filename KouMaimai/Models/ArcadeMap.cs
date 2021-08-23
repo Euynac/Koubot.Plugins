@@ -1,14 +1,13 @@
-﻿using Koubot.SDK.Protocol.AutoModel;
-using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Koubot.Shared.Protocol.AutoModel;
 
 
 namespace KouGamePlugin.Maimai.Models
 {
     [Table("plugin_maimai_map")]
-    [KouAutoModelTable("map", 
-        new[] { nameof(KouMaimai) }, 
+    [KouAutoModelTable("map",
+        new[] { nameof(KouMaimai) },
         Name = "DX地图", Help = "更新日期：2021/6/12 16:00")]
     public partial class ArcadeMap
     {

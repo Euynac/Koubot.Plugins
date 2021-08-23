@@ -1,14 +1,14 @@
-﻿using Koubot.SDK.Protocol.AutoModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Koubot.Shared.Protocol.AutoModel;
 
 
 namespace KouGamePlugin.Arcaea.Models
 {
     [Table("plugin_arcaea_songs")]
-    [KouAutoModelTable("song", 
+    [KouAutoModelTable("song",
         new[] { nameof(KouArcaea) },
         Name = "Arcaea歌曲",
         Help = "当前表数据版本：3.6.1")]
@@ -48,7 +48,7 @@ namespace KouGamePlugin.Arcaea.Models
         public TimeSpan? SongLength { get; set; }
         [Column("side")]
         public Side? SongSide { get; set; }
-        
+
         [Column("jacket_designer")]
         [StringLength(200)]
         [KouAutoModelField(ActivateKeyword = "画师")]

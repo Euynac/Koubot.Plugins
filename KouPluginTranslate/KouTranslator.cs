@@ -1,24 +1,22 @@
 ﻿using Koubot.SDK.API;
-using Koubot.SDK.Interface;
-using Koubot.SDK.Protocol.Plugin;
-using Koubot.SDK.Services;
+using Koubot.SDK.Tool;
+using Koubot.Tool.Extensions;
 using Koubot.Tool.General;
 using Koubot.Tool.Random;
 using Koubot.Tool.Web;
 using System;
 using System.Text;
-using Koubot.SDK.Tool;
-using Koubot.Tool.Extensions;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Plugin;
 using ToolGood.Words;
 using static Koubot.SDK.API.BaiduTranslateAPI;
-using static Koubot.SDK.Protocol.KouEnum;
 
 namespace KouFunctionPlugin
 {
     [KouPluginClass("trans|翻译|translate", "翻译器",
         Introduction = "提供多种翻译、转换功能",
         Author = "7zou",
-        PluginType = PluginType.Function)]
+        PluginType = KouEnum.PluginType.Function)]
     public class KouTranslator : KouPlugin<KouTranslator>
     {
         [KouPluginParameter(ActivateKeyword = "l", Name = "英文转小写", Help = "返回的结果中的英文全部转为大写小写")]
@@ -51,7 +49,7 @@ namespace KouFunctionPlugin
         [KouPluginParameter(ActivateKeyword = "首拼音", Name = "转首字母拼音")]
         public bool ToFirstPinyin { get; set; }
 
-        [KouPluginFunction(Help = "基本复述", SupportedParameters = new []{nameof(Lower), nameof(From), nameof(To), nameof(Upper), nameof(Reverse), nameof(ToTraditionalChinese), nameof(ToPinyin), nameof(ToFirstPinyin), nameof(ToSimplifiedChinese), nameof(SpeakWithWhiteSpace)})]
+        [KouPluginFunction(Help = "基本复述", SupportedParameters = new[] { nameof(Lower), nameof(From), nameof(To), nameof(Upper), nameof(Reverse), nameof(ToTraditionalChinese), nameof(ToPinyin), nameof(ToFirstPinyin), nameof(ToSimplifiedChinese), nameof(SpeakWithWhiteSpace) })]
         public override object Default(string str = null)
         {
             if (str.IsNullOrWhiteSpace()) return null;

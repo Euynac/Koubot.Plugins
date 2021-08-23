@@ -1,18 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Koubot.SDK.API;
-using Koubot.SDK.Interface;
-using Koubot.SDK.Models.Entities;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol;
-using Koubot.SDK.Protocol.Plugin;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.General;
-using Koubot.Tool.Random;
-using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Models;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Plugin;
 
 // ReSharper disable once CheckNamespace
 namespace KouFunctionPlugin.Pixiv
@@ -21,13 +17,13 @@ namespace KouFunctionPlugin.Pixiv
         Introduction = "随机涩图",
         Author = "7zou",
         PluginType = KouEnum.PluginType.Function)]
-    public class KouSetu : KouPlugin<KouSetu>, IWantKouUser,IWantKouPlatformGroup, IWantKouGlobalConfig
+    public class KouSetu : KouPlugin<KouSetu>, IWantKouUser, IWantKouPlatformGroup, IWantKouGlobalConfig
     {
         private const int WorkFee = 8;
         private static readonly KouColdDown<PlatformGroup> _cd = new();
 
         [KouPluginFunction(Name = "随机一张涩图", NeedCoin = WorkFee, OnlyUsefulInGroup = true)]
-        public override object Default([KouPluginArgument(Name = "涩图要求")]string str = null)
+        public override object Default([KouPluginArgument(Name = "涩图要求")] string str = null)
         {
             if (_cd.IsInCd(CurrentPlatformGroup, new TimeSpan(0, 0, 10), out var remain))
                 return $"大触们还在休息中（剩余{remain.TotalSeconds:0.#}秒）";
@@ -45,7 +41,7 @@ namespace KouFunctionPlugin.Pixiv
                 $"请来了\"{img.Author.Name}\"画了一张「{img.Title}」(pid{img.Pid})" +
                 $"{img.Tags?.ToStringJoin("、")?.BeIfNotEmpty("，据说有如下要素：\n{0}", true)}");
             Thread.Sleep(2000);
-            return new KouImage(img.GetUrl());   
+            return new KouImage(img.GetUrl());
         }
 
         // static KouSetu()

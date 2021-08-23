@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Koubot.Tool.Extensions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using Koubot.SDK.Interface;
-using Koubot.SDK.Models.Entities;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol.AutoModel;
-using Koubot.Tool.Extensions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Koubot.SDK.AutoModel;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Models;
+using Koubot.Shared.Protocol.AutoModel;
 
 namespace KouFunctionPlugin
 {
-    [KouAutoModelTable("list", new []{nameof(KouTickle)}, Name = "戳一戳反馈列表")]
+    [KouAutoModelTable("list", new[] { nameof(KouTickle) }, Name = "戳一戳反馈列表")]
     [Table("plugin_tickle_reply")]
-    public class TickleReply :KouFullAutoModel<TickleReply>
+    public class TickleReply : KouFullAutoModel<TickleReply>
     {
         [Key]
         public int ID { get; set; }
@@ -56,7 +56,7 @@ namespace KouFunctionPlugin
                 entity
                     .HasOne(p => p.SourceUser)
                     .WithMany()
-                    .HasPrincipalKey(p =>p.Id)
+                    .HasPrincipalKey(p => p.Id)
                     .HasForeignKey(p => p.SourceUserID)
                     .OnDelete(DeleteBehavior.ClientSetNull);
             };

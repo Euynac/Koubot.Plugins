@@ -1,11 +1,9 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Koubot.SDK.Interface;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol.AutoModel;
-using Koubot.Tool.Extensions;
+﻿using Koubot.Tool.Extensions;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
+using Koubot.SDK.AutoModel;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
 
 namespace KouGamePlugin.Arcaea.Models
 {
@@ -22,7 +20,7 @@ namespace KouGamePlugin.Arcaea.Models
         {
             return builder =>
             {
-                builder.HasKey(p => new {p.SongEnId, p.ChartRatingClass});
+                builder.HasKey(p => new { p.SongEnId, p.ChartRatingClass });
                 builder.HasIndex(p => p.SongEnId);
                 builder.HasIndex(p => p.ChartDesigner);
             };

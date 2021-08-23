@@ -1,18 +1,19 @@
+using Koubot.Tool.Extensions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using Koubot.SDK.Interface;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol.AutoModel;
-using Koubot.Tool.Extensions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Koubot.SDK.AutoModel;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Protocol.AutoModel;
 
 namespace KouFunctionPlugin.Pixiv
 {
-    [KouAutoModelTable("list", new[] {nameof(KouSetu)}, Name = "作品列表")]
+    [KouAutoModelTable("list", new[] { nameof(KouSetu) }, Name = "作品列表")]
     [Table("plugin_pixiv_works")]
     public partial class PixivWork : KouFullAutoModel<PixivWork>
     {

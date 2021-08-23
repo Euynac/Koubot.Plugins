@@ -1,5 +1,5 @@
-using System;
 using Castle.Core.Internal;
+using System;
 
 namespace KouFunctionPlugin.Pixiv
 {
@@ -22,7 +22,7 @@ namespace KouFunctionPlugin.Pixiv
             /// </summary>
             Mini,
         }
-        
+
         /// <summary>
         /// Get current work img url.
         /// </summary>

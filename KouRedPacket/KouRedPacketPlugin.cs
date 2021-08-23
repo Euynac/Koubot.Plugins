@@ -1,28 +1,27 @@
-﻿using System;
-using System.Threading;
-using Koubot.SDK.API;
-using Koubot.SDK.Interface;
-using Koubot.SDK.Models.Entities;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol;
-using Koubot.SDK.Protocol.Event;
-using Koubot.SDK.Protocol.Plugin;
-using Koubot.SDK.Services;
+﻿using Koubot.SDK.API;
 using Koubot.SDK.Services.Interface;
 using Koubot.SDK.Tool;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.Random;
+using System;
+using System.Threading;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Models;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Event;
+using Koubot.Shared.Protocol.Plugin;
 
 namespace KouFunctionPlugin
 {
-     /// <summary>
+    /// <summary>
     /// Koubot Coin Plugin
     /// </summary>
     [KouPluginClass("hb", "红包",
         Introduction = "发各种红包",
         Author = "7zou",
         PluginType = KouEnum.PluginType.System)]
-    public class KouRedPacketPlugin: KouPlugin<KouRedPacketPlugin>, IWantKouUser, IWantKouPlatformUser, IWantKouGlobalConfig, IWantKouSession, IWantKouPlatformGroup, IWantTargetGroup
+    public class KouRedPacketPlugin : KouPlugin<KouRedPacketPlugin>, IWantKouUser, IWantKouPlatformUser, IWantKouGlobalConfig, IWantKouSession, IWantKouPlatformGroup, IWantTargetGroup
     {
         #region 红包相关
         [KouPluginParameter(
@@ -32,18 +31,18 @@ namespace KouFunctionPlugin
         public bool IsCompeteInVelocity { get; set; }
 
         [KouPluginParameter(
-            Help = "指示红包是均分发送，注意此时总金额变为每个红包金额", 
-            ActivateKeyword = "same", 
+            Help = "指示红包是均分发送，注意此时总金额变为每个红包金额",
+            ActivateKeyword = "same",
             Name = "红包均分")]
         public bool IsIdentical { get; set; }
         [KouPluginParameter(
             Help = "红包有效期，默认五分钟。有效设定时间：（30s-30min）",
-            ActivateKeyword = "t", 
+            ActivateKeyword = "t",
             Name = "设定有效时间")]
         public TimeSpan? Duration { get; set; }
         [KouPluginParameter(
             Help = "红包备注，收到红包的都会得到这个备注",
-            ActivateKeyword = "remark", 
+            ActivateKeyword = "remark",
             Name = "设定红包备注")]
         public string Remark { get; set; }
         [KouPluginEventHandler]
@@ -97,12 +96,12 @@ namespace KouFunctionPlugin
 
 
         [KouPluginFunction(ActivateKeyword = "group|g", Name = "发群组口令红包", Help = "接下来该群组内回复包含该口令的语句即会领取红包",
-            SupportedParameters = new []{nameof(IsIdentical)
+            SupportedParameters = new[]{nameof(IsIdentical)
                 , nameof(IsCompeteInVelocity),
                 nameof(Duration), nameof(Remark)},
             OnlyUsefulInGroup = true)]
         public object SendGroupPasswordRedPacket(
-            [KouPluginArgument(Name = "总金额", NumberMin = 1, DefaultNumberRangeError = true)]int total,
+            [KouPluginArgument(Name = "总金额", NumberMin = 1, DefaultNumberRangeError = true)] int total,
             [KouPluginArgument(Name = "数量", NumberMin = 1, DefaultNumberRangeError = true)] int quantity,
             [KouPluginArgument(Name = "口令(默认生成6位数字)")] string password = null)
         {
@@ -133,7 +132,7 @@ namespace KouFunctionPlugin
                 {
                     return "发红包失败" + redPacket.ErrorMsg?.Be($"，{redPacket.ErrorMsg}");
                 }
-                
+
                 return $"发送红包成功！{redPacket.ToString(FormatType.Customize1)}";
             }
 
@@ -145,7 +144,7 @@ namespace KouFunctionPlugin
             return ReturnHelp();
         }
 
-        
+
 
         private bool ValidateAvailableTime()
         {
@@ -161,11 +160,11 @@ namespace KouFunctionPlugin
         }
 
         [KouPluginFunction(ActivateKeyword = "sent|s", Name = "发口令红包",
-            SupportedParameters = new []{nameof(IsIdentical),
+            SupportedParameters = new[]{nameof(IsIdentical),
                 nameof(IsCompeteInVelocity),
                 nameof(Duration), nameof(Remark)})]
         public object SendPasswordRedPacket(
-            [KouPluginArgument(Name = "总金额", NumberMin = 1, DefaultNumberRangeError = true)]int total,
+            [KouPluginArgument(Name = "总金额", NumberMin = 1, DefaultNumberRangeError = true)] int total,
             [KouPluginArgument(Name = "数量", NumberMin = 1, DefaultNumberRangeError = true)] int quantity,
             [KouPluginArgument(Name = "口令(默认生成6位数字)")] string password = null)
         {
@@ -205,7 +204,7 @@ namespace KouFunctionPlugin
 
 
         #endregion
-        
+
 
         public UserAccount CurrentUser { get; set; }
         public PlatformUser CurrentPlatformUser { get; set; }

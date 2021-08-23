@@ -1,6 +1,5 @@
-﻿using Koubot.SDK.Interface;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol.AutoModel;
+﻿using Koubot.Tool.Extensions;
+using Koubot.Tool.General;
 using Koubot.Tool.String;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -9,12 +8,11 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using Koubot.SDK.Models.Entities;
-using Koubot.Tool.Extensions;
-using Koubot.Tool.General;
-using Microsoft.EntityFrameworkCore.Query;
+using Koubot.SDK.AutoModel;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Protocol.AutoModel;
 
 namespace KouGamePlugin.Arcaea.Models
 {
@@ -58,9 +56,9 @@ namespace KouGamePlugin.Arcaea.Models
 
         protected override dynamic SetModelIncludeConfig(IQueryable<Song> set)
         {
-            return set.Include(p=>p.MoreInfo)
+            return set.Include(p => p.MoreInfo)
                 .Include(p => p.Aliases)
-                .ThenInclude(p=>p.SourceUser);
+                .ThenInclude(p => p.SourceUser);
         }
 
         public override int GetHashCode() => SongId.GetHashCodeWith(SongEnId);
@@ -98,7 +96,7 @@ namespace KouGamePlugin.Arcaea.Models
 
         private string GetBriefChartDesigner() =>
             MoreInfo?.Select(p => p.ChartDesigner).Distinct().ToStringJoin('/').TrimEnd('/');
-        private string GetBriefConstant() => 
+        private string GetBriefConstant() =>
             MoreInfo?.OrderBy(p => p.ChartRatingClass).Select(p => p.ChartConstant).ToStringJoin('/').TrimEnd('/');
         private string GetBriefAllNotes() =>
             MoreInfo?.OrderBy(p => p.ChartRatingClass).Select(p => p.ChartAllNotes).ToStringJoin('/').TrimEnd('/');
@@ -118,7 +116,7 @@ namespace KouGamePlugin.Arcaea.Models
                            constantDesc?.Be($"定数：{constantDesc}\n") +
                            Aliases?.Be($"别名：{Aliases.Select(p => p.Alias).ToStringJoin('，')}\n") +
                            SongArtist?.Be($"曲师：{SongArtist}\n") +
-                           designerDesc?.Be($"谱师：{designerDesc}\n")+
+                           designerDesc?.Be($"谱师：{designerDesc}\n") +
                            JacketDesigner?.Be($"画师：{JacketDesigner}\n") +
                            SongBpm?.Be($"BPM：{SongBpm}\n") +
                            SongLength?.Be($"歌曲长度：{SongLength}\n") +
@@ -144,9 +142,9 @@ namespace KouGamePlugin.Arcaea.Models
 
                 entity
                     .HasMany(e => e.Aliases)
-                    .WithOne(p=>p.CorrespondingSong)
-                    .HasForeignKey(p=>p.SongEnId)
-                    .HasPrincipalKey(p=>p.SongEnId);
+                    .WithOne(p => p.CorrespondingSong)
+                    .HasForeignKey(p => p.SongEnId)
+                    .HasPrincipalKey(p => p.SongEnId);
                 entity.HasMany(p => p.MoreInfo)
                     .WithOne(p => p.Song)
                     .HasForeignKey(p => p.SongEnId)
@@ -159,21 +157,21 @@ namespace KouGamePlugin.Arcaea.Models
         /// </summary>
         public enum Side
         {
-            [KouEnumName("光","光侧","白")]
+            [KouEnumName("光", "光侧", "白")]
             Light,
-            [KouEnumName("对立","对立侧","黑")]
+            [KouEnumName("对立", "对立侧", "黑")]
             Conflict
         }
-        
+
         /// <summary>
         /// 曲包
         /// </summary>
         [SuppressMessage("ReSharper", "IdentifierTypo")]
         public enum SongPackType
         {
-            [KouEnumName("Arcaea","arc")]
+            [KouEnumName("Arcaea", "arc")]
             Base,
-            [KouEnumName("World Extend","扩展")]
+            [KouEnumName("World Extend", "扩展")]
             Extend,
             [KouEnumName("Black Fate")]
             Vs,
@@ -199,25 +197,25 @@ namespace KouGamePlugin.Arcaea.Models
             Zettai,
             [KouEnumName("Binary Enfold")]
             Nijuusei,
-            [KouEnumName("Ambivalent Vision","av")]
+            [KouEnumName("Ambivalent Vision", "av")]
             Mirai,
-            [KouEnumName("Crimson Solace","cs")]
+            [KouEnumName("Crimson Solace", "cs")]
             Shiawase,
             [KouEnumName("maimai")]
             Maimai,
             [KouEnumName("O.N.G.E.K.I.")]
             Ongeki,
-            [KouEnumName("CHUNITHM","中二")]
+            [KouEnumName("CHUNITHM", "中二")]
             Chunithm,
             [KouEnumName("Collaboration Chapter 2")]
             Chunithm_append_1,
-            [KouEnumName("Groove Coaster","gc")]
+            [KouEnumName("Groove Coaster", "gc")]
             Groovecoaster,
-            [KouEnumName("Tone Sphere","ts")]
+            [KouEnumName("Tone Sphere", "ts")]
             Tonesphere,
-            [KouEnumName("Lanota","la")]
+            [KouEnumName("Lanota", "la")]
             Lanota,
-            [KouEnumName("Dynamix","dy")]
+            [KouEnumName("Dynamix", "dy")]
             Dynamix,
         }
 

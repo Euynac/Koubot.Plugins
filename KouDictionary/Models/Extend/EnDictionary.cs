@@ -1,12 +1,10 @@
-﻿using Koubot.SDK.Interface;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol.AutoModel;
-using Koubot.Tool.String;
-using Microsoft.EntityFrameworkCore;
+﻿using Koubot.Tool.Extensions;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
-using Koubot.Tool.Extensions;
+using Koubot.SDK.AutoModel;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
 
 namespace KouFunctionPlugin.Models
 {

@@ -1,5 +1,5 @@
-﻿using Koubot.SDK.Models.Entities;
-using Koubot.SDK.Models.System;
+﻿using Koubot.SDK.System;
+using Koubot.Shared.Models;
 
 namespace KouFunctionPlugin
 {

@@ -1,15 +1,15 @@
-﻿using Koubot.SDK.Interface;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol.AutoModel;
+﻿using Koubot.Tool.Extensions;
 using Koubot.Tool.General;
 using Koubot.Tool.Math;
-using Koubot.Tool.String;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using Koubot.Tool.Extensions;
+using Koubot.SDK.AutoModel;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Protocol.AutoModel;
 
 namespace KouGamePlugin.Maimai.Models
 {
@@ -71,7 +71,7 @@ namespace KouGamePlugin.Maimai.Models
             {
                 if (input is IntervalDoublePair pair)
                 {
-                    return DelegateExtensions.SatisfyAny(pair.IsInInterval,song.ChartBasicConstant,
+                    return DelegateExtensions.SatisfyAny(pair.IsInInterval, song.ChartBasicConstant,
                         song.ChartAdvancedConstant, song.ChartExpertConstant, song.ChartMasterConstant,
                         song.ChartRemasterConstant);
                 }
@@ -87,7 +87,7 @@ namespace KouGamePlugin.Maimai.Models
             {
                 if (input is IntervalDoublePair pair)
                 {
-                    return DelegateExtensions.SatisfyAny(pair.IsInInterval,song.SplashChartBasicConstant,
+                    return DelegateExtensions.SatisfyAny(pair.IsInInterval, song.SplashChartBasicConstant,
                         song.SplashChartAdvancedConstant, song.SplashChartExpertConstant, song.SplashChartMasterConstant,
                         song.SplashChartRemasterConstant);
                 }
@@ -113,6 +113,7 @@ namespace KouGamePlugin.Maimai.Models
                    $"{citedFieldNames.BeIfContains(nameof(SongArtist), $"\n   曲师：{SongArtist}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(Version), $"\n   版本：{Version}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(Date), $"\n   日期：20{Date}")}" +
+                   $"{citedFieldNames.BeIfContains(nameof(SongBpm), $"\n   BPM：{SongBpm}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(Remark), $"\n   注：{Remark}")}";
         }
 
@@ -145,8 +146,8 @@ namespace KouGamePlugin.Maimai.Models
 
             bool withoutConstant = SongGenreSplash == null;
             string splashAndDxData = $"{SongGenreSplash?.Be($"\n分类：{SongGenreSplash}")}" +
-                                     $"{ToSplashRatingString()?.Be("\n难度：{0}", true)}"+
-                                     $"{ToSplashConstantString()?.Be("\n定数：{0}", true)}"+
+                                     $"{ToSplashRatingString()?.Be("\n难度：{0}", true)}" +
+                                     $"{ToSplashConstantString()?.Be("\n定数：{0}", true)}" +
                                      $"{ToRatingString()?.Be("\n旧难度：{0}", true)}" +
                                      $"{ToConstantString()?.Be("\n旧定数：{0}", true)}";
 
@@ -158,7 +159,7 @@ namespace KouGamePlugin.Maimai.Models
                 case FormatType.Detail:
                     return $"{JacketUrl?.Be(new KouImage(JacketUrl, this).ToKouResourceString())}" + //BUG 需要解决翻页可能会使得图片资源字符串裂开的问题
                            $"{SongId}.{SongTitle} [{SongType}]" +
-                           splashAndDxData + 
+                           splashAndDxData +
                            Version?.Be($"\n版本：{Version}") +
                            SongArtist?.Be($"\n曲师：{SongArtist}") +
                            SongBpm?.Be($"\nBPM：{SongBpm}") +

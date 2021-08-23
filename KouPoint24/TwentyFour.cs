@@ -1,15 +1,15 @@
-﻿using System;
+﻿using Koubot.Tool.Extensions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using Koubot.Tool.Extensions;
 
 namespace KouGamePlugin
 {
     public class TwentyFour
     {
-    
-        private List<int> curCalArr = new() {0,0,0,0};
+
+        private List<int> curCalArr = new() { 0, 0, 0, 0 };
         private const double Loss = 1e-7;
         private List<Num> _answers = new();
         private int _target;
@@ -41,7 +41,7 @@ namespace KouGamePlugin
             answer = null;
             _answers = new();
             CalCount = 0;
-            if (ToTargetUse(curCalArr.Select(n=>new Num(n)).ToList()))
+            if (ToTargetUse(curCalArr.Select(n => new Num(n)).ToList()))
             {
                 answer = _answers.Select(n => n.ToString()).Distinct().ToList();
                 return true;
@@ -89,7 +89,7 @@ namespace KouGamePlugin
                 if (_notComeFromCal) return ((int)Value).ToString();
                 string result = $"{_x}{_way.GetDescription()}{_y}";
                 //if (_way.EqualsAny(Operator.Add, Operator.Sub))
-                    return $"({result})";
+                return $"({result})";
                 return result;
             }
         }
@@ -109,7 +109,7 @@ namespace KouGamePlugin
 
                 return false;
             }
-            for (int i = 0; i < numList.Count-1; i++)
+            for (int i = 0; i < numList.Count - 1; i++)
             {
                 for (int j = i + 1; j < numList.Count; j++)
                 {
@@ -118,7 +118,7 @@ namespace KouGamePlugin
                     List<Num> newList = new List<Num>();
                     for (int k = 0; k < numList.Count; k++)
                     {
-                        if(k == i || k == j) continue;
+                        if (k == i || k == j) continue;
                         newList.Add(numList[k]);
                     }
 
@@ -190,7 +190,7 @@ namespace KouGamePlugin
         //        sequence = $"({curCalArr[at]}+{sequence})";
         //        return true;
         //    }
-     
+
         //    if (CanGetWanted(at + 1, curCalArr[at] * wanted))
         //    {
         //        sequence = $"{sequence}/{curCalArr[at]}";

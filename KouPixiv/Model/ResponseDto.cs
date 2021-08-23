@@ -1,8 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Koubot.SDK.Models.Entities;
 using Koubot.Tool.Extensions;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace KouFunctionPlugin.Pixiv
 {
@@ -68,13 +67,13 @@ namespace KouFunctionPlugin.Pixiv
                     foreach (var tagName in Tags)
                     {
                         if (R18 || tagName.IsMatch("r.*(18|17).*", RegexOptions.IgnoreCase)) R18Flag = true;
-                        var newTag = new PixivTag {Name = tagName};
+                        var newTag = new PixivTag { Name = tagName };
                         var oldTag = newTag.FindThis(context);
                         tags.Add(oldTag ?? newTag);
                     }
                 }
 
-                var author = new PixivAuthor() {Name = Author, Uid = Uid};
+                var author = new PixivAuthor() { Name = Author, Uid = Uid };
                 var oldAuthor = author.FindThis(context);
                 if (oldAuthor != null) author = oldAuthor;
 
@@ -100,6 +99,6 @@ namespace KouFunctionPlugin.Pixiv
             public string Error { get; set; }
             public List<DataItem> Data { get; set; }
         }
-        
+
     }
 }

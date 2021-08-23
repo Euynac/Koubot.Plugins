@@ -1,11 +1,11 @@
-﻿using Koubot.SDK.Interface;
-using Koubot.SDK.Protocol.AutoModel;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Koubot.SDK.Models.System;
+using Koubot.SDK.AutoModel;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Protocol.AutoModel;
 
 // ReSharper disable once CheckNamespace
 namespace KouFunctionPlugin.Romaji.Models

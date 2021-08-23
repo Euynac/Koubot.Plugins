@@ -1,27 +1,25 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using Koubot.SDK.API;
+using Koubot.SDK.Models.Entities;
+using Koubot.Tool.Extensions;
+using Koubot.Tool.General;
+using Koubot.Tool.Random;
+using Koubot.Tool.Web.RateLimiter;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Koubot.SDK.API;
-using Koubot.SDK.Interface;
-using Koubot.SDK.Models.Entities;
-using Koubot.SDK.Protocol;
-using Koubot.SDK.Protocol.Event;
-using Koubot.SDK.Protocol.Plugin;
-using Koubot.SDK.Services;
-using Koubot.Tool.Extensions;
-using Koubot.Tool.General;
-using Koubot.Tool.Random;
-using Koubot.Tool.Web;
-using Koubot.Tool.Web.RateLimiter;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Models;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Event;
+using Koubot.Shared.Protocol.Plugin;
 
 namespace KouFunctionPlugin
 {
     [KouPluginClass(
-        "poke", 
-        "戳一戳", 
+        "poke",
+        "戳一戳",
         Author = "7zou")]
     public class KouTickle : KouPlugin<KouTickle>,
         IWantKouPlatformUser,
@@ -32,22 +30,32 @@ namespace KouFunctionPlugin
 
         private static readonly List<string> _thirdDescription = new()
         {
-            "这就算了", "可还行？看看下面的","嗯。。。","还可以"
+            "这就算了",
+            "可还行？看看下面的",
+            "嗯。。。",
+            "还可以"
         };
         private static readonly List<string> _secondDescription = new()
         {
-            "有够闲得啊", "这还不算什么，还有更离谱的！","说什么好呢","挺闲的呢",
+            "有够闲得啊",
+            "这还不算什么，还有更离谱的！",
+            "说什么好呢",
+            "挺闲的呢",
             "戳出了好几个好"
         };
         private static readonly List<string> _firstDescription = new()
         {
-            "也太几把闲的慌了，建议多戳戳自己的肚皮", "就那么喜欢听我骂你吗",
-            "建议戳纵连也这样戳噢","无语了呢..."
+            "也太几把闲的慌了，建议多戳戳自己的肚皮",
+            "就那么喜欢听我骂你吗",
+            "建议戳纵连也这样戳噢",
+            "无语了呢..."
         };
 
         private static readonly List<List<string>> _descriptionList = new()
         {
-            _firstDescription, _secondDescription, _thirdDescription
+            _firstDescription,
+            _secondDescription,
+            _thirdDescription
         };
 
         private static readonly KouColdDown<PlatformGroup> _rankCD = new();
@@ -78,23 +86,26 @@ namespace KouFunctionPlugin
                 }
 
                 return reply.TrimEnd();
-            }    
+            }
             string prologue = $"接下来公布一下自本Kou上次醒来({KouGlobalConfig.SystemStartTime})，本群最闲着没事干玩戳一戳的人";
             CurrentPlatformGroup.SendGroupMessage(prologue);
             Thread.Sleep(2000);
             var list = groupInfoDict.OrderByDescending(p => p.Value.Total)
                 .ToList();
-            for (int i = 2; i >= 0 ; i--)
+            for (int i = 2; i >= 0; i--)
             {
                 var info = list[i];
                 string reply = "";
                 switch (i)
                 {
-                    case 2: reply += "第三名";
+                    case 2:
+                        reply += "第三名";
                         break;
-                    case 1: reply += "第二名";
+                    case 1:
+                        reply += "第二名";
                         break;
-                    case 0: reply += $"{(info.Value.Total > list[i+1].Value.Total + 20 ? "最几把离谱的" : null)}第一名";
+                    case 0:
+                        reply += $"{(info.Value.Total > list[i + 1].Value.Total + 20 ? "最几把离谱的" : null)}第一名";
                         break;
                 }
 
@@ -103,7 +114,7 @@ namespace KouFunctionPlugin
                          $"{info.Value.TimesOfPokeOthers.BeIfNotDefault($"戳了其他人{info.Value.TimesOfPokeOthers}次，")}" +
                          $"{_descriptionList[i].RandomGetOne()}";
                 CurrentPlatformGroup.SendGroupMessage(reply);
-                Thread.Sleep(RandomTool.GenerateRandomInt(1500,3500));
+                Thread.Sleep(RandomTool.GenerateRandomInt(1500, 3500));
             }
             return null;
         }
@@ -160,7 +171,7 @@ namespace KouFunctionPlugin
         }
 
         [KouPluginFunction(Name = "遗忘", ActivateKeyword = "del|delete", Help = "删除学习过的戳一戳反馈")]
-        public string DeleteItem([KouPluginArgument(Name = "戳一戳ID")]List<int> id)
+        public string DeleteItem([KouPluginArgument(Name = "戳一戳ID")] List<int> id)
         {
             var result = new StringBuilder();
             foreach (var i in id)

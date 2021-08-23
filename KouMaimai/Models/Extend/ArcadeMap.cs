@@ -1,15 +1,11 @@
-﻿using Koubot.SDK.Interface;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol.AutoModel;
-using Koubot.Tool.General;
-using Koubot.Tool.Math;
-using Koubot.Tool.String;
+﻿using Koubot.Tool.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using Koubot.Tool.Extensions;
+using Koubot.SDK.AutoModel;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
 
 namespace KouGamePlugin.Maimai.Models
 {
@@ -25,11 +21,11 @@ namespace KouGamePlugin.Maimai.Models
         public override string GetAutoCitedSupplement(List<string> citedFieldNames)
         {
             return
-                   $"{citedFieldNames.BeIfContains(nameof(ArcadeName), $"\n   电玩城名：{ArcadeName}")}"+
+                   $"{citedFieldNames.BeIfContains(nameof(ArcadeName), $"\n   电玩城名：{ArcadeName}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(MallName), $"\n   商城名：{MallName}")}";
         }
 
-        
+
         public override string ToString(FormatType format, object supplement = null, KouCommand command = null)
         {
 

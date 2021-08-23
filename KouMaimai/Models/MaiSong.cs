@@ -1,15 +1,15 @@
-﻿using Koubot.SDK.Protocol.AutoModel;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Koubot.Shared.Protocol.AutoModel;
 
 
 namespace KouGamePlugin.Maimai.Models
 {
     [Table("plugin_maimai_song")]
-    [KouAutoModelTable("song", 
-        new[] { nameof(KouMaimai) }, 
-        Name = "Maimai歌曲", 
+    [KouAutoModelTable("song",
+        new[] { nameof(KouMaimai) },
+        Name = "Maimai歌曲",
         Help = "萌娘wiki + 日服数据")]
     public partial class MaiSong
     {

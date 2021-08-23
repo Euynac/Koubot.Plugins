@@ -1,19 +1,18 @@
-﻿using Koubot.SDK.Interface;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol;
-using Koubot.SDK.Protocol.Plugin;
+﻿using Koubot.SDK.API;
 using Koubot.SDK.Services.Interface;
+using Koubot.Tool.Extensions;
 using Koubot.Tool.KouData;
 using Koubot.Tool.Math;
 using Koubot.Tool.Random;
-using Koubot.Tool.String;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Koubot.SDK.API;
-using Koubot.Tool.Extensions;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Plugin;
 
 namespace KouFunctionPlugin
 {
@@ -83,11 +82,26 @@ namespace KouFunctionPlugin
         };
         private static readonly List<string> kouThinkList = new()
         {
-            "Kou认为","Kou觉得","我认为","我觉得"
+            "Kou认为",
+            "Kou觉得",
+            "我认为",
+            "我觉得"
         };
         private static readonly List<string> maybeList = new()
         {
-            "大概","也许","兴许","或许","可能","很可能","大致","好像","大约","大抵","约","应该",""
+            "大概",
+            "也许",
+            "兴许",
+            "或许",
+            "可能",
+            "很可能",
+            "大致",
+            "好像",
+            "大约",
+            "大抵",
+            "约",
+            "应该",
+            ""
         };
         private static readonly List<string> speakList = new()
         {
@@ -155,12 +169,12 @@ namespace KouFunctionPlugin
                 Message.ReplyMessage("嗯...让我算一算");
                 Thread.Sleep((int)(probability * 3333));
             }
-            
+
             return $"{kouThinkList.RandomGetOne()}{eventName}概率{maybeList.RandomGetOne()}有{probability:P}";
         }
 
         [KouPluginFunction(ActivateKeyword = "抽号码|roll", Name = "随机抽取号码",
-            Help = "从给定的区间随机选取整数字（给单个数则是从1-给定数字的范围）（默认是1-100）", SupportedParameters = new []{nameof(Count), nameof(CanRepeat)})]
+            Help = "从给定的区间随机选取整数字（给单个数则是从1-给定数字的范围）（默认是1-100）", SupportedParameters = new[] { nameof(Count), nameof(CanRepeat) })]
         public string RandomNumber(string intervalOrStr = null)
         {
             if (!IntervalDoublePair.TryGetIntervalDoublePair(intervalOrStr, out var interval, true))

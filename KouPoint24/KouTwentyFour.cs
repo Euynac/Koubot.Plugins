@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Koubot.SDK.Protocol;
-using Koubot.SDK.Protocol.Plugin;
-using Koubot.Tool.Extensions;
+﻿using Koubot.Tool.Extensions;
+using System.Collections.Generic;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Plugin;
 
 namespace KouGamePlugin
 {
@@ -11,7 +11,7 @@ namespace KouGamePlugin
         PluginType = KouEnum.PluginType.Game)]
     public class KouTwentyFour : KouPlugin<KouTwentyFour>
     {
-        
+
         [KouPluginParameter(Name = "计算目标（默认24点）", ActivateKeyword = "t|target")]
         public int Target { get; set; } = 24;
         [KouPluginParameter(Name = "获取所有解组合", ActivateKeyword = "all")]
@@ -20,7 +20,7 @@ namespace KouGamePlugin
         [KouPluginFunction(Name = "使用给定的数尝试计算24点，输出一个解", ActivateKeyword = "cal")]
         public object TryCalUse(
             [KouPluginArgument(Name = "使用数字，比如1，2，3，4",
-                SplitChar = ",， 、", 
+                SplitChar = ",， 、",
                 ArgumentAttributes = KouEnum.KouParameterAttribute.AllowDuplicate)]
             List<int> useNumList)
         {
@@ -41,7 +41,7 @@ namespace KouGamePlugin
         [KouPluginFunction(Name = "使用给定的数尝试计算24点测试是否有答案", ActivateKeyword = "test")]
         public object TryTest(
             [KouPluginArgument(Name = "使用的数字，比如1，2，3，4",
-                SplitChar = ",， 、", 
+                SplitChar = ",， 、",
                 ArgumentAttributes = KouEnum.KouParameterAttribute.AllowDuplicate)]
             List<int> useNumList)
         {

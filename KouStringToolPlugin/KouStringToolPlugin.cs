@@ -1,17 +1,14 @@
-﻿using System;
+﻿using Koubot.SDK.Tool;
+using Koubot.Tool.Extensions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Koubot.SDK.Interface;
-using Koubot.SDK.Protocol;
-using Koubot.SDK.Protocol.Plugin;
-using Koubot.SDK.Protocol.Result;
-using Koubot.SDK.Services;
-using Koubot.SDK.Tool;
-using Koubot.Tool.Extensions;
-using Koubot.Tool.String;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Plugin;
+using Koubot.Shared.Protocol.Result;
 
 namespace KouFunctionPlugin
 {
@@ -19,8 +16,8 @@ namespace KouFunctionPlugin
     /// Kou字符串工具
     /// </summary>
     [KouPluginClass(
-        "str|grep", 
-        "字符串工具", 
+        "str|grep",
+        "字符串工具",
         Author = "7zou")]
     public class KouStringToolPlugin : KouPlugin<KouStringToolPlugin>
     {
@@ -34,8 +31,8 @@ namespace KouFunctionPlugin
         public bool Invert { get; set; }
 
         [KouPluginFunction(ActivateKeyword = "sort", Name = "按行排序字符串",
-            SupportedParameters = new[] {nameof(Descending), nameof(IgnoreCase)})]
-        public object SortStrings([KouPluginArgument(Name = "字符串", SplitChar = "\r\n")]List<string> strList)
+            SupportedParameters = new[] { nameof(Descending), nameof(IgnoreCase) })]
+        public object SortStrings([KouPluginArgument(Name = "字符串", SplitChar = "\r\n")] List<string> strList)
         {
             int factor = Descending ? -1 : 1;
             strList.Sort((s, s1) =>
@@ -54,7 +51,7 @@ namespace KouFunctionPlugin
             if (strToRemove.IsNullOrWhiteSpace()) strToRemove = " ";
             if (strToRemove != " ")
             {
-                var stringsNeedToRemove = strToRemove.Split(new[] {' ', ',', '，', '、'}, StringSplitOptions.RemoveEmptyEntries);
+                var stringsNeedToRemove = strToRemove.Split(new[] { ' ', ',', '，', '、' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var str in stringsNeedToRemove)
                 {
                     value = value.Replace(str, "");
@@ -63,17 +60,17 @@ namespace KouFunctionPlugin
 
             return value;
         }
-        
-        
+
+
         [KouPluginFunction(ActivateKeyword = "split|s", Name = "分割字符串",
-            SupportedParameters = new[] {nameof(IgnoreCase)})]
+            SupportedParameters = new[] { nameof(IgnoreCase) })]
         public object SplitString(string separator, string str)
         {
             return str.Split(separator.ToCharArray()).ToStringJoin("\n");
         }
 
         [KouPluginFunction(ActivateKeyword = "replace|r", Name = "字符串替换",
-            SupportedParameters = new[] {nameof(IgnoreCase)})]
+            SupportedParameters = new[] { nameof(IgnoreCase) })]
         public object StringReplace(string oldValue, string newValue, string str)
         {
             return str.Replace(oldValue, newValue, IgnoreCase, null);
@@ -87,7 +84,7 @@ namespace KouFunctionPlugin
         {
             return new ResultPluginHelp();
         }
-        
+
         #region grep
         private object Default(string pattern, string strToMatch)
         {
@@ -109,7 +106,7 @@ namespace KouFunctionPlugin
         [KouPluginFunction(
             Name = "grep文本搜索",
             Help = "grep模仿自Linux，Globally search a Regular Expression and Print",
-            SupportedParameters = new []{nameof(IgnoreCase), nameof(Invert), nameof(RowCount)})]
+            SupportedParameters = new[] { nameof(IgnoreCase), nameof(Invert), nameof(RowCount) })]
         public object Default(string pattern, object list)
         {
             if (list is string str) return Default(pattern, str);
@@ -140,11 +137,11 @@ namespace KouFunctionPlugin
                 var item = iterator.Current;
                 if (item == null) continue;
                 yield return
-                    isIKouFormattable ? ((IKouFormattable) item).ToString(FormatType.Brief) : item.ToString();
+                    isIKouFormattable ? ((IKouFormattable)item).ToString(FormatType.Brief) : item.ToString();
             }
 
         }
-    
+
         private static string GrepResult(bool isIKouFormattable, IEnumerable enumerable, bool ignoreCase, bool invert, string pattern, bool isRegex)
         {
             StringBuilder resultBuilder = new StringBuilder();
@@ -168,7 +165,7 @@ namespace KouFunctionPlugin
                             resultBuilder.Append(item + "\n");
                     }
                 }
-                
+
             }
             else
             {
@@ -178,7 +175,7 @@ namespace KouFunctionPlugin
                 {
                     foreach (var item in YieldString(enumerable, isIKouFormattable))
                     {
-                        if (regex.IsMatch(item)) 
+                        if (regex.IsMatch(item))
                             resultBuilder.Append(item + "\n");
                     }
                 }
@@ -186,7 +183,7 @@ namespace KouFunctionPlugin
                 {
                     foreach (var item in YieldString(enumerable, isIKouFormattable))
                     {
-                        if (!regex.IsMatch(item)) 
+                        if (!regex.IsMatch(item))
                             resultBuilder.Append(item + "\n");
                     }
                 }
@@ -208,7 +205,7 @@ namespace KouFunctionPlugin
 
             return null;
         }
-        
+
 
         #endregion
     }

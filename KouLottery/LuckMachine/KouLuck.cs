@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Koubot.SDK.Interface;
-using Koubot.SDK.Models.Entities;
-using Koubot.SDK.Models.System;
-using Koubot.SDK.Protocol;
-using Koubot.SDK.Protocol.Plugin;
+﻿using Koubot.SDK.Models.Entities;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.Random;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Models;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Plugin;
 
 namespace KouFunctionPlugin.LuckMachine
 {
@@ -19,23 +19,69 @@ namespace KouFunctionPlugin.LuckMachine
     public class KouLuck : KouPlugin<KouLuck>, IWantKouPlatformUser, IWantCommandLifeKouContext, IWantKouGlobalConfig
     {
         private static List<string> DirectionList { get; } =
-            new() {"东", "南", "西", "北", "东南", "东北", "西南", "西北"};
+            new() { "东", "南", "西", "北", "东南", "东北", "西南", "西北" };
 
         private static List<string> MusicGameList { get; } =
             new()
             {
-                "Cytus", "Hachi Hachi", "P:h Diver", "osu!",
-                "Tone Sphere", "Groove Coaster", "Deemo", "Malody",
-                "Dynamix","同步音律喵赛克","VOEZ","缪斯计划","Lanota","Arcaea",
-                "Pianista","maimai","Cytus II","Muse Dash","O2Jam","Phigros",
-                "polytone","阳春白雪","Beatmania IIDX","LoveLive!",
-                "The IdolM@ster Cinderella Girls Starlight Stage","BanG Dream!",
-                "D4DJ","Project Sekai Colorful Stage!","Groove Coaster","DJMAX",
-                "Taiko no Tatsujin","Beat Saber","WACCA","maimai","CHUNITHM","SOUND VOLTEX",
-                "Jubeat","DANCERUSH","O.N.G.E.K.I.","WAVEAT","Cytoid","Dynamite",
-                "東方鍵盤遊戲","节奏大师 Plus(?","O2Jam u", "Sonolus","BanGround",
-                "钢琴块","初音ミク -Project DIVA-","GITADORA","音灵 INVAXION","OverRapid"
-                ,"初音未来：梦幻歌姬","舞立方","舞萌DX","maimai でらっくす Splash","乐动时代"
+                "Cytus",
+                "Hachi Hachi",
+                "P:h Diver",
+                "osu!",
+                "Tone Sphere",
+                "Groove Coaster",
+                "Deemo",
+                "Malody",
+                "Dynamix",
+                "同步音律喵赛克",
+                "VOEZ",
+                "缪斯计划",
+                "Lanota",
+                "Arcaea",
+                "Pianista",
+                "maimai",
+                "Cytus II",
+                "Muse Dash",
+                "O2Jam",
+                "Phigros",
+                "polytone",
+                "阳春白雪",
+                "Beatmania IIDX",
+                "LoveLive!",
+                "The IdolM@ster Cinderella Girls Starlight Stage",
+                "BanG Dream!",
+                "D4DJ",
+                "Project Sekai Colorful Stage!",
+                "Groove Coaster",
+                "DJMAX",
+                "Taiko no Tatsujin",
+                "Beat Saber",
+                "WACCA",
+                "maimai",
+                "CHUNITHM",
+                "SOUND VOLTEX",
+                "Jubeat",
+                "DANCERUSH",
+                "O.N.G.E.K.I.",
+                "WAVEAT",
+                "Cytoid",
+                "Dynamite",
+                "東方鍵盤遊戲",
+                "节奏大师 Plus(?",
+                "O2Jam u",
+                "Sonolus",
+                "BanGround",
+                "钢琴块",
+                "初音ミク -Project DIVA-",
+                "GITADORA",
+                "音灵 INVAXION",
+                "OverRapid"
+                ,
+                "初音未来：梦幻歌姬",
+                "舞立方",
+                "舞萌DX",
+                "maimai でらっくす Splash",
+                "乐动时代"
             };
 
 
@@ -64,10 +110,10 @@ namespace KouFunctionPlugin.LuckMachine
             result += $"\n今日音游：{MusicGameList.RandomGetOne(hashString)}";
             result += $"\n建议机位：P{RandomTool.GenerateRandomInt(1, 2, hashString)}";
             result += $"\n建议朝向：{DirectionList.RandomGetOne(hashString)}";
-            
+
             return result;
         }
-        
+
         [KouPluginFunction(Help = "重新获取今日运势（限免）", ActivateKeyword = "remake")]
         public string Remake()
         {
@@ -81,7 +127,7 @@ namespace KouFunctionPlugin.LuckMachine
             return GetTodayLuck();
         }
         [KouPluginFunction(Name = "遗忘", ActivateKeyword = "del|delete", Help = "删除学习过的黄历")]
-        public string DeleteItem([KouPluginArgument(Name = "黄历ID")]List<int> id)
+        public string DeleteItem([KouPluginArgument(Name = "黄历ID")] List<int> id)
         {
             var result = new StringBuilder();
             foreach (var i in id)
@@ -115,7 +161,7 @@ namespace KouFunctionPlugin.LuckMachine
             {
                 item = item.Substring(1);
             }
-            
+
             var success = Almanac.Add(almanac =>
             {
                 almanac.Content = itemIntro;

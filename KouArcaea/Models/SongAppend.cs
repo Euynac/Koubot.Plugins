@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Koubot.Shared.Protocol.AutoModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Koubot.SDK.Protocol.AutoModel;
 
 namespace KouGamePlugin.Arcaea.Models
 {

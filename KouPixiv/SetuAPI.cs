@@ -1,6 +1,4 @@
-using System;
-using Koubot.SDK.Interface;
-using Koubot.Tool.Extensions;
+using Koubot.Shared.Interface;
 using Koubot.Tool.Web;
 using Koubot.Tool.Web.RateLimiter;
 using Newtonsoft.Json;

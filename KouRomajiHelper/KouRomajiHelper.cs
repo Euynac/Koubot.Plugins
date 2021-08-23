@@ -1,11 +1,10 @@
-﻿using Koubot.SDK.Protocol.Plugin;
-using Koubot.SDK.Services;
+﻿using Koubot.SDK.Tool;
+using Koubot.Tool.Extensions;
 using KouFunctionPlugin.Romaji.Models;
 using KouRomajiHelper;
 using System.Linq;
-using Koubot.SDK.Tool;
-using Koubot.Tool.Extensions;
-using static Koubot.SDK.Protocol.KouEnum;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Plugin;
 
 namespace KouFunctionPlugin.Romaji
 {
@@ -15,7 +14,7 @@ namespace KouFunctionPlugin.Romaji
     [KouPluginClass("romaji", "罗马音助手",
         Introduction = "罗马音助手",
         Author = "7zou",
-        PluginType = PluginType.Function)]
+        PluginType = KouEnum.PluginType.Function)]
     public class KouRomajiHelper : KouPlugin<KouRomajiHelper>
     {
         [KouPluginParameter(ActivateKeyword = "all", Help = "输出带原日文")]

@@ -1,13 +1,12 @@
-﻿using Koubot.SDK.Interface;
-using Koubot.SDK.Protocol.AutoModel;
+﻿using Koubot.Tool.Extensions;
+using Koubot.Tool.General;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using Koubot.SDK.Models.System;
-using Koubot.Tool.Extensions;
-using Koubot.Tool.General;
+using Koubot.SDK.AutoModel;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
 
 namespace KouGamePlugin.Arcaea.Models
 {
@@ -62,7 +61,7 @@ namespace KouGamePlugin.Arcaea.Models
                 entity
                     .HasOne(p => p.SourceUser)
                     .WithMany()
-                    .HasPrincipalKey(p =>p.Id)
+                    .HasPrincipalKey(p => p.Id)
                     .HasForeignKey(p => p.SourceUserID)
                     .OnDelete(DeleteBehavior.ClientSetNull);
             };
