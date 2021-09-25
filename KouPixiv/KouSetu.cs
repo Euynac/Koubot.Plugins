@@ -1,14 +1,15 @@
 using Koubot.SDK.API;
+using Koubot.SDK.PluginInterface;
+using Koubot.SDK.System;
+using Koubot.Shared.Models;
+using Koubot.Shared.Protocol;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.General;
 using System;
 using System.Linq;
 using System.Threading;
-using Koubot.SDK.System;
-using Koubot.Shared.Interface;
-using Koubot.Shared.Models;
-using Koubot.Shared.Protocol;
-using Koubot.Shared.Protocol.Plugin;
+using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.KouEnum;
 
 // ReSharper disable once CheckNamespace
 namespace KouFunctionPlugin.Pixiv
@@ -16,7 +17,7 @@ namespace KouFunctionPlugin.Pixiv
     [KouPluginClass("setu", "涩图",
         Introduction = "随机涩图",
         Author = "7zou",
-        PluginType = KouEnum.PluginType.Function)]
+        PluginType = PluginType.Function)]
     public class KouSetu : KouPlugin<KouSetu>, IWantKouUser, IWantKouPlatformGroup, IWantKouGlobalConfig
     {
         private const int WorkFee = 8;

@@ -1,7 +1,9 @@
-﻿using Koubot.Tool.Random;
+﻿using Koubot.Shared.Protocol;
+using Koubot.Tool.Random;
 using System.Collections.Generic;
-using Koubot.Shared.Protocol;
-using Koubot.Shared.Protocol.Plugin;
+using Koubot.SDK.PluginInterface;
+using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.KouEnum;
 
 namespace KouFunctionPlugin
 {
@@ -11,7 +13,7 @@ namespace KouFunctionPlugin
     [KouPluginClass("yingxiao", "营销号生成器",
         Introduction = "营销号生成器\n使用方法：<主体> <事件> <另一种说法>",
         Author = "7zou",
-        PluginType = KouEnum.PluginType.Function)]
+        PluginType = PluginType.Function)]
     public class KouMarketingGenerator : KouPlugin<KouMarketingGenerator>
     {
         private static readonly List<string> Ends = new List<string>()

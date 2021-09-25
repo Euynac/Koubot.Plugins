@@ -1,21 +1,23 @@
 ﻿using Koubot.SDK.Models.Entities;
+using Koubot.SDK.PluginInterface;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Models;
+using Koubot.Shared.Protocol;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.Random;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Koubot.Shared.Interface;
-using Koubot.Shared.Models;
-using Koubot.Shared.Protocol;
-using Koubot.Shared.Protocol.Plugin;
+using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.KouEnum;
 
 namespace KouFunctionPlugin.LuckMachine
 {
     [KouPluginClass("luck", "运势",
         Author = "7zou",
-        Authority = KouEnum.Authority.NormalUser,
+        Authority = Authority.NormalUser,
         Introduction = "运势相关功能",
-        PluginType = KouEnum.PluginType.Function)]
+        PluginType = PluginType.Function)]
     public class KouLuck : KouPlugin<KouLuck>, IWantKouPlatformUser, IWantCommandLifeKouContext, IWantKouGlobalConfig
     {
         private static List<string> DirectionList { get; } =
@@ -135,7 +137,7 @@ namespace KouFunctionPlugin.LuckMachine
                 var almanac = Almanac.SingleOrDefault(a => a.ID == i);
                 if (almanac == null) result.Append($"\n不记得ID{i}");
                 else if (almanac.SourceUser != null && almanac.SourceUser != CurrentPlatformUser &&
-                         !CurrentPlatformUser.HasTheAuthority(KouEnum.Authority.BotManager))
+                         !CurrentPlatformUser.HasTheAuthority(Authority.BotManager))
                     result.Append($"\nID{i}是别人贡献的，不可以删噢");
                 else
                 {

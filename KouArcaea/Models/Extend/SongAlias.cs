@@ -1,12 +1,12 @@
-﻿using Koubot.Tool.Extensions;
+﻿using Koubot.SDK.AutoModel;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Protocol;
+using Koubot.Tool.Extensions;
 using Koubot.Tool.General;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Linq;
-using Koubot.SDK.AutoModel;
-using Koubot.SDK.System;
-using Koubot.Shared.Interface;
 
 namespace KouGamePlugin.Arcaea.Models
 {

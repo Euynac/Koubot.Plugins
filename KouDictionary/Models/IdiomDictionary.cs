@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Koubot.Shared.Protocol.AutoModel;
+using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.Enums;
 
 
 namespace KouFunctionPlugin.Models

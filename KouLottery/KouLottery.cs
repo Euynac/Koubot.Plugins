@@ -1,5 +1,8 @@
 ﻿using Koubot.SDK.API;
+using Koubot.SDK.PluginInterface;
 using Koubot.SDK.Services.Interface;
+using Koubot.SDK.System;
+using Koubot.Shared.Protocol;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.KouData;
 using Koubot.Tool.Math;
@@ -9,18 +12,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Koubot.SDK.System;
-using Koubot.Shared.Interface;
-using Koubot.Shared.Protocol;
-using Koubot.Shared.Protocol.Plugin;
+using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.KouEnum;
+using KouMessage = Koubot.Shared.Protocol.KouMessage;
 
 namespace KouFunctionPlugin
 {
     [KouPluginClass("lot|抽奖", "抽奖机",
         Author = "7zou",
-        Authority = KouEnum.Authority.NormalUser,
+        Authority = Authority.NormalUser,
         Introduction = "抽奖机",
-        PluginType = KouEnum.PluginType.Function)]
+        PluginType = PluginType.Function)]
     public class KouLottery : KouPlugin<KouLottery>, IWantKouMessage, IWantKouSession
     {
         [KouPluginParameter(ActivateKeyword = "count|c", Name = "抽签数量", Help = "范围在1-100",
@@ -131,7 +133,7 @@ namespace KouFunctionPlugin
         public string DrawCustomLottery(
             [KouPluginArgument(
                 Name = "自定义签",
-                ArgumentAttributes = KouEnum.KouParameterAttribute.AllowDuplicate,
+                ArgumentAttributes = KouParameterAttribute.AllowDuplicate,
                 SplitChar = " ")]List<string> lotList)
         {
             StringBuilder result = new StringBuilder();

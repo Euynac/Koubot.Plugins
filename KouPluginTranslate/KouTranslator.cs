@@ -1,13 +1,15 @@
 ﻿using Koubot.SDK.API;
 using Koubot.SDK.Tool;
+using Koubot.Shared.Protocol;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.General;
 using Koubot.Tool.Random;
 using Koubot.Tool.Web;
 using System;
 using System.Text;
-using Koubot.Shared.Protocol;
-using Koubot.Shared.Protocol.Plugin;
+using Koubot.SDK.PluginInterface;
+using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.KouEnum;
 using ToolGood.Words;
 using static Koubot.SDK.API.BaiduTranslateAPI;
 
@@ -16,7 +18,7 @@ namespace KouFunctionPlugin
     [KouPluginClass("trans|翻译|translate", "翻译器",
         Introduction = "提供多种翻译、转换功能",
         Author = "7zou",
-        PluginType = KouEnum.PluginType.Function)]
+        PluginType = PluginType.Function)]
     public class KouTranslator : KouPlugin<KouTranslator>
     {
         [KouPluginParameter(ActivateKeyword = "l", Name = "英文转小写", Help = "返回的结果中的英文全部转为大写小写")]

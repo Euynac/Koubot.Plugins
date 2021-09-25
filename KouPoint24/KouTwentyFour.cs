@@ -1,14 +1,16 @@
-﻿using Koubot.Tool.Extensions;
+﻿using Koubot.Shared.Protocol;
+using Koubot.Tool.Extensions;
 using System.Collections.Generic;
-using Koubot.Shared.Protocol;
-using Koubot.Shared.Protocol.Plugin;
+using Koubot.SDK.PluginInterface;
+using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.KouEnum;
 
 namespace KouGamePlugin
 {
     [KouPluginClass("24", "24点",
         Introduction = "24点游戏",
         Author = "7zou",
-        PluginType = KouEnum.PluginType.Game)]
+        PluginType = PluginType.Game)]
     public class KouTwentyFour : KouPlugin<KouTwentyFour>
     {
 
@@ -21,7 +23,7 @@ namespace KouGamePlugin
         public object TryCalUse(
             [KouPluginArgument(Name = "使用数字，比如1，2，3，4",
                 SplitChar = ",， 、",
-                ArgumentAttributes = KouEnum.KouParameterAttribute.AllowDuplicate)]
+                ArgumentAttributes = KouParameterAttribute.AllowDuplicate)]
             List<int> useNumList)
         {
             if (useNumList.Count > 5) return "最多只能算5个数";
@@ -42,7 +44,7 @@ namespace KouGamePlugin
         public object TryTest(
             [KouPluginArgument(Name = "使用的数字，比如1，2，3，4",
                 SplitChar = ",， 、",
-                ArgumentAttributes = KouEnum.KouParameterAttribute.AllowDuplicate)]
+                ArgumentAttributes = KouParameterAttribute.AllowDuplicate)]
             List<int> useNumList)
         {
             if (useNumList.Count > 5) return "最多只能算5个数";

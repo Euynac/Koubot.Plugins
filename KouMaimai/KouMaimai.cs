@@ -1,7 +1,8 @@
-﻿using Koubot.SDK.System;
-using Koubot.Shared.Interface;
+﻿using Koubot.SDK.PluginInterface;
 using Koubot.Shared.Protocol;
-using Koubot.Shared.Protocol.Plugin;
+using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.KouEnum;
+using KouMessage = Koubot.Shared.Protocol.KouMessage;
 
 namespace KouGamePlugin.Maimai
 {
@@ -11,7 +12,7 @@ namespace KouGamePlugin.Maimai
     [KouPluginClass("mai", "Maimai",
         Introduction = "Maimai",
         Author = "7zou",
-        PluginType = KouEnum.PluginType.Game,
+        PluginType = PluginType.Game,
         CanUseProxy = true)]
     public class KouMaimai : KouPlugin<KouMaimai>, IWantKouMessage
     {

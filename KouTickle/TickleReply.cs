@@ -1,15 +1,15 @@
-﻿using Koubot.Tool.Extensions;
+﻿using Koubot.SDK.AutoModel;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Models;
+using Koubot.Shared.Protocol;
+using Koubot.Tool.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using Koubot.SDK.AutoModel;
-using Koubot.SDK.System;
-using Koubot.Shared.Interface;
-using Koubot.Shared.Models;
-using Koubot.Shared.Protocol.AutoModel;
+using Koubot.Shared.Protocol.Attribute;
 
 namespace KouFunctionPlugin
 {

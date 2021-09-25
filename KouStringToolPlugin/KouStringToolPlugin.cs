@@ -1,14 +1,15 @@
-﻿using Koubot.SDK.Tool;
+﻿using Koubot.SDK.PluginExtension.Result;
+using Koubot.SDK.Tool;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Protocol;
 using Koubot.Tool.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using Koubot.Shared.Interface;
-using Koubot.Shared.Protocol;
-using Koubot.Shared.Protocol.Plugin;
-using Koubot.Shared.Protocol.Result;
+using Koubot.SDK.PluginInterface;
+using Koubot.Shared.Protocol.Attribute;
 
 namespace KouFunctionPlugin
 {

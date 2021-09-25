@@ -1,5 +1,7 @@
+using Koubot.SDK.PluginInterface;
 using Koubot.Shared.Protocol;
-using Koubot.Shared.Protocol.Plugin;
+using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.KouEnum;
 using Koubot.Tool.Extensions;
 
 namespace KouFunctionPlugin.Pixiv
@@ -7,7 +9,7 @@ namespace KouFunctionPlugin.Pixiv
     [KouPluginClass("pixiv", "Pixiv助手",
         Introduction = "Pixiv相关插件（施工中）",
         Author = "7zou",
-        PluginType = KouEnum.PluginType.Function)]
+        PluginType = PluginType.Function)]
     public class KouPixiv : KouPlugin<KouPixiv>
     {
         [KouPluginFunction(ActivateKeyword = "count", Name = "当前本地Pixiv作品信息数量")]

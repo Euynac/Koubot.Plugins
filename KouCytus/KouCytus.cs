@@ -1,13 +1,15 @@
-﻿using System;
-using Koubot.Shared.Protocol;
-using Koubot.Shared.Protocol.Plugin;
+﻿using Koubot.Shared.Protocol;
+using System;
+using Koubot.SDK.PluginInterface;
+using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.KouEnum;
 
 namespace KouGamePlugin.Cytus
 {
     [KouPluginClass("cy", "Cytus助手",
         Introduction = "提供随机歌曲、计算小p等功能",
         Author = "7zou",
-        PluginType = KouEnum.PluginType.Game,
+        PluginType = PluginType.Game,
         CanUseProxy = true)]
     public class KouCytus : KouPlugin<KouCytus>
     {

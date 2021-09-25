@@ -1,5 +1,10 @@
 ﻿using Koubot.SDK.API;
 using Koubot.SDK.Models.Entities;
+using Koubot.SDK.PluginInterface;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Models;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Event;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.General;
 using Koubot.Tool.Random;
@@ -9,11 +14,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Koubot.Shared.Interface;
-using Koubot.Shared.Models;
-using Koubot.Shared.Protocol;
-using Koubot.Shared.Protocol.Event;
-using Koubot.Shared.Protocol.Plugin;
+using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.KouEnum;
 
 namespace KouFunctionPlugin
 {
@@ -179,7 +181,7 @@ namespace KouFunctionPlugin
                 var reply = TickleReply.SingleOrDefault(a => a.ID == i);
                 if (reply == null) result.Append($"\n不记得ID{i}");
                 else if (reply.SourceUser != null && reply.SourceUser != CurrentPlatformUser &&
-                         !CurrentPlatformUser.HasTheAuthority(KouEnum.Authority.BotManager))
+                         !CurrentPlatformUser.HasTheAuthority(Authority.BotManager))
                     result.Append($"\nID{i}是别人贡献的，不可以删噢");
                 else
                 {

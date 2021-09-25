@@ -1,4 +1,8 @@
-﻿using Koubot.Tool.Extensions;
+﻿using Koubot.SDK.AutoModel;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Protocol;
+using Koubot.Tool.Extensions;
 using Koubot.Tool.General;
 using Koubot.Tool.String;
 using Microsoft.EntityFrameworkCore;
@@ -9,10 +13,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Koubot.SDK.AutoModel;
-using Koubot.SDK.System;
-using Koubot.Shared.Interface;
-using Koubot.Shared.Protocol.AutoModel;
+using Koubot.Shared.Protocol.Attribute;
+using KouCommand = Koubot.Shared.Protocol.KouCommand;
 
 namespace KouGamePlugin.Arcaea.Models
 {

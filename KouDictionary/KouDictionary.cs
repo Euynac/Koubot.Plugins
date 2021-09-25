@@ -1,12 +1,14 @@
-﻿using Koubot.Shared.Protocol;
-using Koubot.Shared.Protocol.Plugin;
+﻿using Koubot.SDK.PluginInterface;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.KouEnum;
 
 namespace KouFunctionPlugin
 {
     [KouPluginClass("dict", "词典",
         Introduction = "词典",
         Author = "7zou",
-        PluginType = KouEnum.PluginType.Function)]
+        PluginType = PluginType.Function)]
     public class KouDictionary : KouPlugin<KouDictionary>
     {
         [KouPluginFunction(Help = "现有英文字典(en)、成语字典(idiom)，使用/dict.en help查看英文表详情")]

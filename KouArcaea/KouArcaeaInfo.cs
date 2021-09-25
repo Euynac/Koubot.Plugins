@@ -1,5 +1,10 @@
 ﻿using Koubot.SDK.Models.Entities;
+using Koubot.SDK.PluginInterface;
 using Koubot.SDK.Tool;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Models;
+using Koubot.Shared.Protocol;
+using Koubot.Shared.Protocol.Format;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.Random;
 using KouGamePlugin.Arcaea.Models;
@@ -7,11 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Koubot.Shared.Interface;
-using Koubot.Shared.Models;
-using Koubot.Shared.Protocol;
-using Koubot.Shared.Protocol.Format;
-using Koubot.Shared.Protocol.Plugin;
+using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.KouEnum;
 
 namespace KouGamePlugin.Arcaea
 {
@@ -21,7 +23,7 @@ namespace KouGamePlugin.Arcaea
     [KouPluginClass("arcinfo", "Arcaea歌曲数据服务",
         Introduction = "提供歌曲详细信息查询、随机歌曲功能，可限定条件",
         Author = "7zou",
-        PluginType = KouEnum.PluginType.Game)]
+        PluginType = PluginType.Game)]
     public class KouArcaeaInfo : KouPlugin<KouArcaeaInfo>, IWantCommandLifeKouContext, IWantKouUser, IWantKouGlobalConfig
     {
         [KouPluginFunction(Name = "查询歌曲信息", Help = "请使用/arc.song help")]
@@ -83,7 +85,7 @@ namespace KouGamePlugin.Arcaea
                 var alias = SongAlias.SingleOrDefault(a => a.AliasID == i);
                 if (alias == null) result.Append($"\n不记得ID{i}");
                 else if (alias.SourceUser != null && alias.SourceUser != CurrentPlatformUser &&
-                         !CurrentPlatformUser.HasTheAuthority(KouEnum.Authority.BotManager))
+                         !CurrentPlatformUser.HasTheAuthority(Authority.BotManager))
                     result.Append($"\nID{i}是别人贡献的，不可以删噢");
                 else
                 {

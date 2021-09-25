@@ -1,16 +1,18 @@
 ﻿using Koubot.SDK.API;
+using Koubot.SDK.PluginInterface;
 using Koubot.SDK.Services.Interface;
-using Koubot.SDK.Tool;
-using Koubot.Tool.Extensions;
-using Koubot.Tool.Random;
-using System;
-using System.Threading;
 using Koubot.SDK.System;
+using Koubot.SDK.Tool;
 using Koubot.Shared.Interface;
 using Koubot.Shared.Models;
 using Koubot.Shared.Protocol;
 using Koubot.Shared.Protocol.Event;
-using Koubot.Shared.Protocol.Plugin;
+using Koubot.Tool.Extensions;
+using Koubot.Tool.Random;
+using System;
+using System.Threading;
+using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.KouEnum;
 
 namespace KouFunctionPlugin
 {
@@ -20,7 +22,7 @@ namespace KouFunctionPlugin
     [KouPluginClass("hb", "红包",
         Introduction = "发各种红包",
         Author = "7zou",
-        PluginType = KouEnum.PluginType.System)]
+        PluginType = PluginType.System)]
     public class KouRedPacketPlugin : KouPlugin<KouRedPacketPlugin>, IWantKouUser, IWantKouPlatformUser, IWantKouGlobalConfig, IWantKouSession, IWantKouPlatformGroup, IWantTargetGroup
     {
         #region 红包相关
