@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Koubot.Shared.Protocol.Attribute;
@@ -20,6 +21,8 @@ namespace KouGamePlugin.Maimai.Models
         public int SongId { get; set; }
         [Column("song_title_kana")]
         public string SongTitleKaNa { get; set; }
+        [KouAutoModelField(true)]
+        public virtual ICollection<MaiSongAlias> Aliases { get; set; }
         [Column("song_title")]
         [StringLength(500)]
         [KouAutoModelField(ActivateKeyword = "曲名", Features = AutoModelFieldFeatures.IsDefaultField)]

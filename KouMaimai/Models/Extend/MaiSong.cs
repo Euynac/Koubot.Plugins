@@ -182,6 +182,11 @@ namespace KouGamePlugin.Maimai.Models
                 entity.HasIndex(e => e.SongId);
 
                 entity.HasIndex(e => e.SongTitle);
+
+                entity
+                    .HasMany(e => e.Aliases)
+                    .WithMany(p => p.CorrespondingSong)
+                     ;
             };
         }
 

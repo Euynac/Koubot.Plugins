@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Koubot.SDK.PluginInterface;
 using Koubot.Shared.Protocol;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;
+using KouGamePlugin.Maimai.Models;
 using KouMessage = Koubot.Shared.Protocol.KouMessage;
 
 namespace KouGamePlugin.Maimai
@@ -25,6 +27,18 @@ namespace KouGamePlugin.Maimai
         {
             return ReturnHelp();
         }
+
+        [KouPluginFunction(Name ="使用别名获取歌曲详情", ActivateKeyword = "alias")]
+        public string GetSongByAlias(string aliasName, string songType = null)
+        {
+            var list = MaiSongAlias.Find(p=>p.Alias == aliasName);
+            if(list.Count == 0)
+            {
+                list = MaiSongAlias.Find(p => p.Alias.Contains(aliasName));
+            }
+            var songList = list.Select(p => p.CorrespondingSong).ToList();
+        }
+
 
 
         private static readonly double[] _rateSeq = {49,50,60,70,75,80,90,94,97,98,99,99.5,100,100.5};
