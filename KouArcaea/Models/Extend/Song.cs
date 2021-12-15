@@ -173,6 +173,8 @@ namespace KouGamePlugin.Arcaea.Models
         {
             [KouEnumName("Arcaea", "arc")]
             Base,
+            [KouEnumName("单曲")]
+            Single,
             [KouEnumName("World Extend", "扩展")]
             Extend,
             [KouEnumName("Black Fate")]

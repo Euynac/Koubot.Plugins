@@ -13,7 +13,7 @@ namespace KouGamePlugin.Maimai.Models
     /// <summary>
     /// Maimai歌曲别名
     /// </summary>
-    public partial class MaiSongAlias : KouFullAutoModel<MaiSongAlias>
+    public partial class SongAlias : KouFullAutoModel<SongAlias>
     {
         public override bool IsAutoItemIDEnabled() => true;
         public override bool IsTheItemID(int id) => AliasID == id;
@@ -24,7 +24,7 @@ namespace KouGamePlugin.Maimai.Models
 
         public override bool Equals(object? obj)
         {
-            if (obj is MaiSongAlias alias)
+            if (obj is SongAlias alias)
             {
                 return this.TryEqual(AliasID, alias.AliasID)
                        || Alias == alias.Alias && SongKanaId == alias.SongKanaId;
@@ -32,7 +32,7 @@ namespace KouGamePlugin.Maimai.Models
             return base.Equals(obj);
         }
 
-        protected override dynamic SetModelIncludeConfig(IQueryable<MaiSongAlias> set)
+        protected override dynamic SetModelIncludeConfig(IQueryable<SongAlias> set)
         {
             return set.Include(p => p.CorrespondingSong)
                 .Include(p => p.SourceUser);
@@ -42,21 +42,25 @@ namespace KouGamePlugin.Maimai.Models
         {
             return format switch
             {
-                FormatType.Brief => $"{AliasID}.{Alias}——{CorrespondingSong?.ElementAt(0).SongTitle}",
-                FormatType.Detail => $"{AliasID}.{Alias}——{CorrespondingSong?.ElementAt(0).SongTitle}" +
+                FormatType.Brief => $"{AliasID}.{Alias}——{CorrespondingSong?.SongTitle}",
+                FormatType.Detail => $"{AliasID}.{Alias}——{CorrespondingSong?.SongTitle}" +
                                      $"{SourceUser?.Be($"\n贡献者：{SourceUser.Name}")}",
                 FormatType.Customize1 => $"{Alias}",
                 _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
             };
         }
 
-        public override Action<EntityTypeBuilder<MaiSongAlias>> ModelSetup()
+        public override Action<EntityTypeBuilder<SongAlias>> ModelSetup()
         {
             return entity =>
             {
                 entity.HasKey(e => e.AliasID);
-
+             
                 entity.HasIndex(e => e.Alias);
+                entity.HasOne(p => p.CorrespondingSong).WithMany(p => p.Aliases)
+                    .IsRequired()
+                    .HasForeignKey(p => p.SongKanaId)
+                    .HasPrincipalKey(p => p.SongTitleKaNa);
 
                 entity
                     .HasOne(p => p.SourceUser)
