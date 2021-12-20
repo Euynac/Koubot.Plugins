@@ -13,28 +13,39 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Koubot.Shared.Protocol.Attribute;
+using Koubot.Tool.String;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using KouCommand = Koubot.Shared.Protocol.KouCommand;
 
 namespace KouGamePlugin.Maimai.Models
 {
     public partial class SongChart : KouFullAutoModel<SongChart>
     {
-        ///// <summary>
-        ///// 难度类型
-        ///// </summary>
-        //public enum RatingType
-        //{
-        //    [KouEnumName("b")]
-        //    Basic,
-        //    [KouEnumName("a")]
-        //    Advanced,
-        //    [KouEnumName("e","ex")]
-        //    Expert,
-        //    [KouEnumName("m")]
-        //    Master,
-        //    [KouEnumName("r","rm")]
-        //    ReMaster
-        //}
+        /// <summary>
+        /// 谱面类型
+        /// </summary>
+        public enum ChartType
+        {
+            DX,
+            SD,
+        }
+
+        /// <summary>
+        /// 难度类型
+        /// </summary>
+        public enum RatingType
+        {
+            [KouEnumName("绿")]
+            Basic,
+            [KouEnumName("黄")]
+            Advanced,
+            [KouEnumName("红")]
+            Expert,
+            [KouEnumName("紫")]
+            Master,
+            [KouEnumName("白")]
+            ReMaster
+        }
         //[NotMapped]
         //[KouAutoModelField(ActivateKeyword = "难度类型")]（临时虚拟字段）
         //public RatingType SongRatingType { get; set; }
@@ -129,7 +140,7 @@ namespace KouGamePlugin.Maimai.Models
                     out userInput, out var groupResult, RegexOptions.IgnoreCase | RegexOptions.RightToLeft))
             {
                 var ratingClass = groupResult[1].Value;
-                ruleDictionary.Add($"{nameof(SongType)}", ratingClass);
+                ruleDictionary.Add($"{nameof(SongChartType)}", ratingClass);
             }
             ruleDictionary.Add($"{nameof(BasicInfo)}.{nameof(BasicInfo.SongTitle)}", userInput);
             ruleDictionary.Add(nameof(SongAlias), userInput);
@@ -138,7 +149,7 @@ namespace KouGamePlugin.Maimai.Models
 
         public override int GetHashCode()
         {
-            return SongTitleKaNa.GetHashCodeWith(SongType);
+            return SongTitleKaNa.GetHashCodeWith(SongChartType);
         }
 
         public override bool Equals(object? obj)
@@ -150,7 +161,7 @@ namespace KouGamePlugin.Maimai.Models
                     return another.ChartId == ChartId;
                 }
 
-                return another.SongTitleKaNa == SongTitleKaNa && another.SongType == SongType;
+                return another.SongTitleKaNa == SongTitleKaNa && another.SongChartType == SongChartType;
             }
             return false;
         }
@@ -175,6 +186,19 @@ namespace KouGamePlugin.Maimai.Models
                    $"{citedFieldNames.BeIfContains(nameof(Date), $"\n   日期：20{Date}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(BasicInfo.SongBpm), $"\n   BPM：{BasicInfo.SongBpm}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(BasicInfo.Remark), $"\n   注：{BasicInfo.Remark}")}";
+        }
+
+        public double? GetSpecificConstant(RatingType type)
+        {
+            return type switch
+            {
+                RatingType.Basic => ChartBasicConstant,
+                RatingType.Advanced => ChartAdvancedConstant,
+                RatingType.Expert => ChartExpertConstant,
+                RatingType.Master => ChartMasterConstant,
+                RatingType.ReMaster => ChartRemasterConstant,
+                _ => null
+            };
         }
 
         public string ToConstantString()
@@ -219,6 +243,8 @@ namespace KouGamePlugin.Maimai.Models
                     .HasName("PRIMARY");
 
                 entity.HasIndex(e => e.ChartId);
+
+                entity.Property(p => p.SongChartType).HasConversion<EnumToStringConverter<ChartType>>();
 
                 entity
                     .HasOne(e => e.BasicInfo)

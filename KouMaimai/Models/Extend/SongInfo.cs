@@ -49,7 +49,7 @@ namespace KouGamePlugin.Maimai.Models
             }
 
             var id = chartInfo.ChartId;
-            var songType = chartInfo.SongType;
+            var songType = chartInfo.SongChartType;
             var constantData = chartInfo.ToConstantString();
             switch (formatType)
             {

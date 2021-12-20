@@ -14,6 +14,8 @@ namespace KouGamePlugin.Maimai.Models
         [Key]
         [Column("song_id")]
         public int SongId { get; set; }
+        [Column("official_id")]
+        public int? OfficialId { get; set; }
         [Column("song_title_kana")]
         public string SongTitleKaNa { get; set; }
         [KouAutoModelField(true)]

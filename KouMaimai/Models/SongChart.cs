@@ -27,7 +27,7 @@ namespace KouGamePlugin.Maimai.Models
         [Column("song_type")]
         [StringLength(20)]
         [KouAutoModelField(ActivateKeyword = "类型")]
-        public string SongType { get; set; }
+        public ChartType SongChartType { get; set; }
         [StringLength(10)]
         [Column("chart_easy_rating")]
         public string ChartEasyRating { get; set; }

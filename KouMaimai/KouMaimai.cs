@@ -9,6 +9,7 @@ using Koubot.Shared.Protocol;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;
 using Koubot.Tool.Extensions;
+using Koubot.Tool.String;
 using KouGamePlugin.Maimai.Models;
 using KouMessage = Koubot.Shared.Protocol.KouMessage;
 
@@ -68,6 +69,16 @@ namespace KouGamePlugin.Maimai
             {
                 if (constantOrName != null)
                 {
+                    if (!constantOrName.StartsWithAny(false, out string difficultStr, "白", "紫", "红", "黄", "绿") ||
+                        !difficultStr.TryGetKouEnum(out SongChart.RatingType type))
+                    {
+                        type = SongChart.RatingType.Master;
+                    }
+                    else
+                    {
+                        constantOrName = constantOrName[1..];
+                    }
+                    
                     var list = TryGetSongCharts(constantOrName);
                     if (list.Count == 1)
                     {
@@ -92,8 +103,8 @@ namespace KouGamePlugin.Maimai
                     }
 
                     if (song == null) return "不知道是什么歌呢";
-                    constant = song.ChartRemasterConstant ?? song.ChartMasterConstant ?? 0;
-                    if (constant == 0) return $"Kou还不知道{song.BasicInfo.SongTitle}的定数呢";
+                    constant = song.GetSpecificConstant(type) ?? 0;
+                    if (constant == 0) return $"Kou还不知道{type.GetKouEnumFirstName()}{song.BasicInfo.SongTitle}的定数呢";
                 }
                 else
                 {
