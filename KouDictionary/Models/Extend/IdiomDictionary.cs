@@ -12,12 +12,9 @@ namespace KouFunctionPlugin.Models
 {
     public partial class IdiomDictionary : KouFullAutoModel<IdiomDictionary>
     {
-        public override bool IsTheItemID(int id)
-        {
-            return id == Id;
-        }
-
-        public override bool IsAutoItemIDEnabled()
+        public override int? GetItemID() => Id;
+        public override bool UseAutoCache() => false;
+        public override bool UseItemIDToFormat()
         {
             return true;
         }
@@ -27,19 +24,19 @@ namespace KouFunctionPlugin.Models
             return "未找到符合条件的成语";
         }
 
-        public override string GetAutoCitedSupplement(List<string> citedFieldNames)
+        public override string? GetAutoCitedSupplement(List<string> citedFieldNames)
         {
             return $"{citedFieldNames.BeIfContains(nameof(Derivation), $"\n   来源：{Derivation}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(Pinyin), $"\n   拼音：{Pinyin}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(Explanation), $"\n   解释：{Explanation}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(Abbreviation), $"\n   缩写：{Abbreviation}")}";
         }
-        public override string ToString(FormatType format, object supplement = null, KouCommand command = null)
+        public override string? ToString(FormatType format, object? supplement = null, KouCommand? command = null)
         {
             switch (format)
             {
                 case FormatType.Brief:
-                    return $"{Id}.{Word} [{Abbreviation}]";
+                    return $"{Word} [{Abbreviation}]";
 
                 case FormatType.Detail:
                     return $"{Id}.{Word} [{Abbreviation}]{Pinyin?.BeIfNotWhiteSpace($"\n拼音：{Pinyin}")}{Explanation?.BeIfNotWhiteSpace($"\n解释：{Explanation}")}{Derivation?.BeIfNotWhiteSpace($"\n来源：{Derivation}")}{Example?.BeIfNotWhiteSpace($"\n例子：{Example}")}";

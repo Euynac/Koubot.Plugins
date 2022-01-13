@@ -13,7 +13,7 @@ namespace KouFunctionPlugin.Pixiv
             None
         }
         public Error ErrorCode { get; set; }
-        public string ErrorMsg { get; set; }
+        public string? ErrorMsg { get; set; }
 
         public ResponseDto.Root? Call(int num = 10)
         {
@@ -35,7 +35,7 @@ namespace KouFunctionPlugin.Pixiv
                 if (limiter.CanRequest())
                 {
                     responseStr = WebHelper.HttpPost("https://api.lolicon.app/setu/v2", JsonConvert.SerializeObject(body, jsonSerializeSetting),
-                        WebHelper.WebContentType.Json);
+                        WebContentType.Json);
                 }
             }
 

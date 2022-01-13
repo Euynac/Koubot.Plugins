@@ -3,8 +3,6 @@ using Koubot.SDK.PluginInterface;
 using Koubot.SDK.Tool;
 using Koubot.Shared.Interface;
 using Koubot.Shared.Models;
-using Koubot.Shared.Protocol;
-using Koubot.Shared.Protocol.Format;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.Random;
 using KouGamePlugin.Arcaea.Models;
@@ -24,17 +22,17 @@ namespace KouGamePlugin.Arcaea
         Introduction = "提供歌曲详细信息查询、随机歌曲功能，可限定条件",
         Author = "7zou",
         PluginType = PluginType.Game)]
-    public class KouArcaeaInfo : KouPlugin<KouArcaeaInfo>, IWantCommandLifeKouContext, IWantKouUser, IWantKouGlobalConfig
+    public class KouArcaeaInfo : KouPlugin<KouArcaeaInfo>
     {
         [KouPluginFunction(Name = "查询歌曲信息", Help = "请使用/arc.song help")]
-        public override object Default(string name = null)
+        public override object? Default(string? name = null)
         {
             return name == null ? ReturnHelp() : "歌曲信息查询请使用升级版的/arc.song help";
         }
 
         #region 歌曲别名
         [KouPluginFunction(ActivateKeyword = "add|教教", Name = "学新的歌曲别名", Help = "教kou一个歌曲的别名。")]
-        public string KouLearnAnotherName(
+        public object KouLearnAnotherName(
             [KouPluginArgument(Name = "歌曲名等")] string songName,
             [KouPluginArgument(Name = "要学的歌曲别名")] string songAnotherName)
         {
@@ -50,27 +48,28 @@ namespace KouGamePlugin.Arcaea
                     s.SongId.ToString() == songName ||
                     s.SongTitle.Contains(songName,
                         StringComparison.OrdinalIgnoreCase)).ToList();
-                if (satisfiedSongs.Count > 1) return $"具体是以下哪一首歌呢（暂时不支持选择id）：\n{satisfiedSongs.ToSetString()}";
+                if (satisfiedSongs.Count > 1) return satisfiedSongs.ToAutoPageSetString($"具体是以下哪一首歌呢：\n");
                 if (satisfiedSongs.Count == 0) return $"找不到哪个歌叫{songName}哦...";
                 song = satisfiedSongs[0];
             }
 
-            var sourceUser = CurrentPlatformUser.FindThis(KouContext);
-            var dbSong = song.FindThis(KouContext);
+            var sourceUser = CurUser.FindThis(Context);
+            var dbSong = song.FindThis(Context);
             var havenHadAliases = dbSong.Aliases?.Select(p => p.Alias).ToStringJoin("、");
             var success = SongAlias.Add(alias =>
             {
                 alias.CorrespondingSong = dbSong;
                 alias.Alias = songAnotherName;
                 alias.SourceUser = sourceUser;
-            }, out var added, out var error, KouContext);
+            }, out var added, out var error, Context);
             if (success)
             {
+                Song.UpdateCache();
                 var reward = RandomTool.GenerateRandomInt(1, 2);
-                CurrentPlatformUser.KouUser.GainCoinFree(reward);
+                CurUser.KouUser.GainCoinFree(reward);
                 return $"学会了，{song.SongTitle}可以叫做{songAnotherName}({added.AliasID})" +
-                       $"{havenHadAliases?.Be($"，我知道它还可以叫做{havenHadAliases}！")}（目前暂不会立即同步）\n" +
-                       $"[{CurrentUser.FormatGainFreeCoin(CurrentKouGlobalConfig, reward)}!]";
+                       $"{havenHadAliases?.BeIfNotEmpty($"，我知道它还可以叫做{havenHadAliases}！")}\n" +
+                       $"[{FormatGainFreeCoin(reward)}]";
             }
             return $"没学会，就突然：{error}";
         }
@@ -84,23 +83,19 @@ namespace KouGamePlugin.Arcaea
             {
                 var alias = SongAlias.SingleOrDefault(a => a.AliasID == i);
                 if (alias == null) result.Append($"\n不记得ID{i}");
-                else if (alias.SourceUser != null && alias.SourceUser != CurrentPlatformUser &&
-                         !CurrentPlatformUser.HasTheAuthority(Authority.BotManager))
+                else if (alias.SourceUser != null && alias.SourceUser != CurUser &&
+                         !CurUser.HasTheAuthority(Authority.BotManager))
                     result.Append($"\nID{i}是别人贡献的，不可以删噢");
                 else
                 {
                     result.Append($"\n忘记了{alias.ToString(FormatType.Brief)}");
                     alias.DeleteThis();
+                    Song.UpdateCache();
                 };
             }
 
             return result.ToString().TrimStart();
         }
         #endregion
-
-        public KouContext KouContext { get; set; }
-        public PlatformUser CurrentPlatformUser { get; set; }
-        public UserAccount CurrentUser { get; set; }
-        public KouGlobalConfig CurrentKouGlobalConfig { get; set; }
     }
 }

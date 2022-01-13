@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Koubot.SDK\Koubot.SDK.csproj" />
+    <ProjectReference Include="..\KouLottery\KouLottery.csproj" />
+    <ProjectReference Include="..\KouPixiv\KouPixiv.csproj" />
   </ItemGroup>
 
 </Project>

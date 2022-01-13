@@ -15,8 +15,8 @@ namespace KouGamePlugin.Maimai.Models
     /// </summary>
     public partial class SongAlias : KouFullAutoModel<SongAlias>
     {
-        public override bool IsAutoItemIDEnabled() => true;
-        public override bool IsTheItemID(int id) => AliasID == id;
+        public override bool UseItemIDToFormat() => true;
+        public override int? GetItemID() => AliasID;
         public override int GetHashCode()
         {
             return base.GetHashCode();
@@ -38,7 +38,7 @@ namespace KouGamePlugin.Maimai.Models
                 .Include(p => p.SourceUser);
         }
 
-        public override string ToString(FormatType format, object supplement = null, KouCommand command = null)
+        public override string? ToString(FormatType format, object? supplement = null, KouCommand? command = null)
         {
             return format switch
             {
@@ -55,7 +55,7 @@ namespace KouGamePlugin.Maimai.Models
             return entity =>
             {
                 entity.HasKey(e => e.AliasID);
-             
+
                 entity.HasIndex(e => e.Alias);
                 entity.HasOne(p => p.CorrespondingSong).WithMany(p => p.Aliases)
                     .IsRequired()

@@ -11,11 +11,16 @@ namespace KouFunctionPlugin.Models
 {
     public partial class EnDictionary : KouFullAutoModel<EnDictionary>
     {
+        public override bool EnableAutoID()
+        {
+            return false;
+        }
+
         protected override KouMessage ReplyOnFailingToSearch()
         {
             return "未找到符合条件的单词";
         }
-        public override string GetAutoCitedSupplement(List<string> citedFieldNames)
+        public override string? GetAutoCitedSupplement(List<string> citedFieldNames)
         {
             return $"{citedFieldNames.BeIfContains(nameof(Population), $"\n   词频：{Population}")}";
         }
@@ -25,7 +30,7 @@ namespace KouFunctionPlugin.Models
             return builder => builder.HasKey(p => p.Word);
         }
 
-        public override string ToString(FormatType format, object supplement = null, KouCommand command = null)
+        public override string? ToString(FormatType format, object? supplement = null, KouCommand? command = null)
         {
             switch (format)
             {

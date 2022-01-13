@@ -15,8 +15,8 @@ namespace KouGamePlugin.Arcaea.Models
     /// </summary>
     public partial class SongAlias : KouFullAutoModel<SongAlias>
     {
-        public override bool IsAutoItemIDEnabled() => true;
-        public override bool IsTheItemID(int id) => AliasID == id;
+        public override bool UseItemIDToFormat() => true;
+        public override int? GetItemID() => AliasID;
         public override int GetHashCode()
         {
             return base.GetHashCode();
@@ -38,11 +38,11 @@ namespace KouGamePlugin.Arcaea.Models
                 .Include(p => p.SourceUser);
         }
 
-        public override string ToString(FormatType format, object supplement = null, KouCommand command = null)
+        public override string? ToString(FormatType format, object? supplement = null, KouCommand? command = null)
         {
             return format switch
             {
-                FormatType.Brief => $"{AliasID}.{Alias}——{CorrespondingSong?.SongTitle}",
+                FormatType.Brief => $"{Alias}——{CorrespondingSong?.SongTitle}",
                 FormatType.Detail => $"{AliasID}.{Alias}——{CorrespondingSong?.SongTitle}" +
                                      $"{SourceUser?.Be($"\n贡献者：{SourceUser.Name}")}",
                 FormatType.Customize1 => $"{Alias}",

@@ -36,7 +36,7 @@ namespace KouRomajiHelper
             kouContext.Dispose();
         }
         public ErrorCodes ErrorCode { get; set; }
-        public string ErrorMsg { get; set; }
+        public string? ErrorMsg { get; set; }
 
         /// <summary>
         /// 删除罗马音-谐音键值对
@@ -97,7 +97,7 @@ namespace KouRomajiHelper
                     this.InheritError(limiter, "发生在" + nameof(KouRomajiHelper) + "中的" + nameof(CallAPI));
                 }
                 string data = "mode=japanese&q=" + HttpUtility.UrlEncode(japanese);
-                result = WebHelper.HttpPost("http://www.kawa.net/works/ajax/romanize/romanize.cgi ", data, WebHelper.WebContentType.General);
+                result = WebHelper.HttpPost("http://www.kawa.net/works/ajax/romanize/romanize.cgi ", data, WebContentType.General);
             }
             return result;
         }

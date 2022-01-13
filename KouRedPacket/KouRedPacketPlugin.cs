@@ -23,7 +23,7 @@ namespace KouFunctionPlugin
         Introduction = "发各种红包",
         Author = "7zou",
         PluginType = PluginType.System)]
-    public class KouRedPacketPlugin : KouPlugin<KouRedPacketPlugin>, IWantKouUser, IWantKouPlatformUser, IWantKouGlobalConfig, IWantKouSession, IWantKouPlatformGroup, IWantTargetGroup
+    public class KouRedPacketPlugin : KouPlugin<KouRedPacketPlugin>, IWantTargetGroup
     {
         #region 红包相关
         [KouPluginParameter(
@@ -71,9 +71,9 @@ namespace KouFunctionPlugin
             string speedAppend =
                 red.IsCompeteInVelocity ? $"（耗时{(DateTime.Now - red.StartTime).TotalSeconds:0.##}秒）" : null;
             speedAppend += red.Remark?.Be($"\n红包留言：{red.Remark}");
-            if (red.TestIfHaveOpened(CurrentPlatformUser)) return $"{CurrentPlatformUser.Name}已经抢过该红包啦";
-            if (!red.Open(CurrentPlatformUser, out var coinsGot)) return "可惜，没有抢到这个红包呢";
-            return $"{CurrentPlatformUser.Name}打开{(red.FromUser.KouUser == CurrentPlatformUser.KouUser ? "自己" : red.FromUser.Name)}的红包获得了{CurrentKouGlobalConfig.CoinFormat(coinsGot)}！{speedAppend}";
+            if (red.TestIfHaveOpened(CurUser)) return $"{CurUser.Name}已经抢过该红包啦";
+            if (!red.Open(CurUser, out var coinsGot)) return "可惜，没有抢到这个红包呢";
+            return $"{CurUser.Name}打开{(red.FromUser.KouUser == CurUser.KouUser ? "自己" : red.FromUser.Name)}的红包获得了{CurKouGlobalConfig.CoinFormat(coinsGot)}！{speedAppend}";
         }
 
         private void RedPacketEndAction(KouRedPacket r)
@@ -83,17 +83,17 @@ namespace KouFunctionPlugin
             r.FromUser.KouUser.GainExp(exp);
             if (r.RemainCount == 0)
             {
-                reply = $"{CurrentPlatformUser.Name}的红包抢完啦！\n[{CurrentPlatformUser.Name}获得了{exp}点经验]";
+                reply = $"{CurUser.Name}的红包抢完啦！\n[{CurUser.Name}获得了{exp}点经验]";
             }
             else
             {
-                reply = $"{CurrentPlatformUser.Name}的口令红包\"{r.Password}\"到期，" +
+                reply = $"{CurUser.Name}的口令红包\"{r.Password}\"到期，" +
                         $"共{r.TotalCount - r.RemainCount}人领取，" +
-                        $"剩余{CurrentKouGlobalConfig.CoinFormat(r.RemainCoins)}\n" +
+                        $"剩余{CurKouGlobalConfig.CoinFormat(r.RemainCoins)}\n" +
                         $"[获得了{exp}点经验]";
             }
 
-            CurrentPlatformUser.SendMessage(TargetGroup ?? CurrentPlatformGroup, reply);
+            CurUser.SendMessage(TargetGroup ?? CurGroup, reply);
         }
 
 
@@ -109,28 +109,28 @@ namespace KouFunctionPlugin
         {
             if (password == "") password = null;
             if (!ValidateAvailableTime()) return ConveyMessage;
-            KouRedPacket redPacket = new KouRedPacket(CurrentPlatformUser, total, quantity, IsIdentical, password, Duration)
+            KouRedPacket redPacket = new KouRedPacket(CurUser, total, quantity, IsIdentical, password, Duration)
             {
                 EndAction = RedPacketEndAction,
                 IsCompeteInVelocity = IsCompeteInVelocity,
                 Remark = Remark
             };
 
-            if (redPacket.TotalCoins / redPacket.TotalCount == 0) return $"每人至少需要有{CurrentKouGlobalConfig.CoinFormat(1)}";
-            var rest = CurrentUser.CoinFree - redPacket.TotalCoins;
+            if (redPacket.TotalCoins / redPacket.TotalCount == 0) return $"每人至少需要有{CurKouGlobalConfig.CoinFormat(1)}";
+            var rest = CurKouUser.CoinFree - redPacket.TotalCoins;
             if (rest >= 0)
             {
                 string ask =
-                    $"发送总额为{CurrentKouGlobalConfig.CoinFormat(redPacket.TotalCoins)}的{quantity}个群组{IsCompeteInVelocity.BeIfTrue("竞速")}红包{password?.Be($"(口令为\"{password}\")")}" +
-                    $"(成功后余额为{CurrentKouGlobalConfig.CoinFormat(rest)})\n" +
+                    $"发送总额为{CurKouGlobalConfig.CoinFormat(redPacket.TotalCoins)}的{quantity}个群组{IsCompeteInVelocity.BeIfTrue("竞速")}红包{password?.Be($"(口令为\"{password}\")")}" +
+                    $"(成功后余额为{CurKouGlobalConfig.CoinFormat(rest)})\n" +
                     $"输入\"y\"确认";
                 if (!SessionService.AskConfirm(ask)) return null;
                 if (IsCompeteInVelocity)
                 {
-                    CurrentPlatformUser.SendMessage(CurrentPlatformGroup, "将随机在5~30秒内发送竞速红包");
+                    CurUser.SendMessage(CurGroup, "将随机在5~30秒内发送竞速红包");
                     Thread.Sleep(RandomTool.GenerateRandomInt(5000, 30000));
                 }
-                if (!redPacket.Sent(TargetGroup ?? CurrentPlatformGroup))
+                if (!redPacket.Sent(TargetGroup ?? CurGroup))
                 {
                     return "发红包失败" + redPacket.ErrorMsg?.Be($"，{redPacket.ErrorMsg}");
                 }
@@ -141,7 +141,7 @@ namespace KouFunctionPlugin
             return this.ReturnNullWithError(null, ErrorCodes.Core_BankNotEnoughMoney);
         }
         [KouPluginFunction]
-        public override object Default(string str = null)
+        public override object? Default(string? str = null)
         {
             return ReturnHelp();
         }
@@ -172,25 +172,25 @@ namespace KouFunctionPlugin
         {
             if (password == "") password = null;
             if (!ValidateAvailableTime()) return ConveyMessage;
-            KouRedPacket redPacket = new KouRedPacket(CurrentPlatformUser, total, quantity, IsIdentical, password, Duration)
+            KouRedPacket redPacket = new KouRedPacket(CurUser, total, quantity, IsIdentical, password, Duration)
             {
                 EndAction = RedPacketEndAction,
                 IsCompeteInVelocity = IsCompeteInVelocity,
                 Remark = Remark
             };
 
-            if (redPacket.TotalCoins / redPacket.TotalCount == 0) return $"每人至少需要有{CurrentKouGlobalConfig.CoinFormat(1)}";
-            var rest = CurrentUser.CoinFree - redPacket.TotalCoins;
+            if (redPacket.TotalCoins / redPacket.TotalCount == 0) return $"每人至少需要有{CurKouGlobalConfig.CoinFormat(1)}";
+            var rest = CurKouUser.CoinFree - redPacket.TotalCoins;
             if (rest >= 0)
             {
                 string ask =
-                    $"发送总额为{CurrentKouGlobalConfig.CoinFormat(redPacket.TotalCoins)}的{quantity}个{IsCompeteInVelocity.BeIfTrue("竞速")}红包{password?.Be($"(口令为\"{password}\")")}" +
-                    $"(成功后余额为{CurrentKouGlobalConfig.CoinFormat(rest)})\n" +
+                    $"发送总额为{CurKouGlobalConfig.CoinFormat(redPacket.TotalCoins)}的{quantity}个{IsCompeteInVelocity.BeIfTrue("竞速")}红包{password?.Be($"(口令为\"{password}\")")}" +
+                    $"(成功后余额为{CurKouGlobalConfig.CoinFormat(rest)})\n" +
                     $"输入\"y\"确认";
                 if (!SessionService.AskConfirm(ask)) return null;
                 if (IsCompeteInVelocity)
                 {
-                    CurrentPlatformUser.SendMessage(CurrentPlatformGroup, "将随机在5~30秒内发送竞速红包");
+                    CurUser.SendMessage(CurGroup, "将随机在5~30秒内发送竞速红包");
                     Thread.Sleep(RandomTool.GenerateRandomInt(5000, 30000));
                 }
                 if (!redPacket.Sent())
@@ -207,12 +207,6 @@ namespace KouFunctionPlugin
 
         #endregion
 
-
-        public UserAccount CurrentUser { get; set; }
-        public PlatformUser CurrentPlatformUser { get; set; }
-        public KouGlobalConfig CurrentKouGlobalConfig { get; set; }
-        public IKouSessionService SessionService { get; set; }
-        public PlatformGroup CurrentPlatformGroup { get; set; }
-        public PlatformGroup TargetGroup { get; set; }
+        public PlatformGroup? TargetGroup { get; set; }
     }
 }

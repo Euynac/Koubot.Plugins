@@ -58,7 +58,7 @@ namespace KouGamePlugin
         }
 
         [KouPluginFunction]
-        public override object Default(string str = null)
+        public override object? Default(string? str = null)
         {
             return ReturnHelp();
         }

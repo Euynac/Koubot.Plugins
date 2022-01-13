@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Koubot.Shared.Protocol.Attribute;
-using Koubot.Shared.Protocol.Enums;
 
 
 namespace KouGamePlugin.Maimai.Models
@@ -14,8 +14,6 @@ namespace KouGamePlugin.Maimai.Models
         [Key]
         [Column("song_id")]
         public int SongId { get; set; }
-        [Column("official_id")]
-        public int? OfficialId { get; set; }
         [Column("song_title_kana")]
         public string SongTitleKaNa { get; set; }
         [KouAutoModelField(true)]
@@ -40,7 +38,7 @@ namespace KouGamePlugin.Maimai.Models
         public TimeSpan? SongLength { get; set; }
         [KouAutoModelField(ActivateKeyword = "版本")]
         [Column("version")]
-        public string Version { get; set; }
+        public SongVersion? Version { get; set; }
         [Column("remark")]
         [StringLength(2000)]
         [KouAutoModelField(ActivateKeyword = "注|评论")]
@@ -51,5 +49,11 @@ namespace KouGamePlugin.Maimai.Models
         [Column("song_genre_old")]
         [KouAutoModelField(ActivateKeyword = "旧分类")]
         public string SongGenreOld { get; set; }
+        /// <summary>
+        /// 判断是否是新曲，用于计算DX b15
+        /// </summary>
+        [KouAutoModelField(ActivateKeyword = "新DX")]
+        [Column("is_new")]
+        public bool? IsNew { get; set; }
     }
 }

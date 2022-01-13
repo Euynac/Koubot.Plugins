@@ -27,7 +27,7 @@ namespace KouFunctionPlugin
         public bool All { get; set; }
 
         [KouPluginFunction(Name = "能不能好好说话的默认功能", Help = "输入带缩写的文字，返回一个结果（多个则随机）\n支持all参数")]
-        public override object Default(string str = null)
+        public override object? Default(string? str = null)
         {
             if (str.IsNullOrWhiteSpace()) return "输入带首字母缩写的一段话";
             var root = CallAPI(str);
@@ -81,7 +81,7 @@ namespace KouFunctionPlugin
                     this.InheritError(limiter, "发生在" + nameof(KouNbnhhsh) + "中的" + nameof(CallAPI));
                     return null;
                 }
-                result = WebHelper.HttpPost("https://lab.magiconch.com/api/nbnhhsh/guess/", "{\"text\":\"" + str + "\"}", WebHelper.WebContentType.Json);
+                result = WebHelper.HttpPost("https://lab.magiconch.com/api/nbnhhsh/guess/", "{\"text\":\"" + str + "\"}", WebContentType.Json);
             }
 
             result = "{\"result\":" + result + "}";

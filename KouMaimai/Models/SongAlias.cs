@@ -1,8 +1,7 @@
 ﻿using Koubot.Shared.Models;
+using Koubot.Shared.Protocol.Attribute;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Koubot.Shared.Protocol.Attribute;
-using System.Collections.Generic;
 
 namespace KouGamePlugin.Maimai.Models
 {

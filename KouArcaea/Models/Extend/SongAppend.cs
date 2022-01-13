@@ -9,7 +9,7 @@ namespace KouGamePlugin.Arcaea.Models
 {
     public partial class SongAppend : KouFullAutoModel<SongAppend>
     {
-        public override string ToString(FormatType formatType, object supplement = null, KouCommand command = null)
+        public override string? ToString(FormatType formatType, object? supplement = null, KouCommand? command = null)
         {
             return $"[{ChartRatingClass} {ChartConstant}]" + ChartDesigner?.Be($"谱师：{ChartDesigner}\n") +
                    ChartAllNotes?.Be(

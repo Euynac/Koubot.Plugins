@@ -1,8 +1,5 @@
-﻿using Koubot.SDK.Models.Entities;
-using Koubot.SDK.PluginInterface;
+﻿using Koubot.SDK.PluginInterface;
 using Koubot.Shared.Interface;
-using Koubot.Shared.Models;
-using Koubot.Shared.Protocol;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.Random;
 using System.Collections.Generic;
@@ -18,7 +15,7 @@ namespace KouFunctionPlugin.LuckMachine
         Authority = Authority.NormalUser,
         Introduction = "运势相关功能",
         PluginType = PluginType.Function)]
-    public class KouLuck : KouPlugin<KouLuck>, IWantKouPlatformUser, IWantCommandLifeKouContext, IWantKouGlobalConfig
+    public class KouLuck : KouPlugin<KouLuck>
     {
         private static List<string> DirectionList { get; } =
             new() { "东", "南", "西", "北", "东南", "东北", "西南", "西北" };
@@ -89,9 +86,9 @@ namespace KouFunctionPlugin.LuckMachine
 
         private string GetTodayLuck(bool remake = false)
         {
-            var luckValue = CurrentPlatformUser.KouUser.LuckValue(remake);
-            var result = $"{CurrentPlatformUser.Name}的今日人品：{luckValue}";
-            var hashString = $"{luckValue}{CurrentPlatformUser.PlatformUserId}";
+            var luckValue = CurUser.KouUser.LuckValue(remake);
+            var result = $"{CurUser.Name}的今日人品：{luckValue}";
+            var hashString = $"{luckValue}{CurUser.PlatformUserId}";
             var list = Almanac.GetAutoModelCache();
             if (list.Count == 0) return result;
             if (luckValue >= 99)
@@ -124,7 +121,7 @@ namespace KouFunctionPlugin.LuckMachine
 
 
         [KouPluginFunction(Help = "查看今日运势", Name = "获取今日运势")]
-        public override object Default(string str = null)
+        public override object? Default(string? str = null)
         {
             return GetTodayLuck();
         }
@@ -136,8 +133,8 @@ namespace KouFunctionPlugin.LuckMachine
             {
                 var almanac = Almanac.SingleOrDefault(a => a.ID == i);
                 if (almanac == null) result.Append($"\n不记得ID{i}");
-                else if (almanac.SourceUser != null && almanac.SourceUser != CurrentPlatformUser &&
-                         !CurrentPlatformUser.HasTheAuthority(Authority.BotManager))
+                else if (almanac.SourceUser != null && almanac.SourceUser != CurUser &&
+                         !CurUser.HasTheAuthority(Authority.BotManager))
                     result.Append($"\nID{i}是别人贡献的，不可以删噢");
                 else
                 {
@@ -169,18 +166,15 @@ namespace KouFunctionPlugin.LuckMachine
                 almanac.Content = itemIntro;
                 almanac.Title = item;
                 almanac.IsOminous = isOminous;
-                almanac.SourceUser = CurrentPlatformUser.FindThis(KouContext);
-            }, out var added, out var error, KouContext);
+                almanac.SourceUser = CurUser.FindThis(Context);
+            }, out var added, out var error, Context);
             if (success)
             {
                 var reward = RandomTool.GenerateRandomInt(1, 3);
-                CurrentPlatformUser.KouUser.GainCoinFree(reward);
-                return $"学会了，ID{added.ToString(FormatType.Brief)}\n您获得了{CurrentKouGlobalConfig.CoinFormat(reward)}!";
+                CurUser.KouUser.GainCoinFree(reward);
+                return $"学会了，ID{added.ToString(FormatType.Brief)}\n您获得了{CurKouGlobalConfig.CoinFormat(reward)}!";
             }
             return $"没学会，就突然：{error}";
         }
-        public PlatformUser CurrentPlatformUser { get; set; }
-        public KouContext KouContext { get; set; }
-        public KouGlobalConfig CurrentKouGlobalConfig { get; set; }
     }
 }

@@ -20,12 +20,10 @@ namespace KouGamePlugin.Arcaea
         Author = "7zou",
         PluginType = PluginType.Game,
         CanUseProxy = true)]
-    public class KouArcaea : KouPlugin<KouArcaea>, IWantKouMessage
+    public class KouArcaea : KouPlugin<KouArcaea>
     {
-        public KouMessage Message { get; set; }
-
         [KouPluginFunction(Name = "获取当前用户最近一次成绩（施工中）", Help = "默认功能，需要先绑定")]
-        public override object Default(string str = null)
+        public override object? Default(string? str = null)
         {
             return null;
         }

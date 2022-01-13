@@ -23,11 +23,7 @@ namespace KouFunctionPlugin
         "poke",
         "戳一戳",
         Author = "7zou")]
-    public class KouTickle : KouPlugin<KouTickle>,
-        IWantKouPlatformUser,
-        IWantKouGlobalConfig,
-        IWantCommandLifeKouContext,
-        IWantKouPlatformGroup
+    public class KouTickle : KouPlugin<KouTickle>
     {
 
         private static readonly List<string> _thirdDescription = new()
@@ -68,10 +64,10 @@ namespace KouFunctionPlugin
             OnlyUsefulInGroup = true)]
         public object Rank()
         {
-            if (_rankCD.IsInCd(CurrentPlatformGroup, new TimeSpan(0, 5, 0)))
+            if (_rankCD.IsInCd(CurGroup, new TimeSpan(0, 5, 0)))
                 return "在冷却中噢~ (5min)";
-            if (!_pokeInfoDict.ContainsKey(CurrentPlatformGroup)) return $"自从我上次重启以来({KouGlobalConfig.SystemStartTime})，居然没发现有人无聊到玩戳一戳诶";
-            var groupInfoDict = _pokeInfoDict[CurrentPlatformGroup];
+            if (!_pokeInfoDict.ContainsKey(CurGroup)) return $"自从我上次重启以来({KouGlobalConfig.SystemStartTime})，居然没发现有人无聊到玩戳一戳诶";
+            var groupInfoDict = _pokeInfoDict[CurGroup];
             if (groupInfoDict.Count == 1)
             {
                 var info = groupInfoDict.First();
@@ -90,7 +86,7 @@ namespace KouFunctionPlugin
                 return reply.TrimEnd();
             }
             string prologue = $"接下来公布一下自本Kou上次醒来({KouGlobalConfig.SystemStartTime})，本群最闲着没事干玩戳一戳的人";
-            CurrentPlatformGroup.SendGroupMessage(prologue);
+            CurGroup.SendGroupMessage(prologue);
             Thread.Sleep(2000);
             var list = groupInfoDict.OrderByDescending(p => p.Value.Total)
                 .ToList();
@@ -115,13 +111,13 @@ namespace KouFunctionPlugin
                          $"一共{info.Value.TimesOfPokeBot.BeIfNotDefault($"戳了我{info.Value.TimesOfPokeBot}次，")}" +
                          $"{info.Value.TimesOfPokeOthers.BeIfNotDefault($"戳了其他人{info.Value.TimesOfPokeOthers}次，")}" +
                          $"{_descriptionList[i].RandomGetOne()}";
-                CurrentPlatformGroup.SendGroupMessage(reply);
+                CurGroup.SendGroupMessage(reply);
                 Thread.Sleep(RandomTool.GenerateRandomInt(1500, 3500));
             }
             return null;
         }
         [KouPluginFunction(Name = "帮助")]
-        public override object Default(string str = null)
+        public override object? Default(string? str = null)
         {
             return ReturnHelp();
         }
@@ -180,8 +176,8 @@ namespace KouFunctionPlugin
             {
                 var reply = TickleReply.SingleOrDefault(a => a.ID == i);
                 if (reply == null) result.Append($"\n不记得ID{i}");
-                else if (reply.SourceUser != null && reply.SourceUser != CurrentPlatformUser &&
-                         !CurrentPlatformUser.HasTheAuthority(Authority.BotManager))
+                else if (reply.SourceUser != null && reply.SourceUser != CurUser &&
+                         !CurUser.HasTheAuthority(Authority.BotManager))
                     result.Append($"\nID{i}是别人贡献的，不可以删噢");
                 else
                 {
@@ -202,21 +198,16 @@ namespace KouFunctionPlugin
             var success = TickleReply.Add(almanac =>
             {
                 almanac.Reply = reply;
-                almanac.SourceUser = CurrentPlatformUser.FindThis(KouContext);
-            }, out var added, out var error, KouContext);
+                almanac.SourceUser = CurUser.FindThis(Context);
+            }, out var added, out var error, Context);
             if (success)
             {
                 var reward = RandomTool.GenerateRandomInt(1, 2);
-                CurrentPlatformUser.KouUser.GainCoinFree(reward);
+                CurUser.KouUser.GainCoinFree(reward);
                 return $"学会了，别人戳我我就：\n{added.ToString(FormatType.Brief)}\n" +
-                       $"[您获得了{CurrentKouGlobalConfig.CoinFormat(reward)}!]";
+                       $"[您获得了{CurKouGlobalConfig.CoinFormat(reward)}!]";
             }
             return $"没学会，就突然：{error}";
         }
-
-        public KouGlobalConfig CurrentKouGlobalConfig { get; set; }
-        public KouContext KouContext { get; set; }
-        public PlatformUser CurrentPlatformUser { get; set; }
-        public PlatformGroup CurrentPlatformGroup { get; set; }
     }
 }

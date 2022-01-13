@@ -29,15 +29,15 @@ namespace KouFunctionPlugin
         /// </summary>
         public string Reply { get; set; }
 
-        public override bool IsTheItemID(int id) => id == ID;
-        public override bool IsAutoItemIDEnabled() => true;
+        public override int? GetItemID() => ID;
+        public override bool UseItemIDToFormat() => true;
 
         protected override dynamic SetModelIncludeConfig(IQueryable<TickleReply> set)
         {
             return set.Include(p => p.SourceUser);
         }
 
-        public override string ToString(FormatType formatType, object supplement = null, KouCommand command = null)
+        public override string? ToString(FormatType formatType, object? supplement = null, KouCommand? command = null)
         {
             return formatType switch
             {

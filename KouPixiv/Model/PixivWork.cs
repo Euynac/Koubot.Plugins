@@ -90,7 +90,7 @@ namespace KouFunctionPlugin.Pixiv
             return set.Include(p => p.Tags).Include(a => a.Author);
         }
 
-        public override string ToString(FormatType formatType, object supplement = null, KouCommand command = null)
+        public override string? ToString(FormatType formatType, object? supplement = null, KouCommand? command = null)
         {
             return formatType switch
             {

@@ -52,7 +52,7 @@ namespace KouFunctionPlugin
         public bool ToFirstPinyin { get; set; }
 
         [KouPluginFunction(Help = "基本复述", SupportedParameters = new[] { nameof(Lower), nameof(From), nameof(To), nameof(Upper), nameof(Reverse), nameof(ToTraditionalChinese), nameof(ToPinyin), nameof(ToFirstPinyin), nameof(ToSimplifiedChinese), nameof(SpeakWithWhiteSpace) })]
-        public override object Default(string str = null)
+        public override object? Default(string? str = null)
         {
             if (str.IsNullOrWhiteSpace()) return null;
             Language fromLanguage = Language.auto, toLanguage = Language.zh;

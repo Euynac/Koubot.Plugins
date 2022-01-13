@@ -28,6 +28,6 @@ namespace KouGamePlugin.Cytus
             return $"彩P：{tp_perfect}\n黑P：{nm_perfect}\n真实TP：{real_tp:F5}";
         }
         [KouPluginFunction]
-        public override object Default(string str = null) => ReturnHelp();
+        public override object? Default(string? str = null) => ReturnHelp();
     }
 }

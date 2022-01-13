@@ -1,8 +1,6 @@
 ﻿using Koubot.SDK.API;
 using Koubot.SDK.PluginInterface;
-using Koubot.SDK.Services.Interface;
 using Koubot.SDK.System;
-using Koubot.Shared.Protocol;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.KouData;
 using Koubot.Tool.Math;
@@ -12,9 +10,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Koubot.Shared.Models;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;
-using KouMessage = Koubot.Shared.Protocol.KouMessage;
 
 namespace KouFunctionPlugin
 {
@@ -23,7 +21,7 @@ namespace KouFunctionPlugin
         Authority = Authority.NormalUser,
         Introduction = "抽奖机",
         PluginType = PluginType.Function)]
-    public class KouLottery : KouPlugin<KouLottery>, IWantKouMessage, IWantKouSession
+    public class KouLottery : KouPlugin<KouLottery>, IWantPluginGlobalConfig<LotteryConfig>
     {
         [KouPluginParameter(ActivateKeyword = "count|c", Name = "抽签数量", Help = "范围在1-100",
             NumberMin = 1, NumberMax = 100)]
@@ -32,8 +30,17 @@ namespace KouFunctionPlugin
         [KouPluginParameter(ActivateKeyword = "可重复|r", Name = "可重复", Help = "指示能否重复中同一个签")]
         public bool CanRepeat { get; set; }
 
+
+        static KouLottery()
+        {
+            AddCronTab(new TimeSpan(1,0,0), () =>
+            {
+                _hasTookPartInSet.Clear();
+            });
+        }
+
         [KouPluginFunction(Name = "帮助")]
-        public override object Default(string str = null)
+        public override object? Default(string? str = null)
         {
             return ReturnHelp();
         }
@@ -125,6 +132,68 @@ namespace KouFunctionPlugin
         };
 
 
+        private static readonly ReaderWriterLockSlim _coinPoolLock = new();
+        private static readonly HashSet<UserAccount> _hasTookPartInSet = new();
+        [KouPluginFunction(ActivateKeyword = "pool", Name = "硬币池", NeedCoin = -1, Help = "最低有0.05%的概率获取池内所有硬币（与当天运势值也有关系）\n每次产生幸运儿后，池中随机产生300-1000枚硬币")]
+        public object PlayCoinPool([KouPluginArgument(Name = "投放硬币数", NumberMin = 5)]int? coin = null)
+        {
+            coin ??= 5;
+            if (_hasTookPartInSet.Contains(CurKouUser)) return $"{CurKouUserNickname}今天已经参加过啦";
+            if (!CurKouUser.ConsumeCoinFree(coin.Value))
+            {
+                return FormatNotEnoughCoin(coin.Value);
+            }
+
+            _hasTookPartInSet.Add(CurKouUser);
+            var config = this.GlobalConfig()!;
+            var times = Math.Log(coin.Value - 2, 3).Ceiling();
+            var luckValue = CurKouUser.LuckValue();
+            var luckAppend = luckValue / 100000.0;
+            if (luckValue == 100) luckAppend *= 5;
+            int i = 0;
+            bool success = false;
+            int atLastCoins;
+            _coinPoolLock.EnterWriteLock();
+            try
+            {
+                if (config.PoolTotalCoins == 0) config.PoolTotalCoins = RandomTool.GenerateRandomInt(300, 1000);
+                config.PoolTotalCoins += coin.Value;
+                atLastCoins = config.PoolTotalCoins;
+                for (; i < times; i++)
+                {
+                    if (0.0005.ProbablyTrue(luckAppend))
+                    {
+                        success = true;
+                    }
+                }
+                if (success)
+                {
+                    config.SuccessPeopleCount++;
+                    config.LastBonusUserID = CurKouUser.Id;
+                    config.LastBonusTime = DateTime.Now;
+                    config.LastBonusCoins = config.PoolTotalCoins;
+                    config.PoolTotalCoins = RandomTool.GenerateRandomInt(100, 1000);
+                }
+                config.SaveChanges();
+            }
+            finally
+            {
+                _coinPoolLock.ExitWriteLock();
+            }
+            
+            Reply($"{CurKouUserNickname}投入{CurKouGlobalConfig.CoinFormat(coin.Value)}，{"叮铃".Repeat(times.LimitInRange(10))}...");
+            Thread.Sleep((RandomTool.GenerateRandomInt(1000,2000) * times).LimitInRange(5000));
+            if (success)
+            {
+                CurKouUser.GainCoinFree(atLastCoins);
+                return $"恭喜{CurKouUserNickname}暴富！！获得了池中所有的{CurKouGlobalConfig.CoinFormat(atLastCoins)}，" +
+                       $"是第{config.SuccessPeopleCount}个搬空池子的人！{CurKouUserNickname}当前有{CurKouGlobalConfig.CoinFormat(CurKouUser.CoinFree)}";
+            }
+
+            return $"{CurKouUserNickname}失败了呢，下次再来吧\n{config.GetCoinPoolInfo(CurKouGlobalConfig)}";
+        }
+
+
         [KouPluginFunction(
             ActivateKeyword = "选择",
             Name = "帮忙随机选择",
@@ -166,9 +235,9 @@ namespace KouFunctionPlugin
             }
             var interval = new IntervalDoublePair(0, 1);
             var probability = interval.GenerateRandomDouble();
-            if (Message.ProbablyDo(0.1) != null)
+            if (CurMessage.ProbablyDo(0.1) != null)
             {
-                Message.ReplyMessage("嗯...让我算一算");
+                CurMessage.ReplyMessage("嗯...让我算一算");
                 Thread.Sleep((int)(probability * 3333));
             }
 
@@ -208,8 +277,5 @@ namespace KouFunctionPlugin
             }
             return result.TrimEnd('、');
         }
-
-        public KouMessage Message { get; set; }
-        public IKouSessionService SessionService { get; set; }
     }
 }

@@ -29,7 +29,7 @@ namespace KouFunctionPlugin.Romaji
 
 
         [KouPluginFunction(Name = "日语转罗马音", Help = "输入日文")]
-        public override object Default(string str = null)
+        public override object? Default(string? str = null)
         {
             if (str.IsNullOrWhiteSpace()) return null;
             var result = romajiHelper.CallAPI(str);

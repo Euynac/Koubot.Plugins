@@ -54,7 +54,7 @@ namespace KouFunctionPlugin.Pixiv
             return Uid.GetHashCode();
         }
 
-        public override string ToString(FormatType formatType, object supplement = null, KouCommand command = null)
+        public override string? ToString(FormatType formatType, object? supplement = null, KouCommand? command = null)
         {
             return $"{ID}.{Name}「{Uid}」";
         }

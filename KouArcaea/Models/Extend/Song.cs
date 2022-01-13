@@ -76,16 +76,14 @@ namespace KouGamePlugin.Arcaea.Models
             return false;
         }
 
-        public override bool IsAutoItemIDEnabled() => true;
-
-
-        public override bool IsTheItemID(int id) => SongId == id;
+        public override bool UseItemIDToFormat() => true;
+        public override int? GetItemID() => SongId;
         protected override KouMessage ReplyOnFailingToSearch()
         {
             return "未找到符合条件的歌曲";
         }
 
-        public override string GetAutoCitedSupplement(List<string> citedFieldNames)
+        public override string? GetAutoCitedSupplement(List<string> citedFieldNames)
         {
             return $"{citedFieldNames.BeIfContains(nameof(SongArtist), $"\n   曲师：{SongArtist}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(SongBpm), $"\n   BPM：{SongBpm}")}" +
@@ -102,7 +100,7 @@ namespace KouGamePlugin.Arcaea.Models
             MoreInfo?.OrderBy(p => p.ChartRatingClass).Select(p => p.ChartConstant).ToStringJoin('/').TrimEnd('/');
         private string GetBriefAllNotes() =>
             MoreInfo?.OrderBy(p => p.ChartRatingClass).Select(p => p.ChartAllNotes).ToStringJoin('/').TrimEnd('/');
-        public override string ToString(FormatType format, object supplement = null, KouCommand command = null)
+        public override string? ToString(FormatType format, object? supplement = null, KouCommand? command = null)
         {
             string constantDesc = GetBriefConstant();
             string designerDesc = GetBriefChartDesigner();
@@ -110,13 +108,13 @@ namespace KouGamePlugin.Arcaea.Models
             switch (format)
             {
                 case FormatType.Brief:
-                    return $"{SongId}.{SongTitle}{constantDesc?.Be($" [{constantDesc}]")}";
+                    return $"{SongTitle}{constantDesc?.Be($" [{constantDesc}]")}";
 
                 case FormatType.Detail:
                     return $"{JacketUrl?.Be(new KouImage(JacketUrl, this).ToKouResourceString())}" +
                            $"{SongId}.{SongTitle}\n" +
                            constantDesc?.Be($"定数：{constantDesc}\n") +
-                           Aliases?.Be($"别名：{Aliases.Select(p => p.Alias).ToStringJoin('，')}\n") +
+                           Aliases?.BeIfNotEmptySet($"别名：{Aliases.Select(p => p.Alias).ToStringJoin('，')}\n") +
                            SongArtist?.Be($"曲师：{SongArtist}\n") +
                            designerDesc?.Be($"谱师：{designerDesc}\n") +
                            JacketDesigner?.Be($"画师：{JacketDesigner}\n") +
