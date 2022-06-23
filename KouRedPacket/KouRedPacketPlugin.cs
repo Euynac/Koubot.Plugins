@@ -103,8 +103,8 @@ namespace KouFunctionPlugin
                 nameof(Duration), nameof(Remark)},
             OnlyUsefulInGroup = true)]
         public object SendGroupPasswordRedPacket(
-            [KouPluginArgument(Name = "总金额", NumberMin = 1, DefaultNumberRangeError = true)] int total,
-            [KouPluginArgument(Name = "数量", NumberMin = 1, DefaultNumberRangeError = true)] int quantity,
+            [KouPluginArgument(Name = "总金额", Min = 1, EnableDefaultRangeError = true)] int total,
+            [KouPluginArgument(Name = "数量", Min = 1, EnableDefaultRangeError = true)] int quantity,
             [KouPluginArgument(Name = "口令(默认生成6位数字)")] string password = null)
         {
             if (password == "") password = null;
@@ -166,8 +166,8 @@ namespace KouFunctionPlugin
                 nameof(IsCompeteInVelocity),
                 nameof(Duration), nameof(Remark)})]
         public object SendPasswordRedPacket(
-            [KouPluginArgument(Name = "总金额", NumberMin = 1, DefaultNumberRangeError = true)] int total,
-            [KouPluginArgument(Name = "数量", NumberMin = 1, DefaultNumberRangeError = true)] int quantity,
+            [KouPluginArgument(Name = "总金额", Min = 1, EnableDefaultRangeError = true)] int total,
+            [KouPluginArgument(Name = "数量", Min = 1, EnableDefaultRangeError = true)] int quantity,
             [KouPluginArgument(Name = "口令(默认生成6位数字)")] string password = null)
         {
             if (password == "") password = null;

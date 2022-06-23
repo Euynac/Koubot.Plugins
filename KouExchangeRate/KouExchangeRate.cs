@@ -67,8 +67,7 @@ namespace KouFunctionPlugin.Currency
             CurrencyRateData? otherRateData;
             if (list.Count > 1)
             {
-                var id = SessionService.Ask<int>($"是下面哪个？输入ID：{list.ToSetStringWithID(5)}");
-                otherRateData = list.ElementAtOrDefault(id - 1);
+                otherRateData = SessionService.AskWhichOne(list);
                 if (otherRateData == null) return null;
             }
             else

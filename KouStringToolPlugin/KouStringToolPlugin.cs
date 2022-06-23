@@ -6,10 +6,13 @@ using Koubot.Tool.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Koubot.SDK.PluginInterface;
 using Koubot.Shared.Protocol.Attribute;
+using Koubot.Shared.Protocol.KouEnum;
 
 namespace KouFunctionPlugin
 {
@@ -30,6 +33,17 @@ namespace KouFunctionPlugin
         public bool RowCount { get; set; }
         [KouPluginParameter(ActivateKeyword = "v", Name = "只显示不匹配的（Invert）")]
         public bool Invert { get; set; }
+
+        [KouPluginFunction(Name = "分割去重")]
+        public object? Distinct(List<string> list)
+        {
+            return list.Distinct().ToStringJoin(' ');
+        }
+        [KouPluginFunction(Name = "整体去重")]
+        public object? WholeDistinct(string str)
+        {
+            return new string(str.Distinct().ToArray());
+        }
 
         [KouPluginFunction(ActivateKeyword = "sort", Name = "按行排序字符串",
             SupportedParameters = new[] { nameof(Descending), nameof(IgnoreCase) })]
@@ -52,22 +66,50 @@ namespace KouFunctionPlugin
             if (strToRemove.IsNullOrWhiteSpace()) strToRemove = " ";
             if (strToRemove != " ")
             {
-                var stringsNeedToRemove = strToRemove.Split(new[] { ' ', ',', '，', '、' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (var str in stringsNeedToRemove)
-                {
-                    value = value.Replace(str, "");
-                }
+                value = value.Replace(strToRemove, "");
             }
 
             return value;
         }
 
+        [KouPluginFunction(ActivateKeyword = "title case", Name = "每个英文首字母大写")]
+        public object? ToTitleCase(string str) => str.ToTitleCase();
+
+        [KouPluginFunction(ActivateKeyword = "camel case split", Name = "驼峰字符串分割")]
+        public object? CamelCaseSplit(string str) => str.CamelCaseSplit(true).ToStringJoin(' ');
 
         [KouPluginFunction(ActivateKeyword = "split|s", Name = "分割字符串",
             SupportedParameters = new[] { nameof(IgnoreCase) })]
         public object SplitString(string separator, string str)
         {
+            separator = separator.Replace("\\n", "\n");
             return str.Split(separator.ToCharArray()).ToStringJoin("\n");
+        }
+
+        [KouPluginFunction(ActivateKeyword = "append start", Name = "在字符串最前面添加")]
+        public object? StringAppendStart([KouPluginArgument(Name = "添加的内容")] string content, [KouPluginArgument(Name = "字符串列表", ArgumentAttributes = KouParameterAttribute.AllowDuplicate, SplitChar = "\n ")] List<string> strList)
+        {
+            return strList.Select(p => content + p).ToStringJoin(" ");
+        }
+        [KouPluginFunction(ActivateKeyword = "append end", Name = "在字符串最后面添加")]
+        public object? StringAppendEnd([KouPluginArgument(Name = "添加的内容")] string content, [KouPluginArgument(Name = "字符串列表", ArgumentAttributes = KouParameterAttribute.AllowDuplicate, SplitChar = "\n ")] List<string> strList)
+        {
+            return strList.Select(p => p + content).ToStringJoin(" ");
+        }
+        [KouPluginFunction(ActivateKeyword = "join", Name = "字符串合并")]
+        public object? StringJoin([KouPluginArgument(Name = "合并符")] string separator, [KouPluginArgument(Name = "字符串列表", ArgumentAttributes = KouParameterAttribute.AllowDuplicate | KouParameterAttribute.DoAutoTrim, SplitChar = "\n ")] List<string> strList)
+        {
+            return strList.ToStringJoin(separator);
+        }
+
+        [KouPluginFunction(ActivateKeyword = "append advance", Name = "高级添加")]
+        public object? AdvanceAppend(
+            [KouPluginArgument(Name = "0代表原始值")] string expression,
+            [KouPluginArgument(Name = "字符串列表",
+                ArgumentAttributes = KouParameterAttribute.AllowDuplicate, SplitChar = "\n ")] List<string> strList)
+        {
+            var exp = expression.Replace("0", "$0");
+            return strList.Select(p => p.RegexReplace(".+", exp)).ToStringJoin('\n');
         }
 
         [KouPluginFunction(ActivateKeyword = "replace|r", Name = "字符串替换",
@@ -76,10 +118,24 @@ namespace KouFunctionPlugin
         {
             return str.Replace(oldValue, newValue, IgnoreCase, null);
         }
+
+        [KouPluginFunction(Name = "统计元素个数")]
+        public object? CountItem(List<string> words)
+        {
+            return words.Count;
+        }
+
         [KouPluginFunction(ActivateKeyword = "count|c", Name = "字符数统计")]
         public int StringWordCount(string words)
         {
-            return words.Length;
+            return new StringInfo(words).LengthInTextElements;
+        }
+        [KouPluginFunction(ActivateKeyword = "repeat", Name ="重复")]
+        public object RepeatStr(
+            [KouPluginArgument(Name ="重复次数", Min = 1, Max = 1000, CustomRangeErrorReply ="重复范围1-1000次")] int times,
+            [KouPluginArgument(Name ="要重复的词")] string str)
+        {
+            return str.Repeat(times);
         }
         public override object? Default(string? str = null)
         {

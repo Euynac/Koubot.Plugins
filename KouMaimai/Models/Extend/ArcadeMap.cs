@@ -14,7 +14,7 @@ namespace KouGamePlugin.Maimai.Models
 {
     public partial class ArcadeMap : KouFullAutoModel<ArcadeMap>
     {
-        public override bool UseItemIDToFormat() => true;
+        public override FormatConfig ConfigFormat() => new() {UseItemIdToFormat = true};
         public override int? GetItemID() => LocationId;
         protected override KouMessage ReplyOnFailingToSearch()
         {
@@ -36,7 +36,7 @@ namespace KouGamePlugin.Maimai.Models
             return LocationId.GetHashCode();
         }
 
-        public override string? GetAutoCitedSupplement(List<string> citedFieldNames)
+        public override string? GetAutoCitedSupplement(HashSet<string> citedFieldNames)
         {
             return
                    $"{citedFieldNames.BeIfContains(nameof(ArcadeName), $"\n   电玩城名：{ArcadeName}")}" +
@@ -58,7 +58,7 @@ namespace KouGamePlugin.Maimai.Models
                 case FormatType.Customize3:
                     var arcadeName = ArcadeName;
                     var curPeople = PeopleCount?.Sum(p => p.AlterCount) ?? 0;
-                    var modifiedTime = PeopleCount?.OrderByDescending(p => p.ModifyAt).FirstOrDefault()?.ModifyAt ?? default;
+                    var modifiedTime = PeopleCount?.MaxBy(p => p.ModifyAt)?.ModifyAt ?? default;
                     switch (format)
                     {
                         case FormatType.Customize1:

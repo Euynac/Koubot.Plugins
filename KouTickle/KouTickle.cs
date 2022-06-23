@@ -161,9 +161,9 @@ namespace KouFunctionPlugin
             if (0.1.ProbablyTrue()) return null;//90%概率触发
             using (var limiter = new LeakyBucketRateLimiter(nameof(KouTickle), 1))
             {
-                if (!limiter.TryRequestOnce()) return null;
+                if (!limiter.TokenBucketRequest()) return null;
             }
-            var list = TickleReply.GetAutoModelCache();
+            var list = TickleReply.GetCache();
             var reply = list.RandomGetOne()?.Reply;
             return reply;
         }

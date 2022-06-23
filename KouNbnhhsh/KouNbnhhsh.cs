@@ -1,12 +1,11 @@
 ﻿using Koubot.SDK.Tool;
-using Koubot.Shared.Protocol;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.Random;
 using Koubot.Tool.Web;
 using Koubot.Tool.Web.RateLimiter;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Koubot.SDK.PluginInterface;
 using Koubot.Shared.Protocol.Attribute;
@@ -85,7 +84,7 @@ namespace KouFunctionPlugin
             }
 
             result = "{\"result\":" + result + "}";
-            Root root = JsonConvert.DeserializeObject<Root>(result);
+            Root root = JsonSerializer.Deserialize<Root>(result);
             return root;
         }
         public class ResultItem

@@ -48,22 +48,22 @@ namespace KouGamePlugin.Arcaea.Models
         {
             AddCustomFunc(nameof(SongAlias), (song, o) =>
             {
-                if (o is string input)
+                if (o.ConvertedValue is string input)
                 {
-                    return song.Aliases.Any(n => n.Alias.Contains(input));
+                    return song.Aliases.Any(n => n.Alias.Contains(input, StringComparison.OrdinalIgnoreCase));
                 }
                 return false;
             });
         }
 
-        protected override dynamic SetModelIncludeConfig(IQueryable<Song> set)
+        protected override dynamic ConfigModelInclude(IQueryable<Song> set)
         {
             return set.Include(p => p.MoreInfo)
                 .Include(p => p.Aliases)
                 .ThenInclude(p => p.SourceUser);
         }
 
-        public override int GetHashCode() => SongId.GetHashCodeWith(SongEnId);
+        public override int GetHashCode() => HashCode.Combine(SongId, SongEnId);
 
         public override bool Equals(object? obj)
         {
@@ -76,18 +76,18 @@ namespace KouGamePlugin.Arcaea.Models
             return false;
         }
 
-        public override bool UseItemIDToFormat() => true;
+        public override FormatConfig ConfigFormat() => new() {UseItemIdToFormat = true};
         public override int? GetItemID() => SongId;
         protected override KouMessage ReplyOnFailingToSearch()
         {
             return "未找到符合条件的歌曲";
         }
 
-        public override string? GetAutoCitedSupplement(List<string> citedFieldNames)
+        public override string? GetAutoCitedSupplement(HashSet<string> citedFieldNames)
         {
             return $"{citedFieldNames.BeIfContains(nameof(SongArtist), $"\n   曲师：{SongArtist}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(SongBpm), $"\n   BPM：{SongBpm}")}" +
-                   $"{citedFieldNames.BeIfContains(nameof(SongPack), $"\n   曲包：{SongPack.GetKouEnumFirstName()}")}" +
+                   $"{citedFieldNames.BeIfContains(nameof(SongPack), $"\n   曲包：{SongPack.GetKouEnumName()}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(SongLength), $"\n   长度：{SongLength}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(SongAppend.ChartDesigner), $"\n   谱师：{GetBriefChartDesigner()}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(SongAppend.ChartAllNotes), $"\n   总键数：{GetBriefAllNotes()}")}" +
@@ -120,7 +120,7 @@ namespace KouGamePlugin.Arcaea.Models
                            JacketDesigner?.Be($"画师：{JacketDesigner}\n") +
                            SongBpm?.Be($"BPM：{SongBpm}\n") +
                            SongLength?.Be($"歌曲长度：{SongLength}\n") +
-                           SongPack?.Be($"曲包：{SongPack.GetKouEnumFirstName().ToTitleCase()}\n") +
+                           SongPack?.Be($"曲包：{SongPack.GetKouEnumName().ToTitleCase()}\n") +
                            allNotesDesc?.Be($"总键数：{allNotesDesc}\n");
             }
             return null;

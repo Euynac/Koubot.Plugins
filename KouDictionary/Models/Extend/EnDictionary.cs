@@ -11,16 +11,17 @@ namespace KouFunctionPlugin.Models
 {
     public partial class EnDictionary : KouFullAutoModel<EnDictionary>
     {
-        public override bool EnableAutoID()
-        {
-            return false;
-        }
+        public override FormatConfig ConfigFormat() =>
+            new()
+            {
+                EnableAutoId = false
+            };
 
         protected override KouMessage ReplyOnFailingToSearch()
         {
             return "未找到符合条件的单词";
         }
-        public override string? GetAutoCitedSupplement(List<string> citedFieldNames)
+        public override string? GetAutoCitedSupplement(HashSet<string> citedFieldNames)
         {
             return $"{citedFieldNames.BeIfContains(nameof(Population), $"\n   词频：{Population}")}";
         }

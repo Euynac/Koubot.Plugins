@@ -30,9 +30,9 @@ namespace KouFunctionPlugin
         public string Reply { get; set; }
 
         public override int? GetItemID() => ID;
-        public override bool UseItemIDToFormat() => true;
+        public override FormatConfig ConfigFormat() => new() {UseItemIdToFormat = true};
 
-        protected override dynamic SetModelIncludeConfig(IQueryable<TickleReply> set)
+        protected override dynamic ConfigModelInclude(IQueryable<TickleReply> set)
         {
             return set.Include(p => p.SourceUser);
         }

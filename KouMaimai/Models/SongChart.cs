@@ -4,6 +4,8 @@ using Koubot.Tool.Extensions;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+using Koubot.Tool.String;
 
 
 namespace KouGamePlugin.Maimai.Models
@@ -66,6 +68,59 @@ namespace KouGamePlugin.Maimai.Models
         #region 谱面数据
         [KouAutoModelField(true)]
         public List<ChartData>? ChartDataList { get; set; }
+        [KouAutoModelField(true)]
+        public List<ChartStatus>? ChartStatusList { get; set; }
+        public class ChartStatus
+        {
+            public enum Tag
+            {
+                [KouEnumName("Very Easy","超简单","非常简单", "very easy")]
+                VeryEasy,
+                [KouEnumName("简单")]
+                Easy,
+                [KouEnumName("中等","一般")]
+                Medium,
+                [KouEnumName("困难","难")]
+                Hard,
+                [KouEnumName("Very Hard","非常困难","超困难", "very hard")]
+                VeryHard,
+                None,
+            }
+            public Tag DifficultTag { get; set; }
+            /// <summary>
+            /// 平均达成率
+            /// </summary>
+            public double AverageRate { get; set; }
+            /// <summary>
+            /// 记录总人数
+            /// </summary>
+            public int TotalCount { get; set; }
+            /// <summary>
+            /// 记录中，SSS以上成绩的人数
+            /// </summary>
+            public int SSSCount { get; set; }
+            [JsonIgnore]
+            public double SSSPeopleRatio => SSSCount/(double)TotalCount;
+            /// <summary>
+            /// 相同难度歌曲数
+            /// </summary>
+            public int SameDifficultCount { get; set; }
+            /// <summary>
+            /// 相同难度SSS比例排名
+            /// </summary>
+            public int SSSRankOfSameDifficult { get; set; }
+            [JsonIgnore]
+            public string SSSRankString => $"{SSSRankOfSameDifficult + 1}/{SameDifficultCount}";
+            public override string ToString()
+            {
+                return
+                    $"Tag：{DifficultTag}\n"+
+                    $"SSS比例排名：{SSSRankString}\n" +
+                       $"SSS人数：{SSSCount}/{TotalCount}({SSSPeopleRatio:P}) \n" +
+                       $"平均达成率：{AverageRate:0.##}%";
+            }
+        }
+
 
         public class ChartData
         {

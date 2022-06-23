@@ -17,8 +17,8 @@ namespace KouGamePlugin.Maimai.Models
     [KouAutoModelTable]
     public partial class SongInfo : KouFullAutoModel<SongInfo>
     {
-        public override int GetHashCode() => SongId.GetHashCodeWith(SongTitleKaNa);
-
+        public override int GetHashCode() => HashCode.Combine(SongId, SongTitleKaNa);
+        
         public override bool Equals(object? obj)
         {
             if (obj is SongInfo song)
@@ -39,7 +39,7 @@ namespace KouGamePlugin.Maimai.Models
                 entity.HasIndex(e => e.SongId);
 
                 entity.Property(p => p.Version)
-                    .HasConversion(v => v.GetKouEnumFirstName(true),
+                    .HasConversion(v => v.GetKouEnumName(1) ?? v.ToString(),
                     s => s.ToKouEnum<SongVersion>());
 
                 entity.HasIndex(e => e.SongTitle);
@@ -84,10 +84,11 @@ namespace KouGamePlugin.Maimai.Models
                         Version?.Be($"\n版本：{Version.Value.GetKouEnumName()}") + SongArtist?.Be($"\n曲师：{SongArtist}") +
                         SongBpm?.Be($"\nBPM：{SongBpm}") + SongLength?.Be($"\n歌曲长度：{SongLength}") +
                         Remark?.Be($"\n注：{Remark}") +
-                        Aliases?.ToSetString(FormatType.Customize1, "，", false)?.Be("\n别名：{0}", true) +
+                        Aliases?.ToKouSetString(FormatType.Customize1, "，", false)?.Be("\n别名：{0}", true) +
                         chartInfo.GetChartData(SongChart.SongRatingColor.Value)?.Be(
-                            $"\n[{SongChart.SongRatingColor.Value.GetKouEnumFirstName()}谱数据]\n{{0}}", true);
-                //$"{chartInfo.ToOldRatingString()?.Be("\n旧难度：{0}", true)}" +
+                            $"\n[{SongChart.SongRatingColor.Value.GetKouEnumName()}谱数据]\n{chartInfo.GetChartStatus(SongChart.SongRatingColor.Value)}\n{{0}}",
+                            true);
+                        //$"{chartInfo.ToOldRatingString()?.Be("\n旧难度：{0}", true)}" +
                 //$"{chartInfo.ToOldConstantString()?.Be("\n旧定数：{0}", true)}";
                 default:
                     return null;

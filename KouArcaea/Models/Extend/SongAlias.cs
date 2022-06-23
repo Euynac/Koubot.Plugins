@@ -15,7 +15,7 @@ namespace KouGamePlugin.Arcaea.Models
     /// </summary>
     public partial class SongAlias : KouFullAutoModel<SongAlias>
     {
-        public override bool UseItemIDToFormat() => true;
+        public override FormatConfig ConfigFormat() => new() {UseItemIdToFormat = true};
         public override int? GetItemID() => AliasID;
         public override int GetHashCode()
         {
@@ -32,7 +32,7 @@ namespace KouGamePlugin.Arcaea.Models
             return base.Equals(obj);
         }
 
-        protected override dynamic SetModelIncludeConfig(IQueryable<SongAlias> set)
+        protected override dynamic ConfigModelInclude(IQueryable<SongAlias> set)
         {
             return set.Include(p => p.CorrespondingSong)
                 .Include(p => p.SourceUser);

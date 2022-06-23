@@ -3,11 +3,23 @@ using Koubot.Tool.Extensions;
 using Koubot.Tool.String;
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace KouGamePlugin.Maimai.Models;
 
+public class MaiGroupConfig : PluginGroupConfig<MaiGroupConfig>
+{
+    /// <summary>
+    /// 设定的默认地区，用于快捷查看几卡，避免别名冲突
+    /// </summary>
+    public string MapDefaultArea { get; set; }
+}
+
 [Flags]
+[SuppressMessage("ReSharper", "StringLiteralTypo")]
+[SuppressMessage("ReSharper", "IdentifierTypo")]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum SongVersion
 {
     None,
@@ -102,7 +114,7 @@ public enum PlateType
 /// <summary>
 /// maimai插件用户配置
 /// </summary>
-public class MaiUserConfig : PluginUserConfig
+public class MaiUserConfig : PluginUserConfig<MaiUserConfig>
 {
     /// <summary>
     /// Diving-fish 用户名
@@ -132,6 +144,14 @@ public class MaiUserConfig : PluginUserConfig
     /// 上一次获取成绩时间
     /// </summary>
     public DateTime GetRecordsTime { get; set; }
+    /// <summary>
+    /// Token刷新时间
+    /// </summary>
+    public DateTime TokenRefreshTime { get; set; }
+    /// <summary>
+    /// 使用皮肤
+    /// </summary>
+    public bool? UseHtml { get; set; }
     /// <summary>
     /// 获取用户当前资料
     /// </summary>

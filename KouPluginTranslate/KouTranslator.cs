@@ -6,16 +6,19 @@ using Koubot.Tool.General;
 using Koubot.Tool.Random;
 using Koubot.Tool.Web;
 using System;
+using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using Koubot.SDK.PluginInterface;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;
+using Koubot.Tool.String;
 using ToolGood.Words;
 using static Koubot.SDK.API.BaiduTranslateAPI;
 
 namespace KouFunctionPlugin
 {
-    [KouPluginClass("trans|翻译|translate", "翻译器",
+    [KouPluginClass("trans|echo", "翻译器",
         Introduction = "提供多种翻译、转换功能",
         Author = "7zou",
         PluginType = PluginType.Function)]
@@ -34,8 +37,7 @@ namespace KouFunctionPlugin
 
         [KouPluginParameter(ActivateKeyword = "count", Help = "润色次数", DefaultContent = "5")]
         public string Count { get; set; } = "5";
-        [KouPluginParameter(ActivateKeyword = "type", Help = "转换类型(如：时间戳unix、JavaScript)")]
-        public string Type { get; set; }
+       
         [KouPluginParameter(ActivateKeyword = "带空格", Name = "说 话 带 空 格", Help = "返回的结果中字符间带空格")]
         public bool SpeakWithWhiteSpace { get; set; }
 
@@ -50,6 +52,61 @@ namespace KouFunctionPlugin
         public string ToPinyin { get; set; }
         [KouPluginParameter(ActivateKeyword = "首拼音", Name = "转首字母拼音")]
         public bool ToFirstPinyin { get; set; }
+
+
+        private enum SupportsPronounce
+        {
+            [KouEnumName("日", "jp")]
+            Japanese,
+            [KouEnumName("英", "en")]
+            English,
+            [KouEnumName("法","fr")]
+            French,
+            [KouEnumName("德")]
+            German,
+            [KouEnumName("俄")]
+            Russian,
+            [KouEnumName("韩")]
+            Korean,
+            [KouEnumName("泰")]
+            Thai,
+        }
+
+        private static readonly Dictionary<SupportsPronounce, Dictionary<string, string>> _pronounceDict;
+        static KouTranslator()
+        {
+            var json = FileTool.ReadEmbeddedResource("pronounce.json");
+            _pronounceDict = JsonSerializer.Deserialize<Dictionary<SupportsPronounce, Dictionary<string, string>>>(json!);
+        }
+
+        [KouPluginFunction(ActivateKeyword = "pronounce", Name = "发音转换", SupportedParameters = new []{nameof(To)}, 
+            Help = "当前支持日语、英文、法语、德语、俄语、韩语、泰语（使用-to）。https://github.com/Uahh/Fyzhq")]
+        public object? PronounceConvert(string content)
+        {
+            var pinyinList = WordsHelper.GetPinyin(content, "|").ToLowerInvariant();
+            var target = SupportsPronounce.Japanese;
+            if (!To.IsNullOrWhiteSpace())
+            {
+                if (To.EndsWith("语"))
+                {
+                    To = To.TrimEnd('语');
+                }
+                if (!To.TryToKouEnum(out target)) return "当前仅支持日语、英文、法语、德语、俄语、韩语、泰语";
+            }
+            var dict = _pronounceDict[target];
+            var sb = new StringBuilder();
+            foreach (var pinyin in pinyinList.Split('|'))
+            {
+                sb.Append(dict.GetValueOrDefault(pinyin) ?? pinyin);
+                if (target == SupportsPronounce.English)
+                {
+                    sb.Append(" ");
+                }
+            }
+
+            return sb.ToString();
+        }
+
 
         [KouPluginFunction(Help = "基本复述", SupportedParameters = new[] { nameof(Lower), nameof(From), nameof(To), nameof(Upper), nameof(Reverse), nameof(ToTraditionalChinese), nameof(ToPinyin), nameof(ToFirstPinyin), nameof(ToSimplifiedChinese), nameof(SpeakWithWhiteSpace) })]
         public override object? Default(string? str = null)
@@ -102,11 +159,8 @@ namespace KouFunctionPlugin
                         case "md5":
                             str = ToMD5(str);
                             break;
-                        case "时间戳":
-                            str = ToUnixTime(str);
-                            break;
                         default:
-                            str = "to参数支持翻译API中的Language类（使用翻译的“支持语种”功能查看）以及其他功能：繁体、简体、全角、半角、base64、md5、时间戳";
+                            str = "to参数支持翻译API中的Language类（使用翻译的“支持语种”功能查看）以及其他功能：繁体、简体、全角、半角、base64、md5";
                             break;
                     }
                 }
@@ -185,7 +239,7 @@ namespace KouFunctionPlugin
                     return null;
                 }
             }
-            string result = translator.Translate(source, Language.auto);//最后转为中文
+            var result = translator.Translate(source, Language.auto);//最后转为中文
             if (result == null)
             {
                 this.InheritError(translator);
@@ -230,49 +284,11 @@ namespace KouFunctionPlugin
         [KouPluginFunction(ActivateKeyword = "转MD5|MD5|md5|转md5", Help = "计算MD5值")]
         public string ToMD5(string str = null)
         {
-            return ResultPipe(WebTool.EncryptStringMD5(str));
+            return ResultPipe(WebTool.StringHash(str));
         }
 
-        [KouPluginFunction(ActivateKeyword = "转时间", Help = "将时间戳转换为时间形式\ntype参数支持js，默认unix时间戳")]
-        public string ToDateTime(string str)
-        {
-            if (str.IsNullOrWhiteSpace()) return null;
-            if (str.Equals("now", StringComparison.OrdinalIgnoreCase))
-            {
-                return DateTime.Now.ToString();
-            }
-            TimeExtensions.TimeStampType timeStampType = TimeExtensions.TimeStampType.Unix;
-            if (!Type.IsNullOrWhiteSpace())
-            {
-                if (str.Equals("js", StringComparison.OrdinalIgnoreCase) || str.Equals("javascript", StringComparison.OrdinalIgnoreCase))
-                    timeStampType = TimeExtensions.TimeStampType.Javascript;
-            }
-            return str.ToDateTime(timeStampType).ToString();
-        }
-        [KouPluginFunction(ActivateKeyword = "转时间戳", Help = "将日期转换为时间戳格式\ntype参数支持js，默认unix时间戳")]
-        public string ToUnixTime(string str)
-        {
-            if (str.IsNullOrWhiteSpace()) return null;
-            if (str.Equals("now", StringComparison.OrdinalIgnoreCase))
-            {
-                return DateTime.Now.ToTimeStamp().ToString();
-            }
-            TimeExtensions.TimeStampType timeStampType = TimeExtensions.TimeStampType.Unix;
-            if (!Type.IsNullOrWhiteSpace())
-            {
-                if (str.Equals("js", StringComparison.OrdinalIgnoreCase) || str.Equals("javascript", StringComparison.OrdinalIgnoreCase))
-                    timeStampType = TimeExtensions.TimeStampType.Javascript;
-            }
-            return str.ToUnixTimeStamp(timeStampType).ToString();
-        }
-        [KouPluginFunction(ActivateKeyword = "转秒数", Help = "将输入的时间转换为对应秒数，-to可以相应使用分钟、小时、天数")]
-        public string ToTotalSecond(TimeSpan time)
-        {
-            if (To.EqualsAny("min", "分钟")) return time.TotalMinutes.ToString();
-            if (To.EqualsAny("hour", "小时")) return time.TotalHours.ToString();
-            if (To.EqualsAny("day", "天数")) return time.TotalDays.ToString();
-            return time.TotalSeconds.ToString();
-        }
+        
+        
         [KouPluginFunction(ActivateKeyword = "转人民币", Help = "将输入的数字转中文大写")]
         public string ToChineseRMB(double number)
         {

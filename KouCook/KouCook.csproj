@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+	  <ProduceReferenceAssembly>false
+	  </ProduceReferenceAssembly>
+    <ImplicitUsings>enable</ImplicitUsings>
+	  <AssemblyVersion>1.0.*</AssemblyVersion>
+	  <Deterministic>false</Deterministic>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Koubot.SDK\Koubot.SDK.csproj" />
+  </ItemGroup>
+
+</Project>

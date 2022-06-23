@@ -4,7 +4,6 @@ using Koubot.Shared.Models;
 using Koubot.Shared.Protocol;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Tool.Extensions;
-using Koubot.Tool.General;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -12,6 +11,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Koubot.SDK.PluginExtension.Result;
+using Koubot.SDK.Services;
+using Koubot.SDK.System;
+using Koubot.SDK.System.Messages;
+using Koubot.SDK.Templates;
+using KouMaimai;
 
 namespace KouGamePlugin.Maimai.Models;
 
@@ -23,20 +28,26 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
 
     protected override KouMessage ReplyOnFailingToSearch() => "没有找到相应的成绩哦";
 
+    public override bool UseAutoCache()
+    {
+        return false;
+    }
+
+    public override FormatConfig ConfigFormat()
+    {
+        return new FormatConfig() {OnePageMaxCount = 30};
+    }
+
     static SongRecord()
     {
-        AddCustomFunc(nameof(SongTitle), (song, o) =>
-        {
-            if (o is string input)
-            {
-                return song.CorrespondingChart.BasicInfo.SongTitle.Contains(input, StringComparison.OrdinalIgnoreCase);
-            }
-            return false;
-        });
+        AddCustomFunc(nameof(SongTitle), (song, o) => BaseCompare(song.CorrespondingChart.BasicInfo.SongTitle, o));
+        AddCustomFunc(nameof(SongChart.DifficultTag), (song, o) => BaseCompare(song.CorrespondingChart.GetChartStatus(song.RatingColor), o));
+        AddCustomFunc(nameof(SongChart.ChartRating), (song, o) => BaseCompare(song.CorrespondingChart.GetChartRatingOfSpecificColor(song.RatingColor), o));
+        AddCustomFunc(nameof(SongChart.ChartConstant), (song, o) => BaseCompare(song.CorrespondingChart.GetChartConstantOfSpecificColor(song.RatingColor), o));
     }
     public static List<SongRecord> GetB40Charts(UserAccount user)
     {
-        var list = Find(p => p.User == user);
+        var list = DbWhere(p => p.User == user);
         if (list.IsNullOrEmptySet()) return new List<SongRecord>();
         var newSong = list.Where(p => p.CorrespondingChart.BasicInfo.IsNew is true).OrderByDescending(p => p.Rating).Take(15);
         var oldSong = list.Where(p => p.CorrespondingChart.BasicInfo.IsNew is false).OrderByDescending(p => p.Rating).Take(25);
@@ -93,7 +104,7 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
     private int? _rating;
 
 
-    protected override dynamic? SetModelIncludeConfig(IQueryable<SongRecord> set)
+    protected override dynamic? ConfigModelInclude(IQueryable<SongRecord> set)
         => set.Include(p => p.User).Include(p => p.CorrespondingChart)
             .ThenInclude(p => p.BasicInfo).ThenInclude(p => p.Aliases);
     public override bool Equals(object? obj)
@@ -106,10 +117,7 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
         return false;
     }
 
-    public override int GetHashCode()
-    {
-        return User.GetHashCodeWith(CorrespondingChart).GetHashCodeWith(RatingColor);
-    }
+    public override int GetHashCode() => HashCode.Combine(User, CorrespondingChart, RatingColor);
 
     public override Action<EntityTypeBuilder<SongRecord>>? ModelSetup()
     {
@@ -122,6 +130,13 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
 
     public override string? ToString(FormatType formatType, object? supplement = null, KouCommand? command = null)
     {
+        if (command != null)
+        {
+            command.ImageRenderOptions = new KouMutateImage.KouTextOptions()
+            {
+                WrapTextWidth = 1800
+            };
+        }
         return formatType switch
         {
             FormatType.Brief =>
@@ -137,6 +152,43 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
                                  $"\nRating：{CorrespondingChart.CalRating(RatingColor, Achievements)}",
 
             _ => throw new ArgumentOutOfRangeException(nameof(formatType), formatType, null)
+        };
+    }
+
+    public override KouMessage? ListToKouMessage(IEnumerable<SongRecord> list,
+        object? supplement = null, KouCommand? command = null)
+    {
+        //var pageSetting = command?.Pick<ResultAutoPage>();
+        if (supplement is not ResultAutoPage pageSetting) return null;
+
+        return new KouMessage()
+        {
+            CurMessageType = KouMessage.MessageType.Html,
+            HtmlTypeMsg = new HtmlMessage(new Lazy<object>(() =>
+                {
+                    var browser = StaticServices.BrowserService;
+                    return new {CardTitle = pageSetting.PageSetting.PageSketch
+                        , Records = list.Select(p => new
+                    {
+                        Title = p.CorrespondingChart.BasicInfo.SongTitle,
+                        Achievement =  $"{p.Achievements}% {p.FcStatus?.Be($" {p.FcStatus.GetDescription()}")}{p.FsStatus?.Be($" {p.FsStatus.GetDescription()}")}",
+                        ImageUrl = browser.ResolveFileUrl(p.CorrespondingChart.BasicInfo.JacketUrl, new SongChart()),
+                        ColorTypeStr = p.RatingColor switch
+                        {
+                            SongChart.RatingColor.Basic => "basic_color",
+                            SongChart.RatingColor.Advanced => "advanced_color",
+                            SongChart.RatingColor.Expert => "expert_color",
+                            SongChart.RatingColor.Master => "master_color",
+                            SongChart.RatingColor.ReMaster => "remaster_color",
+                            _ => ""
+                        },
+                        ChartType = p.CorrespondingChart.SongChartType.ToString(),
+                        ChartConstant = p.CorrespondingChart.GetSpecificConstant(p.RatingColor)?.ToString("F1"),
+                        ChartLabel = p.CorrespondingChart.DifficultTag.ToString(),
+                        Rating = p.Rating,
+                    }).ToList()};
+                }),
+                new KouTemplate(TemplateResources.MaimaiRecordListTemplate).AppendModel(new ModelPage(pageSetting)))
         };
     }
 }

@@ -1,4 +1,5 @@
-﻿using Koubot.SDK.Tool;
+﻿using System.Collections.Generic;
+using Koubot.SDK.Tool;
 using Koubot.Shared.Interface;
 using Koubot.Shared.Models;
 using Koubot.Tool.Interfaces;
@@ -37,7 +38,27 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
         Username = config.Username;
         Password = config.Password;
         TokenValue = config.LoginTokenValue;
+        
     }
+
+    public static DivingFishChartStatusDto? GetChartStatusList()
+    {
+        var response = KouHttp.Create("https://www.diving-fish.com/api/maimaidxprober/chart_stats").SetBody().SendRequest(HttpMethods.GET);
+        if (response == null) return null;
+        var body = response.Body;
+        var parsed = $"{{\"data\":{body}}}";
+        return JsonSerializer.Deserialize<DivingFishChartStatusDto>(parsed);
+    }
+    public static DivingFishChartInfoDto.Root? GetChartInfoList()
+    {
+        var response = KouHttp.Create("https://www.diving-fish.com/api/maimaidxprober/music_data").SetBody().SendRequest(HttpMethods.GET);
+        if (response == null) return null;
+        var body = response.Body;
+        return new DivingFishChartInfoDto.Root()
+            { Infos = JsonSerializer.Deserialize<List<DivingFishChartInfoDto.ChartInfo>>(body) };
+    }
+    //public static bool
+
     /// <summary>
     /// 登录并获取token
     /// </summary>
@@ -101,6 +122,11 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
         var response = KouHttp.Create("https://www.diving-fish.com/api/maimaidxprober/player/records")
             .AddCookie(_tokenKey, TokenValue).SetQPS(1).SetBody().SendRequest(HttpMethods.GET);
 
+        if (response.HasError)
+        {
+            ErrorMsg = $"{response.ExceptionStatus}";
+            return false;
+        }
         var records = JsonSerializer.Deserialize<DivingFishRecordResponseDto>(response.Body);
         if (records == null)
         {
@@ -111,6 +137,9 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
         records.SaveToDb(user);
         return true;
     }
+
+    
+
 
     public class UserProfile
     {

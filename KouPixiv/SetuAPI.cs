@@ -1,8 +1,9 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Koubot.Shared.Interface;
 using Koubot.Tool.Web;
 using Koubot.Tool.Web.RateLimiter;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+
 
 namespace KouFunctionPlugin.Pixiv
 {
@@ -22,24 +23,22 @@ namespace KouFunctionPlugin.Pixiv
                 Num = num,
                 R18 = 2
             };
-            var jsonSerializeSetting = new JsonSerializerSettings
+            var option = new JsonSerializerOptions()
             {
-                NullValueHandling = NullValueHandling.Ignore,
-                DefaultValueHandling = DefaultValueHandling.Ignore,
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
-
             string responseStr = null;
             using (var limiter = new LeakyBucketRateLimiter(nameof(SetuAPI), 1))
             {
                 if (limiter.CanRequest())
                 {
-                    responseStr = WebHelper.HttpPost("https://api.lolicon.app/setu/v2", JsonConvert.SerializeObject(body, jsonSerializeSetting),
+                    responseStr = WebHelper.HttpPost("https://api.lolicon.app/setu/v2", JsonSerializer.Serialize(body, option),
                         WebContentType.Json);
                 }
             }
 
-            return responseStr == null ? null : JsonConvert.DeserializeObject<ResponseDto.Root>(responseStr, jsonSerializeSetting);
+            return responseStr == null ? null : JsonSerializer.Deserialize<ResponseDto.Root>(responseStr, option);
         }
     }
 }

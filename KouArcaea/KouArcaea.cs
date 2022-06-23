@@ -61,7 +61,12 @@ namespace KouGamePlugin.Arcaea
                     StringComparison.OrdinalIgnoreCase)
                 || s.Aliases?.Any(alias => alias.Alias == songName) ==
                 true);
-            if (satisfiedSongs.Count > 1) return $"具体是以下哪一首歌呢（暂时不支持选择id）：\n{satisfiedSongs.ToSetString()}";
+            Song song = null;
+            if (satisfiedSongs.Count > 1)
+            {
+                song = SessionService.AskWhichOne(satisfiedSongs);
+                if (song == null) return null;
+            }
             if (satisfiedSongs.Count == 0)
             {
                 if (KouStringTool.TryToDouble(nameOrConstant, out double constant))
@@ -70,7 +75,7 @@ namespace KouGamePlugin.Arcaea
                 }
                 return $"找不到哪个歌叫{songName}哦...";
             }
-            var song = satisfiedSongs[0];
+            song ??= satisfiedSongs[0];
             var songConstant = song.MoreInfo.FirstOrDefault(p => p.ChartRatingClass == ratingClass)?.ChartConstant;
             if (songConstant == null) return $"{song.SongTitle}还没有{ratingClass}的定数信息呢...";
             return $"{song.SongTitle}[{ratingClass}{songConstant.Value:0.#}]{score}分的ptt为{ArcaeaData.CalSongScorePtt(songConstant.Value, score):F3}";

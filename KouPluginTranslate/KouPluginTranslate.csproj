@@ -9,6 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="pronounce.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="pronounce.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Koubot.SDK\Koubot.SDK.csproj" />
   </ItemGroup>
 

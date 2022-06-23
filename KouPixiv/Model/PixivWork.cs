@@ -85,7 +85,7 @@ namespace KouFunctionPlugin.Pixiv
             };
         }
 
-        protected override dynamic SetModelIncludeConfig(IQueryable<PixivWork> set)
+        protected override dynamic ConfigModelInclude(IQueryable<PixivWork> set)
         {
             return set.Include(p => p.Tags).Include(a => a.Author);
         }

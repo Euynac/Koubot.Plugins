@@ -74,8 +74,7 @@ namespace KouFunctionPlugin.LuckMachine
                 "初音ミク -Project DIVA-",
                 "GITADORA",
                 "音灵 INVAXION",
-                "OverRapid"
-                ,
+                "OverRapid",
                 "初音未来：梦幻歌姬",
                 "舞立方",
                 "舞萌DX",
@@ -89,7 +88,7 @@ namespace KouFunctionPlugin.LuckMachine
             var luckValue = CurUser.KouUser.LuckValue(remake);
             var result = $"{CurUser.Name}的今日人品：{luckValue}";
             var hashString = $"{luckValue}{CurUser.PlatformUserId}";
-            var list = Almanac.GetAutoModelCache();
+            var list = Almanac.GetCache();
             if (list.Count == 0) return result;
             if (luckValue >= 99)
             {
@@ -170,7 +169,7 @@ namespace KouFunctionPlugin.LuckMachine
             }, out var added, out var error, Context);
             if (success)
             {
-                var reward = RandomTool.GenerateRandomInt(1, 3);
+                var reward = RandomTool.GenerateRandomInt(8, 15);
                 CurUser.KouUser.GainCoinFree(reward);
                 return $"学会了，ID{added.ToString(FormatType.Brief)}\n您获得了{CurKouGlobalConfig.CoinFormat(reward)}!";
             }

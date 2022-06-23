@@ -41,9 +41,9 @@ namespace KouFunctionPlugin.LuckMachine
         public string Content { get; set; }
 
         public override int? GetItemID() => ID;
-        public override bool UseItemIDToFormat() => true;
+        public override FormatConfig ConfigFormat() => new() {UseItemIdToFormat = true};
 
-        protected override dynamic SetModelIncludeConfig(IQueryable<Almanac> set)
+        protected override dynamic ConfigModelInclude(IQueryable<Almanac> set)
         {
             return set.Include(p => p.SourceUser);
         }

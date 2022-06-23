@@ -14,17 +14,14 @@ namespace KouFunctionPlugin.Models
     {
         public override int? GetItemID() => Id;
         public override bool UseAutoCache() => false;
-        public override bool UseItemIDToFormat()
-        {
-            return true;
-        }
+        public override FormatConfig ConfigFormat() => new() {UseItemIdToFormat = true};
 
         protected override KouMessage ReplyOnFailingToSearch()
         {
             return "未找到符合条件的成语";
         }
 
-        public override string? GetAutoCitedSupplement(List<string> citedFieldNames)
+        public override string? GetAutoCitedSupplement(HashSet<string> citedFieldNames)
         {
             return $"{citedFieldNames.BeIfContains(nameof(Derivation), $"\n   来源：{Derivation}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(Pinyin), $"\n   拼音：{Pinyin}")}" +
