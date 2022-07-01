@@ -49,7 +49,7 @@ namespace KouFunctionPlugin
             SupportedParameters = new[] { nameof(Descending), nameof(IgnoreCase) })]
         public object SortStrings([KouPluginArgument(Name = "字符串", SplitChar = "\r\n")] List<string> strList)
         {
-            int factor = Descending ? -1 : 1;
+            var factor = Descending ? -1 : 1;
             strList.Sort((s, s1) =>
                 string.Compare(s, s1, IgnoreCase ? StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture) *
                 factor);
@@ -125,7 +125,12 @@ namespace KouFunctionPlugin
             return words.Count;
         }
 
-        [KouPluginFunction(ActivateKeyword = "count|c", Name = "字符数统计")]
+        [KouPluginFunction(ActivateKeyword = "count", Name = "统计子字符串出现次数")]
+        public object? CountSpecificString(string subStr, string wholeStr)
+        {
+            return wholeStr.AllIndexOf(subStr).Count;
+        }
+        [KouPluginFunction(ActivateKeyword = "count word", Name = "字符数统计")]
         public int StringWordCount(string words)
         {
             return new StringInfo(words).LengthInTextElements;
@@ -147,7 +152,7 @@ namespace KouFunctionPlugin
         {
             if (strToMatch.IsNullOrEmpty()) return "要搜索的字符串为空";
             if (pattern.IsNullOrEmpty()) return "匹配模式为空";
-            bool isUsingRegex = false;
+            var isUsingRegex = false;
             var list = strToMatch.Split('\n', '\r', StringSplitOptions.RemoveEmptyEntries);
             var regexPattern = GetRegexPattern(pattern);
             if (regexPattern != null)
@@ -167,7 +172,7 @@ namespace KouFunctionPlugin
         public object Default(string pattern, object list)
         {
             if (list is string str) return Default(pattern, str);
-            bool isUsingRegex = false;
+            var isUsingRegex = false;
             var regexPattern = GetRegexPattern(pattern);
             if (regexPattern != null)
             {
@@ -201,10 +206,10 @@ namespace KouFunctionPlugin
 
         private static string GrepResult(bool isIKouFormattable, IEnumerable enumerable, bool ignoreCase, bool invert, string pattern, bool isRegex)
         {
-            StringBuilder resultBuilder = new StringBuilder();
+            var resultBuilder = new StringBuilder();
             if (!isRegex)
             {
-                StringComparison comparisonType =
+                var comparisonType =
                     ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
                 if (!invert)
                 {
@@ -226,8 +231,8 @@ namespace KouFunctionPlugin
             }
             else
             {
-                RegexOptions options = ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
-                Regex regex = new Regex(pattern, options);
+                var options = ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
+                var regex = new Regex(pattern, options);
                 if (!invert)
                 {
                     foreach (var item in YieldString(enumerable, isIKouFormattable))

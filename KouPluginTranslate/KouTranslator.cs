@@ -1,6 +1,4 @@
 ﻿using Koubot.SDK.API;
-using Koubot.SDK.Tool;
-using Koubot.Shared.Protocol;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.General;
 using Koubot.Tool.Random;
@@ -12,6 +10,7 @@ using System.Text.Json;
 using Koubot.SDK.PluginInterface;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;
+using Koubot.Tool.Interfaces;
 using Koubot.Tool.String;
 using ToolGood.Words;
 using static Koubot.SDK.API.BaiduTranslateAPI;

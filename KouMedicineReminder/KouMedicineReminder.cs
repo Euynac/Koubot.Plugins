@@ -1,14 +1,11 @@
 ﻿using System.Text;
-using K4os.Compression.LZ4.Internal;
 using Koubot.SDK.API;
 using Koubot.SDK.PluginInterface;
 using Koubot.Shared.Models;
-using Koubot.Shared.Protocol;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.General;
-using Koubot.Tool.Random;
 
 namespace KouFunctionPlugin;
 

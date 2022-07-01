@@ -8,6 +8,14 @@ using System.Linq;
 
 namespace KouGamePlugin.Maimai.Models;
 
+public class MaiGlobalConfig : PluginGlobalConfig
+{
+    /// <summary>
+    /// DxMap上一次更新时间
+    /// </summary>
+    public DateTime DxMapLastUpdateTime { get; set; }
+}
+
 public class MaiGroupConfig : PluginGroupConfig<MaiGroupConfig>
 {
     /// <summary>

@@ -1,5 +1,4 @@
-﻿using Koubot.SDK.Models.Entities;
-using Koubot.SDK.PluginInterface;
+﻿using Koubot.SDK.PluginInterface;
 using Koubot.SDK.Tool;
 using Koubot.Shared.Interface;
 using Koubot.Shared.Protocol.Attribute;

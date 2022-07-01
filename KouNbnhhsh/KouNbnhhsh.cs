@@ -1,8 +1,6 @@
-﻿using Koubot.SDK.Tool;
-using Koubot.Tool.Extensions;
+﻿using Koubot.Tool.Extensions;
 using Koubot.Tool.Random;
 using Koubot.Tool.Web;
-using Koubot.Tool.Web.RateLimiter;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
@@ -22,20 +20,20 @@ namespace KouFunctionPlugin
         PluginType = PluginType.Function)]
     public class KouNbnhhsh : KouPlugin<KouNbnhhsh>
     {
-        [KouPluginParameter(ActivateKeyword = "all", Help = "默认功能中使用会将所有结果输出")]
+        [KouPluginParameter(Help = "默认功能中使用会将所有结果输出")]
         public bool All { get; set; }
 
-        [KouPluginFunction(Name = "能不能好好说话的默认功能", Help = "输入带缩写的文字，返回一个结果（多个则随机）\n支持all参数")]
+        [KouPluginFunction(Name = "能不能好好说话的默认功能", Help = "输入带缩写的文字，返回一个结果（多个则随机）", SupportedParameters = new []{nameof(All)})]
         public override object? Default(string? str = null)
         {
             if (str.IsNullOrWhiteSpace()) return "输入带首字母缩写的一段话";
-            var root = CallAPI(str);
-            if (root != null && !root.Result.IsNullOrEmptySet())
+            var list = CallAPI(str);
+            if (!list.IsNullOrEmptySet())
             {
                 if (All)
                 {
                     StringBuilder result = new StringBuilder();
-                    foreach (var item in root.Result)
+                    foreach (var item in list)
                     {
                         if (!item.Trans.IsNullOrEmptySet())
                         {
@@ -51,7 +49,7 @@ namespace KouFunctionPlugin
                 }
                 else
                 {
-                    foreach (var item in root.Result)
+                    foreach (var item in list)
                     {
                         if (item.Trans.IsNullOrEmptySet()) continue;
                         Regex regex1 = new Regex(item.Name);
@@ -64,28 +62,14 @@ namespace KouFunctionPlugin
             return "不懂";
         }
 
-
-
-
-
-
-        public Root CallAPI(string str)
+        public List<ResultItem> CallAPI(string str)
         {
             if (str.IsNullOrWhiteSpace()) return null;
-            string result;
-            using (var limiter = new LeakyBucketRateLimiter(nameof(KouNbnhhsh), 2))
-            {
-                if (!limiter.CanRequest())
-                {
-                    this.InheritError(limiter, "发生在" + nameof(KouNbnhhsh) + "中的" + nameof(CallAPI));
-                    return null;
-                }
-                result = WebHelper.HttpPost("https://lab.magiconch.com/api/nbnhhsh/guess/", "{\"text\":\"" + str + "\"}", WebContentType.Json);
-            }
-
-            result = "{\"result\":" + result + "}";
-            Root root = JsonSerializer.Deserialize<Root>(result);
-            return root;
+    
+            var result = KouHttp.Create("https://lab.magiconch.com/api/nbnhhsh/guess/").SetQPS(2).SetJsonBody(new {text = str})
+                .SendRequest(HttpMethods.POST).Body;
+            var list = JsonSerializer.Deserialize<List<ResultItem>>(result, new JsonSerializerOptions(){PropertyNameCaseInsensitive = true});
+            return list;
         }
         public class ResultItem
         {
@@ -97,14 +81,6 @@ namespace KouFunctionPlugin
             /// 结果
             /// </summary>
             public List<string> Trans { get; set; }
-        }
-
-        public class Root
-        {
-            /// <summary>
-            /// 
-            /// </summary>
-            public List<ResultItem> Result { get; set; }
         }
     }
 

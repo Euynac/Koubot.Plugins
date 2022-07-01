@@ -1,9 +1,7 @@
 ﻿using Koubot.SDK.API;
-using Koubot.SDK.Models.Entities;
 using Koubot.SDK.PluginInterface;
 using Koubot.Shared.Interface;
 using Koubot.Shared.Models;
-using Koubot.Shared.Protocol;
 using Koubot.Shared.Protocol.Event;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.General;

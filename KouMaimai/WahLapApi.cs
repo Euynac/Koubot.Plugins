@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text.Json;
+using Koubot.Tool.Extensions;
 using Koubot.Tool.Web;
 
 namespace KouMaimai;
@@ -9,7 +9,7 @@ public class WahLapApi
     public static List<DxLocationRoot>? GetDxLocation()
     {
         var res = KouHttp.Create("http://wc.wahlap.net/maidx/rest/location").SendRequest(HttpMethods.GET).Body;
-        return JsonSerializer.Deserialize<List<DxLocationRoot>?>(res);
+        return res.DeserializeJson<List<DxLocationRoot>?>();
     }
    
     public class DxLocationRoot

@@ -1,5 +1,4 @@
 ﻿using Koubot.SDK.PluginInterface;
-using Koubot.Shared.Protocol;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;
 

@@ -1,11 +1,9 @@
 ﻿using System.Text;
 using Koubot.SDK.PluginInterface;
-using Koubot.SDK.System;
 using Koubot.Shared.Interface;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.Event;
 using Koubot.Shared.Protocol.KouEnum;
-using Koubot.Tool.Extensions;
 using Koubot.Tool.Random;
 using Koubot.Tool.String;
 

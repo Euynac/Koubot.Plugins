@@ -205,6 +205,11 @@ public class DivingFishChartInfoDto
                                 dbChartInfo.ChartDataList = new List<SongChart.ChartData>().AddRepeatValue(null, 5);
                             }
 
+                            if (dbChartInfo.ChartDataList.Count < 5)
+                            {
+                                dbChartInfo.ChartDataList.AddRepeatValue(null, 5 - dbChartInfo.ChartDataList.Count);
+                            }
+
                             dbChartInfo.ChartDataList[i] ??= new SongChart.ChartData();
                             dbChartInfo.ChartDataList[i].Charter = chartInfo.charter;
                             dbChartInfo.ChartDataList[i].Notes = chartInfo.notes;
@@ -233,6 +238,13 @@ public class DivingFishChartInfoDto
                                 dbChartInfo.ChartRemasterRating = rating.BeNullIfWhiteSpace() ?? dbChartInfo.ChartRemasterRating;
                                 break;
                         }
+                    }
+
+                    if (!dbChartInfo.ChartDataList.IsNullOrEmptySet())
+                    {
+                        var tmp = new List<SongChart.ChartData>();
+                        tmp.AddRange(dbChartInfo.ChartDataList);
+                        dbChartInfo.ChartDataList = tmp; 
                     }
                     context.Update(dbInfo);
                 }

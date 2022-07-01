@@ -49,7 +49,7 @@ namespace KouFunctionPlugin.LuckMachine
                 "LoveLive!",
                 "The IdolM@ster Cinderella Girls Starlight Stage",
                 "BanG Dream!",
-                "D4DJ",
+                "D4DJ Groovy Mix",
                 "Project Sekai Colorful Stage!",
                 "Groove Coaster",
                 "DJMAX",
@@ -79,7 +79,17 @@ namespace KouFunctionPlugin.LuckMachine
                 "舞立方",
                 "舞萌DX",
                 "maimai でらっくす Splash",
-                "乐动时代"
+                "乐动时代",
+                "KALPA",
+                "maimai でらっくす UNiVERSE",
+                "Orzmic",
+                "RAVON",
+                "TAKUMI",
+                "东方弹幕神乐",
+                "STELLIGHTS",
+                "osu! Lazer",
+                "Rhythm Doctor",
+                "A Dance of Fire and Ice"
             };
 
 

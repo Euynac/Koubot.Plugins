@@ -1,5 +1,4 @@
-﻿using Koubot.Shared.Protocol;
-using Koubot.Tool.Extensions;
+﻿using Koubot.Tool.Extensions;
 using System.Collections.Generic;
 using Koubot.SDK.PluginInterface;
 using Koubot.Shared.Protocol.Attribute;

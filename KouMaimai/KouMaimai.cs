@@ -27,7 +27,8 @@ namespace KouGamePlugin.Maimai
         PluginType = PluginType.Game,
         CanUseProxy = true)]
     public class KouMaimai : KouPlugin<KouMaimai>,
-        IWantPluginUserConfig<MaiUserConfig>, IWantPluginGroupConfig<MaiGroupConfig>
+        IWantPluginUserConfig<MaiUserConfig>, IWantPluginGroupConfig<MaiGroupConfig>,
+        IWantPluginGlobalConfig<MaiGlobalConfig>
     {
         [KouPluginFunction]
         public override object? Default(string? str = null)
@@ -53,8 +54,15 @@ namespace KouGamePlugin.Maimai
 
         #region WahLap
 
+        [KouPluginFunction(ActivateKeyword = "map status", Name = "DX地图状态")]
+        public object? DxMapStatus()
+        {
+            var count = ArcadeMap.Count();
+            return $"店铺总数：{count}\n" +
+                   $"上次更新时间：{this.GlobalConfig().DxMapLastUpdateTime}";
+        }
         [KouPluginFunction(Name = "更新机台地址", Authority = Authority.BotManager)]
-        public object? UpdateDxLocation()
+        public object? UpdateDxMap()
         {
             var locations = WahLapApi.GetDxLocation();
             if (locations.IsNullOrEmptySet()) return "更新失败，未能获取到店铺信息";
@@ -97,6 +105,10 @@ namespace KouGamePlugin.Maimai
                 context.Update(closedLocation.Value.Item2);
             }
             var effected = context.SaveChanges();
+            if (effected <= 0) return $"新增店铺{addedCount}，关停店铺{closedCount}，但更新失败，影响0条记录";
+            var config = this.GlobalConfig();
+            config.DxMapLastUpdateTime = DateTime.Now;
+            config.SaveChanges();
             return $"新增店铺{addedCount}，关停店铺{closedCount}，影响了{effected}条记录。";
         }
 
@@ -750,7 +762,7 @@ namespace KouGamePlugin.Maimai
 
             config.UseHtml = !config.UseHtml.Value;
             config.SaveChanges();
-            return $"皮肤已{config.UseHtml.Value.IIf("启用", "关闭")}{consumeDesc}";
+            return $"maimai皮肤已{config.UseHtml.Value.IIf("启用", "关闭")}{consumeDesc}";
         }
 
 

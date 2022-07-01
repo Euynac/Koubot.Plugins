@@ -1,12 +1,11 @@
-﻿using Koubot.SDK.Tool;
-using Koubot.Shared.Protocol;
-using Koubot.Tool.Extensions;
+﻿using Koubot.Tool.Extensions;
 using KouFunctionPlugin.Romaji.Models;
 using KouRomajiHelper;
 using System.Linq;
 using Koubot.SDK.PluginInterface;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;
+using Koubot.Tool.Interfaces;
 
 namespace KouFunctionPlugin.Romaji
 {

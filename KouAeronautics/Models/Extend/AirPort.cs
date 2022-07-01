@@ -1,18 +1,9 @@
 ﻿using Koubot.SDK.AutoModel;
 using Koubot.Shared.Interface;
-using Koubot.Shared.Models;
 using Koubot.Shared.Protocol;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Tool.Extensions;
-using Koubot.Tool.General;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Koubot.SDK.System;
 
 namespace KouFunctionPlugin.Aeronautics;
 

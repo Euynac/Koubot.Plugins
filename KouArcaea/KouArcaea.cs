@@ -1,6 +1,4 @@
 ﻿using Koubot.SDK.PluginInterface;
-using Koubot.SDK.Tool;
-using Koubot.Shared.Protocol;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.String;
 using KouGamePlugin.Arcaea.Models;
@@ -9,7 +7,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;
-using KouMessage = Koubot.Shared.Protocol.KouMessage;
 
 namespace KouGamePlugin.Arcaea
 {

@@ -1,8 +1,6 @@
-﻿using Koubot.SDK.Models.Entities;
-using Koubot.SDK.PluginInterface;
+﻿using Koubot.SDK.PluginInterface;
 using Koubot.SDK.Tool;
 using Koubot.Shared.Interface;
-using Koubot.Shared.Models;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.Random;
 using KouGamePlugin.Arcaea.Models;

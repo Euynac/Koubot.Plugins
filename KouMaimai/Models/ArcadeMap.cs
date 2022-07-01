@@ -13,7 +13,7 @@ namespace KouGamePlugin.Maimai.Models
     [Table("plugin_maimai_map")]
     [KouAutoModelTable("map",
         new[] { nameof(KouMaimai) },
-        Name = "DX地图", Help = "更新日期：2022/1/3 12:00")]
+        Name = "DX地图")]
     public partial class ArcadeMap
     {
         [Key]

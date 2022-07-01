@@ -1,5 +1,4 @@
 ﻿using Koubot.Shared.Models;
-using Koubot.Shared.Protocol.KouEnum;
 
 namespace KouFunctionPlugin;
 

@@ -16,7 +16,7 @@ public partial class Food : KouFullAutoModel<Food>
 {
     public static KouImage? SaveFoodImage(string foodName, KouImage foodImage)
     {
-        foodName = foodName.FilterForFileName().LimitLength(100);
+        foodName = foodName.FilterForFileName().LimitMaxLength(100);
         var fileName =
             $"{foodName}-{DateTime.Now.ToTimeStamp(TimeExtensions.TimeStampType.Javascript).ToString()}";
         foodImage.SaveToLocalPath(Path.Combine(DataDirectory(), fileName), out var image);

@@ -1,7 +1,4 @@
-﻿using Koubot.Shared.Models;
-using Koubot.Shared.Protocol.Attribute;
-using Koubot.Shared.Protocol.Enums;
-using System.ComponentModel;
+﻿using Koubot.Shared.Protocol.Attribute;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

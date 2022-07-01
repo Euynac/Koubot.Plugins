@@ -1,6 +1,6 @@
-﻿using System.Text.Json;
-using Koubot.SDK.Models.Entities;
+﻿using Koubot.SDK.Models.Entities;
 using Koubot.SDK.Services;
+using Koubot.Tool.Extensions;
 using Koubot.Tool.Web;
 using KouFunctionPlugin.Currency.Models;
 
@@ -20,9 +20,8 @@ public class ExchangeRateApi
     public static bool UpdateDataToDb()
     {
         var response = KouHttp.Create($"https://v6.exchangerate-api.com/v6/{StaticData.RateExchangeKey}/latest/CNY")
-            .SendRequest(HttpMethods.GET);
-        if (response == null) return false;
-        var data = JsonSerializer.Deserialize<RateDataDto>(response.Body, new JsonSerializerOptions());
+            .SendRequest(HttpMethods.GET).Body;
+        var data = response.DeserializeJson<RateDataDto>();
         if (data == null) return false;
         using var context = new KouContext();
         var list = context.Set<CurrencyRateData>().ToHashSet();

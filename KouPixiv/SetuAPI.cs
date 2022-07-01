@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Koubot.Shared.Interface;
+using Koubot.Tool.Interfaces;
 using Koubot.Tool.Web;
 using Koubot.Tool.Web.RateLimiter;
 

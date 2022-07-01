@@ -1,9 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using Koubot.SDK.AutoModel;
-using Koubot.Shared.Interface;
 using Koubot.Shared.Models;
-using Koubot.Shared.Protocol;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace KouFunctionPlugin.Cook;
 

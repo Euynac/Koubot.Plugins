@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using Koubot.SDK.Tool;
-using Koubot.Shared.Interface;
 using Koubot.Shared.Models;
 using Koubot.Tool.Interfaces;
 using Koubot.Tool.Web;
@@ -9,6 +7,7 @@ using System.ComponentModel;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Koubot.Tool.Extensions;
 
 namespace KouGamePlugin.Maimai;
 
@@ -91,7 +90,7 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
     /// 获取当前用户资料
     /// </summary>
     /// <returns></returns>
-    public UserProfile GetProfile()
+    public UserProfile? GetProfile()
     {
         if (TokenValue is null)
         {
@@ -101,7 +100,7 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
         var response = KouHttp.Create("https://www.diving-fish.com/api/maimaidxprober/player/profile")
             .AddCookie(_tokenKey, TokenValue).SetQPS(1).SetBody().SendRequest(HttpMethods.GET);
 
-        var profile = JsonSerializer.Deserialize<UserProfile>(response.Body);
+        var profile = response.Body.DeserializeJson<UserProfile>();
         if (profile == null)
         {
             var node = JsonNode.Parse(response.Body)!;
@@ -127,7 +126,7 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
             ErrorMsg = $"{response.ExceptionStatus}";
             return false;
         }
-        var records = JsonSerializer.Deserialize<DivingFishRecordResponseDto>(response.Body);
+        var records = response.Body.DeserializeJson<DivingFishRecordResponseDto>();
         if (records == null)
         {
             var node = JsonNode.Parse(response.Body)!;

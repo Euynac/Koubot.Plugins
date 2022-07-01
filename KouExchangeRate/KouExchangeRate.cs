@@ -1,8 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
-using Koubot.SDK.PluginInterface;
-using Koubot.SDK.Tool;
-using Koubot.Shared.Models;
+﻿using Koubot.SDK.PluginInterface;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;
 using Koubot.Tool.Extensions;
