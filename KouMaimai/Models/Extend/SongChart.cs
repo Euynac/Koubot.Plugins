@@ -4,7 +4,7 @@ using Koubot.Shared.Protocol;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.General;
-using Koubot.Tool.Math;
+using Koubot.Tool.Maths;
 using Koubot.Tool.String;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -51,15 +51,15 @@ namespace KouGamePlugin.Maimai.Models
         }
 
         [NotMapped] //临时虚拟字段
-        [KouAutoModelField(ActivateKeyword = "颜色", IgnoreOrIncludeWhenFrom = new[] { nameof(SongRecord) })]
+        [AutoField(ActivateKeyword = "颜色", IgnoreOrIncludeWhenFrom = new[] { nameof(SongRecord) })]
         public static ThreadLocal<RatingColor> SongRatingColor { get; set; } =
             new(() => RatingColor.Master);
         [NotMapped]//桥梁字段无法支持自动排序
-        [KouAutoModelField(ActivateKeyword = "难度")]
+        [AutoField(ActivateKeyword = "难度")]
         public string ChartRating { get; set; }
 
         [NotMapped]
-        [KouAutoModelField(ActivateKeyword = "定数")]
+        [AutoField(ActivateKeyword = "定数")]
         public IntervalDoublePair ChartConstant { get; set; }
         //[NotMapped]
         //[KouAutoModelField(ActivateKeyword = "旧定数")]
@@ -68,27 +68,40 @@ namespace KouGamePlugin.Maimai.Models
         //[KouAutoModelField(ActivateKeyword = "旧难度")]
         //public string OldChartRating { get; set; }
         [NotMapped]
-        [KouAutoModelField(ActivateKeyword = "别名", Name = "曲名俗称")]
+        [AutoField(ActivateKeyword = "别名", Name = "曲名俗称")]
         public string SongAlias { get; set; }
 
-        [KouAutoModelField(ActivateKeyword = "tag", Name = "难易度标签")]
+        [AutoField(ActivateKeyword = "tag", Name = "难易度标签")]
         public ChartStatus.Tag? DifficultTag =>
             ChartStatusList?.ElementAtOrDefault((int)SongRatingColor.Value)?.DifficultTag;
 
         /// <summary>
         /// 平均达成率
         /// </summary>
-        [KouAutoModelField(ActivateKeyword = "平均达成率")]
+        [AutoField(ActivateKeyword = "平均达成率")]
         public double? AverageRate => ChartStatusList?.ElementAtOrDefault((int)SongRatingColor.Value)?.AverageRate;
-        [KouAutoModelField(ActivateKeyword = "鸟比例")]
+        [AutoField(ActivateKeyword = "鸟比例")]
         public double? SSSPeopleRatio => ChartStatusList?.ElementAtOrDefault((int)SongRatingColor.Value)?.SSSPeopleRatio;
 
         /// <summary>
         /// 相同难度SSS比例排名
         /// </summary>
-        [KouAutoModelField(ActivateKeyword = "同难度排名|rank")]
+        [AutoField(ActivateKeyword = "同难度排名|rank")]
         public int? SSSRankOfSameDifficult =>
             ChartStatusList?.ElementAtOrDefault((int)SongRatingColor.Value)?.SSSRankOfSameDifficult;
+
+        public static string GetCssColorClass(RatingColor color)
+        {
+            return color switch
+            {
+                RatingColor.Basic => "basic_color",
+                RatingColor.Advanced => "advanced_color",
+                RatingColor.Expert => "expert_color",
+                RatingColor.Master => "master_color",
+                RatingColor.ReMaster => "remaster_color",
+                _ => ""
+            };
+        }
         static SongChart()
         {
             //AddCustomFunc(nameof(ChartStatus.DifficultTag), (song, o) =>
@@ -223,6 +236,7 @@ namespace KouGamePlugin.Maimai.Models
             ruleDictionary.Add(nameof(SongAlias), userInput);
             return true;
         }
+      
         public double? GetChartConstantOfSpecificColor(RatingColor color)
         {
             return color switch
@@ -235,6 +249,7 @@ namespace KouGamePlugin.Maimai.Models
                 _ => throw new ArgumentOutOfRangeException(nameof(color), color, null)
             };
         }
+
         public string GetChartRatingOfSpecificColor(RatingColor color)
         {
             return color switch
@@ -296,19 +311,7 @@ namespace KouGamePlugin.Maimai.Models
                    $"{citedFieldNames.BeIfContains(nameof(BasicInfo.Remark), $"\n   注：{BasicInfo.Remark}")}";
         }
 
-        public double? GetSpecificConstant(RatingColor type)
-        {
-            return type switch
-            {
-                RatingColor.Basic => ChartBasicConstant,
-                RatingColor.Advanced => ChartAdvancedConstant,
-                RatingColor.Expert => ChartExpertConstant,
-                RatingColor.Master => ChartMasterConstant,
-                RatingColor.ReMaster => ChartRemasterConstant,
-                _ => null
-            };
-        }
-
+     
         public string ToConstantString()
         {
             if (ChartExpertConstant == null && ChartAdvancedConstant == null) return null;
@@ -346,7 +349,7 @@ namespace KouGamePlugin.Maimai.Models
         /// <returns></returns>
         public string ToSpecificRatingString(RatingColor color)
         {
-            return $"{BasicInfo.SongTitle}[{SongChartType}{color.GetKouEnumName()}{GetSpecificConstant(color)?.Be(" {0:F1}", true)}{GetChartStatus(color)?.DifficultTag.Be(" {0}",true)}]";
+            return $"{BasicInfo.SongTitle}[{SongChartType}{color.GetKouEnumName()}{GetChartConstantOfSpecificColor(color)?.Be(" {0:F1}", true)}{GetChartStatus(color)?.DifficultTag.Be(" {0}",true)}]";
         }
 
         /// <summary>
@@ -356,7 +359,7 @@ namespace KouGamePlugin.Maimai.Models
         /// <param name="achievement"></param>
         /// <returns>不存在相关定数时返回null</returns>
         public int? CalRating(RatingColor type, double achievement) =>
-            GetSpecificConstant(type) is { } constant ? DxCalculator.CalSongRating(achievement, constant) : null;
+            GetChartConstantOfSpecificColor(type) is { } constant ? DxCalculator.CalSongRating(achievement, constant) : null;
 
         /// <summary>
         /// 获取指定难度的谱面数据

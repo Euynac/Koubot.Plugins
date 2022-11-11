@@ -13,7 +13,7 @@ using Koubot.Shared.Protocol.Attribute;
 
 namespace KouFunctionPlugin
 {
-    [KouAutoModelTable("list", new[] { nameof(KouTickle) }, Name = "戳一戳反馈列表")]
+    [AutoTable("list", new[] { nameof(KouTickle) }, Name = "戳一戳反馈列表")]
     [Table("plugin_tickle_reply")]
     public class TickleReply : KouFullAutoModel<TickleReply>
     {

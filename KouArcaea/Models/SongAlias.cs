@@ -5,7 +5,7 @@ using Koubot.Shared.Protocol.Attribute;
 
 namespace KouGamePlugin.Arcaea.Models
 {
-    [KouAutoModelTable("alias", new[] { nameof(KouArcaea) }, Name = "Arcaea歌曲别名")]
+    [AutoTable("alias", new[] { nameof(KouArcaea) }, Name = "Arcaea歌曲别名")]
     [Table("plugin_arcaea_song_alias")]
     public partial class SongAlias
     {

@@ -14,7 +14,7 @@ namespace KouFunctionPlugin.Pixiv
     /// <summary>
     /// Pixiv中的Tag
     /// </summary>
-    [KouAutoModelTable("tag", new[] { nameof(KouSetu) }, Name = "标签列表")]
+    [AutoTable("tag", new[] { nameof(KouPixiv) }, Name = "标签列表")]
     [Table("plugin_pixiv_tags")]
     public class PixivTag : KouFullAutoModel<PixivTag>
     {
@@ -24,7 +24,7 @@ namespace KouFunctionPlugin.Pixiv
         /// 标签名
         /// </summary>
         [Required]
-        [KouAutoModelField(ActivateKeyword = "tag|标签")]
+        [AutoField(ActivateKeyword = "tag|标签")]
         public string Name { get; set; }
         [InverseProperty(nameof(PixivWork.Tags))]
         public virtual ICollection<PixivWork> Works { get; set; }

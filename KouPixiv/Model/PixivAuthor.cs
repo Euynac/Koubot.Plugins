@@ -10,7 +10,7 @@ using Koubot.Shared.Protocol.Attribute;
 
 namespace KouFunctionPlugin.Pixiv
 {
-    [KouAutoModelTable("author", new[] { nameof(KouPixiv) }, Name = "作者列表")]
+    [AutoTable("author", new[] { nameof(KouPixiv) }, Name = "作者列表")]
     [Table("plugin_pixiv_author")]
     public class PixivAuthor : KouFullAutoModel<PixivAuthor>
     {
@@ -25,7 +25,7 @@ namespace KouFunctionPlugin.Pixiv
         /// <summary>
         /// 作者名（入库时，并过滤掉 @ 及其后内容）
         /// </summary>
-        [KouAutoModelField(ActivateKeyword = "作者")]
+        [AutoField(ActivateKeyword = "作者")]
         public string Name { get; set; }
         /// <summary>
         /// 作者相关的作品

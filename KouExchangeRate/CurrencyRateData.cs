@@ -7,21 +7,21 @@ using Koubot.Tool.String;
 
 namespace KouFunctionPlugin.Currency.Models;
 
-[KouAutoModelTable("list", new []{nameof(KouExchangeRate)},
+[AutoTable("list", new []{nameof(KouExchangeRate)},
     Name = "汇率表", Help = "汇率基于CNY人民币。国家中文名与货币中文名大部分为机翻，如有误请见谅。")]
 [Table("plugin_exchange_rate_data")]
 public partial class CurrencyRateData : KouFullAutoModel<CurrencyRateData>
 {
     [Key]
-    [KouAutoModelField(ActivateKeyword = "代码")]
+    [AutoField(ActivateKeyword = "代码")]
     public CurrencyCode Code { get; set; }
     public string CurrencyName { get; set; }
     public string Country { get; set; }
-    [KouAutoModelField(ActivateKeyword = "货币")]
+    [AutoField(ActivateKeyword = "货币")]
     public string CountryZhName { get; set; }
-    [KouAutoModelField(ActivateKeyword = "国家")]
+    [AutoField(ActivateKeyword = "国家")]
     public string CurrencyZhName { get; set; }
-    [KouAutoModelField(ActivateKeyword = "汇率")]
+    [AutoField(ActivateKeyword = "汇率")]
     public double Rate { get; set; }
 
     //public string CurrencyIcon { get; set; }

@@ -9,7 +9,7 @@ using Koubot.Shared.Protocol.Enums;
 namespace KouGamePlugin.Arcaea.Models
 {
     [Table("plugin_arcaea_songs")]
-    [KouAutoModelTable("song",
+    [AutoTable("song",
         new[] { nameof(KouArcaea) },
         Name = "Arcaea歌曲",
         Help = "当前表数据版本：3.6.1")]
@@ -23,15 +23,15 @@ namespace KouGamePlugin.Arcaea.Models
         public string SongEnId { get; set; }
         [Column("title")]
         [StringLength(500)]
-        [KouAutoModelField(ActivateKeyword = "曲名", Features = AutoModelFieldFeatures.IsDefaultField)]
+        [AutoField(ActivateKeyword = "曲名", Features = AutoModelFieldFeatures.IsDefaultField)]
         public string SongTitle { get; set; }
         [Column("artist")]
         [StringLength(200)]
-        [KouAutoModelField(ActivateKeyword = "曲师")]
+        [AutoField(ActivateKeyword = "曲师")]
         public string SongArtist { get; set; }
         [Column("bpm")]
         [StringLength(20)]
-        [KouAutoModelField(ActivateKeyword = "bpm", FilterSetting = FilterType.NumericInterval)]
+        [AutoField(ActivateKeyword = "bpm", FilterSetting = FilterType.NumericInterval)]
         public string SongBpm { get; set; }
         [Column("song_url")]
         public string SongUrl { get; set; }
@@ -39,20 +39,20 @@ namespace KouGamePlugin.Arcaea.Models
         public double? SongBpmBase { get; set; }
         [Column("pack")]
         [StringLength(200)]
-        [KouAutoModelField(ActivateKeyword = "曲包")]
+        [AutoField(ActivateKeyword = "曲包")]
         public SongPackType? SongPack { get; set; }
         [Column("bg_url")]
         [StringLength(255)]
         public string SongBgUrl { get; set; }
         [Column("length")]
-        [KouAutoModelField(ActivateKeyword = "长度")]
+        [AutoField(ActivateKeyword = "长度")]
         public TimeSpan? SongLength { get; set; }
         [Column("side")]
         public Side? SongSide { get; set; }
 
         [Column("jacket_designer")]
         [StringLength(200)]
-        [KouAutoModelField(ActivateKeyword = "画师")]
+        [AutoField(ActivateKeyword = "画师")]
         public string JacketDesigner { get; set; }
         [Column("jacket_url")]
         [StringLength(255)]
@@ -71,9 +71,9 @@ namespace KouGamePlugin.Arcaea.Models
 
         [InverseProperty(nameof(PlayRecord.Song))]
         public virtual ICollection<PlayRecord> PluginArcaeaPlayRecord { get; set; }
-        [KouAutoModelField(true)]
+        [AutoField(true)]
         public virtual ICollection<SongAppend> MoreInfo { get; set; }
-        [KouAutoModelField(true)]
+        [AutoField(true)]
         public virtual ICollection<SongAlias> Aliases { get; set; }
 
         public Song()

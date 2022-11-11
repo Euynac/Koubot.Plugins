@@ -10,7 +10,7 @@ using Koubot.Shared.Protocol.KouEnum;
 
 namespace KouFunctionPlugin.LuckMachine
 {
-    [KouPluginClass("luck", "运势",
+    [PluginClass("luck", "运势",
         Author = "7zou",
         Authority = Authority.NormalUser,
         Introduction = "运势相关功能",
@@ -116,26 +116,26 @@ namespace KouFunctionPlugin.LuckMachine
                           (ominousThing?.Be($"\n{ominousThing.ToString(FormatType.Customize1)}") ?? "\n今天没有忌事项");
             }
             result += $"\n今日音游：{MusicGameList.RandomGetOne(hashString)}";
-            result += $"\n建议机位：P{RandomTool.GenerateRandomInt(1, 2, hashString)}";
+            result += $"\n建议机位：P{RandomTool.GetInt(1, 2, hashString)}";
             result += $"\n建议朝向：{DirectionList.RandomGetOne(hashString)}";
 
             return result;
         }
 
-        [KouPluginFunction(Help = "重新获取今日运势（限免）", ActivateKeyword = "remake")]
+        [PluginFunction(Help = "重新获取今日运势（限免）", ActivateKeyword = "remake")]
         public string Remake()
         {
             return GetTodayLuck(true);
         }
 
 
-        [KouPluginFunction(Help = "查看今日运势", Name = "获取今日运势")]
+        [PluginFunction(Help = "查看今日运势", Name = "获取今日运势")]
         public override object? Default(string? str = null)
         {
             return GetTodayLuck();
         }
-        [KouPluginFunction(Name = "遗忘", ActivateKeyword = "del|delete", Help = "删除学习过的黄历")]
-        public string DeleteItem([KouPluginArgument(Name = "黄历ID")] List<int> id)
+        [PluginFunction(Name = "遗忘", ActivateKeyword = "del|delete", Help = "删除学习过的黄历")]
+        public string DeleteItem([PluginArgument(Name = "黄历ID")] List<int> id)
         {
             var result = new StringBuilder();
             foreach (var i in id)
@@ -155,11 +155,11 @@ namespace KouFunctionPlugin.LuckMachine
             return result.ToString().TrimStart();
         }
 
-        [KouPluginFunction(Help = "教Kou有哪些忌或宜的黄历", Name = "教教", ActivateKeyword = "add")]
+        [PluginFunction(Help = "教Kou有哪些忌或宜的黄历", Name = "教教", ActivateKeyword = "add")]
         public string AddItem(
-            [KouPluginArgument(Name = "事项名(使用忌或宜开头)")]
+            [PluginArgument(Name = "事项名(使用忌或宜开头)")]
             string item,
-            [KouPluginArgument(Name = "事项内容")]
+            [PluginArgument(Name = "事项内容")]
             string itemIntro)
         {
             if (item.IsNullOrWhiteSpace() || itemIntro.IsNullOrWhiteSpace() ||
@@ -179,7 +179,7 @@ namespace KouFunctionPlugin.LuckMachine
             }, out var added, out var error, Context);
             if (success)
             {
-                var reward = RandomTool.GenerateRandomInt(8, 15);
+                var reward = RandomTool.GetInt(8, 15);
                 CurUser.KouUser.GainCoinFree(reward);
                 return $"学会了，ID{added.ToString(FormatType.Brief)}\n您获得了{CurKouGlobalConfig.CoinFormat(reward)}!";
             }

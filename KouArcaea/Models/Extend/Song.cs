@@ -21,7 +21,7 @@ namespace KouGamePlugin.Arcaea.Models
     public partial class Song : KouFullAutoModel<Song>
     {
         [NotMapped]
-        [KouAutoModelField(ActivateKeyword = "别名", Name = "曲名俗称")]
+        [AutoField(ActivateKeyword = "别名", Name = "曲名俗称")]
         public string SongAlias { get; set; }
 
         public override bool UseCustomDefaultFieldSplit(string userInput, out Dictionary<string, string> ruleDictionary, out string relationStr)
@@ -95,11 +95,11 @@ namespace KouGamePlugin.Arcaea.Models
         }
 
         private string GetBriefChartDesigner() =>
-            MoreInfo?.Select(p => p.ChartDesigner).Distinct().ToStringJoin('/').TrimEnd('/');
+            MoreInfo?.Select(p => p.ChartDesigner).Distinct().StringJoin('/').TrimEnd('/');
         private string GetBriefConstant() =>
-            MoreInfo?.OrderBy(p => p.ChartRatingClass).Select(p => p.ChartConstant).ToStringJoin('/').TrimEnd('/');
+            MoreInfo?.OrderBy(p => p.ChartRatingClass).Select(p => p.ChartConstant).StringJoin('/').TrimEnd('/');
         private string GetBriefAllNotes() =>
-            MoreInfo?.OrderBy(p => p.ChartRatingClass).Select(p => p.ChartAllNotes).ToStringJoin('/').TrimEnd('/');
+            MoreInfo?.OrderBy(p => p.ChartRatingClass).Select(p => p.ChartAllNotes).StringJoin('/').TrimEnd('/');
         public override string? ToString(FormatType format, object? supplement = null, KouCommand? command = null)
         {
             string constantDesc = GetBriefConstant();
@@ -114,7 +114,7 @@ namespace KouGamePlugin.Arcaea.Models
                     return $"{JacketUrl?.Be(new KouImage(JacketUrl, this).ToKouResourceString())}" +
                            $"{SongId}.{SongTitle}\n" +
                            constantDesc?.Be($"定数：{constantDesc}\n") +
-                           Aliases?.BeIfNotEmptySet($"别名：{Aliases.Select(p => p.Alias).ToStringJoin('，')}\n") +
+                           Aliases?.BeIfNotEmptySet($"别名：{Aliases.Select(p => p.Alias).StringJoin('，')}\n") +
                            SongArtist?.Be($"曲师：{SongArtist}\n") +
                            designerDesc?.Be($"谱师：{designerDesc}\n") +
                            JacketDesigner?.Be($"画师：{JacketDesigner}\n") +

@@ -10,17 +10,17 @@ public partial class AirPort
 {
     [Key]
     public int ID { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public string Code4 { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public string? Code3 { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public string? City { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public string? Name { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public List<string>? Surname { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public string? Country { get; set; }
     [Column("DomesticFlag")]
     public bool IsDomestic { get; set; }

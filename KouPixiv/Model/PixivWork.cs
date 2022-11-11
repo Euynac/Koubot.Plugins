@@ -13,7 +13,7 @@ using Koubot.Shared.Protocol.Attribute;
 
 namespace KouFunctionPlugin.Pixiv
 {
-    [KouAutoModelTable("list", new[] { nameof(KouSetu) }, Name = "作品列表")]
+    [AutoTable("list", new[] { nameof(KouPixiv) }, Name = "作品列表")]
     [Table("plugin_pixiv_works")]
     public partial class PixivWork : KouFullAutoModel<PixivWork>
     {
@@ -63,10 +63,10 @@ namespace KouFunctionPlugin.Pixiv
         /// <summary>
         /// 作品标签，包含标签的中文翻译（有的话）
         /// </summary>
-        [KouAutoModelField(true)]
+        [AutoField(true)]
         [InverseProperty(nameof(PixivTag.Works))]
         public virtual ICollection<PixivTag> Tags { get; set; }
-        [KouAutoModelField(true)]
+        [AutoField(true)]
         [InverseProperty(nameof(PixivAuthor.Works))]
         public virtual PixivAuthor Author { get; set; }
 
@@ -99,7 +99,7 @@ namespace KouFunctionPlugin.Pixiv
                                      $"\nPID:{Pid}" +
                                      $"\nAuthor:{Author.Name}「{Author.Uid}」" +
                                      $"\nSize:{Width}x{Height}" +
-                                     Tags?.ToStringJoin(",")?.BeIfNotEmpty("\nTags:{0}", true) +
+                                     Tags?.StringJoin(",")?.BeIfNotEmpty("\nTags:{0}", true) +
                                      $"\nTime:{UploadDate}",
                 _ => throw new ArgumentOutOfRangeException(nameof(formatType), formatType, null)
             };

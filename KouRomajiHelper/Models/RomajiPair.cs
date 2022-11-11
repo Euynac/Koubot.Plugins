@@ -11,22 +11,22 @@ using Koubot.Shared.Protocol.Enums;
 // ReSharper disable once CheckNamespace
 namespace KouFunctionPlugin.Romaji.Models
 {
-    [KouAutoModelTable("list", new[] { nameof(KouRomajiHelper) }, Name = "罗马音-中文谐音表")]
+    [AutoTable("list", new[] { nameof(KouRomajiHelper) }, Name = "罗马音-中文谐音表")]
     [Table("plugin_romaji_pair")]
     public partial class RomajiPair : KouFullAutoModel<RomajiPair>
     {
         [Column("id")]
-        [KouAutoModelField(IsPrimaryKey = true,
+        [AutoField(IsPrimaryKey = true,
             UnsupportedActions = AutoModelActions.Add | AutoModelActions.Modify)]
         public int Id { get; set; }
         [Column("romaji_key")]
         [StringLength(20)]
-        [KouAutoModelField(ActivateKeyword = "romaji|罗马音", Name = "罗马音名",
+        [AutoField(ActivateKeyword = "romaji|罗马音", Name = "罗马音名",
             Features = AutoModelFieldFeatures.RequiredAdd, CandidateKey = MultiCandidateKey.FirstCandidateKey)]
         public string RomajiKey { get; set; }
         [Column("zh_value")]
         [StringLength(20)]
-        [KouAutoModelField(ActivateKeyword = "zh|中文", Name = "中文谐音",
+        [AutoField(ActivateKeyword = "zh|中文", Name = "中文谐音",
             Features = AutoModelFieldFeatures.RequiredAdd)]
         public string ZhValue { get; set; }
 

@@ -13,7 +13,10 @@ using System.Linq;
 using System.Text;
 using Koubot.SDK.Models.Entities;
 using Koubot.SDK.PluginExtension.Result;
+using Koubot.SDK.Services;
+using Koubot.SDK.System.Messages;
 using Koubot.SDK.Templates;
+using Koubot.Shared.Protocol;
 using Koubot.Tool.General;
 using KouMaimai;
 
@@ -22,15 +25,14 @@ namespace KouGamePlugin.Maimai
     /// <summary>
     /// KouArcaea插件
     /// </summary>
-    [KouPluginClass("mai", "maimai",
-        Author = "7zou",
+    [PluginClass("mai", "maimai",
         PluginType = PluginType.Game,
         CanUseProxy = true)]
     public class KouMaimai : KouPlugin<KouMaimai>,
         IWantPluginUserConfig<MaiUserConfig>, IWantPluginGroupConfig<MaiGroupConfig>,
         IWantPluginGlobalConfig<MaiGlobalConfig>
     {
-        [KouPluginFunction]
+        [PluginFunction]
         public override object? Default(string? str = null)
         {
             return ReturnHelp();
@@ -54,14 +56,14 @@ namespace KouGamePlugin.Maimai
 
         #region WahLap
 
-        [KouPluginFunction(ActivateKeyword = "map status", Name = "DX地图状态")]
+        [PluginFunction(ActivateKeyword = "map status", Name = "DX地图状态")]
         public object? DxMapStatus()
         {
             var count = ArcadeMap.Count();
             return $"店铺总数：{count}\n" +
                    $"上次更新时间：{this.GlobalConfig().DxMapLastUpdateTime}";
         }
-        [KouPluginFunction(Name = "更新机台地址", Authority = Authority.BotManager)]
+        [PluginFunction(Name = "更新机台地址", Authority = Authority.BotManager)]
         public object? UpdateDxMap()
         {
             var locations = WahLapApi.GetDxLocation();
@@ -143,7 +145,7 @@ namespace KouGamePlugin.Maimai
         }
         //private static readonly KouColdDown<UserAccount> _getRecordsCd = new();
 
-        [KouPluginFunction(ActivateKeyword = "刷新", Name = "重新获取所有成绩", NeedCoin = 10)]
+        [PluginFunction(ActivateKeyword = "刷新", Name = "重新获取所有成绩", NeedCoin = 10)]
         public object RefreshRecords()
         {
             var config = this.UserConfig();
@@ -171,8 +173,8 @@ namespace KouGamePlugin.Maimai
             return $"{config.Nickname}记录刷新成功！";
         }
 
-        [KouPluginFunction(ActivateKeyword = "难度成绩", Name = "获取指定难度成绩")]
-        public object GetDifficultRecords([KouPluginArgument(Name = "难度如14+")] string rating)
+        [PluginFunction(ActivateKeyword = "难度成绩", Name = "获取指定难度成绩")]
+        public object GetDifficultRecords([PluginArgument(Name = "难度如14+")] string rating)
         {
             using var context = new KouContext();
             var records = SongRecord.DbWhere(p =>
@@ -182,7 +184,7 @@ namespace KouGamePlugin.Maimai
             return FormatRecords(records, $"{CurUserName}的难度{rating}成绩：");
         }
 
-        [KouPluginFunction(ActivateKeyword = "b40|b15|b25", Name = "获取B40记录")]
+        [PluginFunction(ActivateKeyword = "b40|b15|b25", Name = "获取B40记录")]
         public object GetRecords()
         {
             var sketch = new StringBuilder();
@@ -209,8 +211,8 @@ namespace KouGamePlugin.Maimai
                 sketch.ToString());
         }
 
-        [KouPluginFunction(ActivateKeyword = "单曲", Name = "获取自己某个单曲成绩")]
-        public object SpecificRecord([KouPluginArgument(Name = "难度+曲名/id/别名")] string name)
+        [PluginFunction(ActivateKeyword = "单曲", Name = "获取自己某个单曲成绩")]
+        public object SpecificRecord([PluginArgument(Name = "难度+曲名/id/别名")] string name)
         {
             var chart = TryGetSongChartUseAliasOrNameOrId(name, out var type);
             if (chart == null) return $"不知道{name}这首歌呢";
@@ -222,7 +224,7 @@ namespace KouGamePlugin.Maimai
             return record.ToString(FormatType.Detail);
         }
 
-        [KouPluginFunction(ActivateKeyword = "info", Name = "获取用户信息")]
+        [PluginFunction(ActivateKeyword = "info", Name = "获取用户信息")]
         public object UserProfile()
         {
             var config = this.UserConfig();
@@ -231,11 +233,11 @@ namespace KouGamePlugin.Maimai
         }
 
         private const string _refreshCD = "RefreshRecords";
-        [KouPluginFunction(ActivateKeyword = "bind",
+        [PluginFunction(ActivateKeyword = "bind",
             Name = "绑定查分账号", Help = "绑定Diving-Fish账号，需要私发Kou用户名密码", CanUseProxy = false)]
         public object BindAccount(
-            [KouPluginArgument(Name = "用户名")] string username,
-            [KouPluginArgument(Name = "密码")] string password)
+            [PluginArgument(Name = "用户名")] string username,
+            [PluginArgument(Name = "密码")] string password)
         {
             var api = new DivingFishApi(username, password, null, null);
             if (!api.Login())
@@ -283,8 +285,8 @@ namespace KouGamePlugin.Maimai
 
         #region 牌子
 
-        [KouPluginFunction(ActivateKeyword = "牌子", Name = "获取牌子距离信息")]
-        public object GetPlateInfo([KouPluginArgument(Name = "如桃极")]string plateName)
+        [PluginFunction(ActivateKeyword = "牌子", Name = "获取牌子距离信息")]
+        public object GetPlateInfo([PluginArgument(Name = "如桃极")]string plateName)
         {
             var failed = "请输入正确的牌子名称，如桃极、舞神、橙将等";
             if (plateName.Length < 2) return failed;
@@ -364,7 +366,7 @@ namespace KouGamePlugin.Maimai
                 return sb.ToString();
             }
 
-            return $"不知道{plateType}是哪种牌子，可选的有：{PlateType.将.GetAllValues().ToStringJoin(',')}";
+            return $"不知道{plateType}是哪种牌子，可选的有：{PlateType.将.GetAllValues().StringJoin(',')}";
 
             HashSet<SongRecord> ReachedRecords(HashSet<SongRecord> records)
             {
@@ -391,8 +393,99 @@ namespace KouGamePlugin.Maimai
 
         #region 计算
 
-        [KouPluginFunction(ActivateKeyword = "分数线|line", Name = "计算分数线", Help =
-                  "（鸣谢：Chiyuki-Bot）例如：/mai line 白潘 100\n" +
+        [PluginFunction(ActivateKeyword = "card", Name = "歌曲卡片（测试）")]
+        public object? SongCard([PluginArgument(Name = "难度+曲名/id/别名")] string name)
+        {
+            if (this.UserConfig().UseHtml != true)
+            {
+                return "还没有开启maimai皮肤噢，使用 /mai config skin 开启";
+            }
+            var chart = TryGetSongChartUseAliasOrNameOrId(name, out var color);
+            if (chart == null) return $"不知道{name}这首歌呢";
+            var data = chart.GetChartData(color);
+            if (data is null) return $"没有{chart.BasicInfo.SongTitle}({color})的谱面数据哦";
+            var song = chart.BasicInfo;
+            var status = chart.GetChartStatus(color)!;
+            var imageUrl = StaticServices.BrowserService.ResolveFileUrl(song.JacketUrl, new SongChart());
+            var constant = chart.GetChartConstantOfSpecificColor(color) ?? default;
+            double totalScore = 500 * data.Tap + 1500 * data.Slide + 1000 * data.Hold + 500 * data.Touch +
+                                2500 * data.Break;
+            var cpBreakBonus = 0.01 / data.Break;//break bonus分分开计算。总共提供1%的额外奖励率，这里得出一个Critical Prefect break能提供的奖励率
+            var p1BreakBonusReduce = (1-0.75 )* cpBreakBonus;//cp额外分100，p1额外分75
+            var p2BreakBonusReduce = (1-0.5 )* cpBreakBonus;
+            var greatBreakBonusReduce = (1-0.4 )* cpBreakBonus;
+            var goodBreakBonusReduce = (1-0.3 )* cpBreakBonus;
+            var missBreakBonusReduce = cpBreakBonus;
+
+
+            var tapGreatReduce = -100 / totalScore;//因为tap满分500分，great400分，少了100分。
+            var g1BreakReduce = 5 * tapGreatReduce - greatBreakBonusReduce;//因为cp break满分2500，g1 break分数2000，少了500分，较great少100少了5倍。
+            var g2BreakReduce = 10 * tapGreatReduce- greatBreakBonusReduce;
+            var g3BreakReduce = 12.5 * tapGreatReduce- greatBreakBonusReduce;
+            var goodBreakReduce = 15 * tapGreatReduce- goodBreakBonusReduce;
+            var p1BreakReduce = -p1BreakBonusReduce;
+            var p2BreakReduce = -p2BreakBonusReduce;
+            var missBreakReduce = 25 * tapGreatReduce - missBreakBonusReduce;
+            
+            var tapArray = new[] {0,tapGreatReduce, 2.5*tapGreatReduce, 5*tapGreatReduce }.Select(p=>p == 0? "-" : $"{p:P5}").ToList();
+            var slideArray = new[] {0,tapGreatReduce*3, 7.5*tapGreatReduce, 15*tapGreatReduce }.Select(p=>p == 0? "-" : $"{p:P5}").ToList();
+            var holdArray = new[] {0,tapGreatReduce*2, 5*tapGreatReduce, 10*tapGreatReduce }.Select(p=>p == 0? "-" : $"{p:P5}").ToList();
+            var touchArray = new[] {0, tapGreatReduce, 2.5 * tapGreatReduce, 5 * tapGreatReduce}.Select(p => data.Touch == 0 ? "-" : p == 0? "-" : $"{p:P5}")
+                .ToList();
+            var breakArray = new[] {p1BreakReduce,p2BreakReduce,g1BreakReduce,g2BreakReduce,g3BreakReduce, goodBreakReduce, missBreakReduce}.Select(p=>p == 0? "-" : $"{p:P5}").ToList();
+
+            var targetLine = 100.5;
+            if (targetLine > 1.01)
+            {
+                targetLine /= 100.0;
+            }
+
+            targetLine *= 100;
+            
+            var lineRemark = $"BREAK 50落等价于 {(p1BreakReduce/tapGreatReduce):F3} 个 TAP GREAT\n" +
+                             $"BREAK 粉2000等价于{(g1BreakReduce/tapGreatReduce):F3} 个 TAP GREAT";
+            var remarkList = new List<string>();
+            if(!song.Remark.IsNullOrEmpty()) remarkList.Add(song.Remark);
+            remarkList.Add(lineRemark);
+            remarkList.Add($"达成分数线 {100 / 100:P4} 允许的最多 TAP GREAT 数量为 {(101-100.0)/100/-tapGreatReduce:F3}个\n" +
+                           $"达成分数线 {100.5 / 100:P4} 允许的最多 TAP GREAT 数量为 {(101-100.5)/100/-tapGreatReduce:F3}个");
+            if (constant != 0)
+            {
+                remarkList.Add($"定数{constant}，100% Rating {DxCalculator.CalSongRating(100, constant)}，100.5% Rating {DxCalculator.CalSongRating(100.5, constant)}");
+            }
+           
+
+
+            remarkList = remarkList.Select(p => p.Replace("\n", "</br>")).ToList();
+            return new HtmlMessage(new
+                {
+                    CurDifficult = chart.GetChartRatingOfSpecificColor(color),
+                    RemarkList = remarkList,
+                    Song = song,
+                    ImageUrl = imageUrl,
+                    Aliases = song.Aliases?.ToKouSetString(FormatType.Customize1, "，", false),
+                    Constant = chart.ToConstantString().Replace("/", " / "),
+                    Difficulty = chart.ToRatingString().Replace("/", " / "),
+                    CurColor = color,
+                    SongType = chart.SongChartType,
+                    CurColorClass = SongChart.GetCssColorClass(color),
+                    Chart = data,
+                    Status = status,
+                    SSSRank =
+                        (((status.SSSRankOfSameDifficult + 1) / (double) status.SameDifficultCount) * 100).Round(1),
+                    SSSPeopleCount = $"{status.SSSCount}/{status.TotalCount}({status.SSSPeopleRatio:P})",
+                    AverageRate = $"{status.AverageRate:0.##}",
+                    TapArray = tapArray,
+                    SlideArray = slideArray,
+                    HoldArray = holdArray,
+                    TouchArray = touchArray,
+                    BreakArray = breakArray
+                },
+                new KouTemplate(TemplateResources.MaiSongInfoTemplate)){DpiRank = 3};
+        }
+
+        [PluginFunction(ActivateKeyword = "分数线|line", Name = "计算分数线", Help =
+                  "例如：/mai line 白潘 100\n" +
                   "命令将返回分数线允许的TAP GREAT容错以及BREAK 50落等价的TAP GREAT数。\n" +
                   "以下为 TAP GREAT 的对应表：\n" +
                   "GREAT/GOOD/MISS\n" +
@@ -400,10 +493,15 @@ namespace KouGamePlugin.Maimai
                   "HOLD   2/5/10\n" +
                   "SLIDE  3/7.5/15\n" +
                   "TOUCH  1/2.5/5\n" +
-                  "BREAK  5/12.5/25(外加200落)")]
-        public string CalScoreLine([KouPluginArgument(Name = "难度+曲名/id/别名")] string name,
-                  [KouPluginArgument(Name = "达成率", Min = 0, Max = 101)] double? line = null)
+                  "BREAK  5/12.5/25(外加200落)\n鸣谢：Chiyuki-Bot")]
+        public object? CalScoreLine([PluginArgument(Name = "难度+曲名/id/别名")] string name,
+                  [PluginArgument(Name = "达成率", Min = 0, Max = 101)] double? line = null)
         {
+            if (this.UserConfig().UseHtml == true)
+            {
+                return SongCard(name);
+            }
+
             var chart = TryGetSongChartUseAliasOrNameOrId(name, out var type);
             if (chart == null) return $"不知道{name}这首歌呢";
             line ??= 100.5;
@@ -428,9 +526,9 @@ namespace KouGamePlugin.Maimai
 
 
         private static readonly double[] _rateSeq = { 49, 50, 60, 70, 75, 80, 90, 94, 97, 98, 99, 99.5, 100, 100.5 };
-        [KouPluginFunction(Name = "计算单曲rating", ActivateKeyword = "cal", Help = "如果不输入达成率，默认输出跳变阶段的所有rating")]
-        public string CalRating([KouPluginArgument(Name = "定数/歌曲名")] string constantOrName,
-            [KouPluginArgument(Name = "达成率", Min = 0, Max = 101)] double? rate = null)
+        [PluginFunction(Name = "计算单曲rating", ActivateKeyword = "cal", Help = "如果不输入达成率，默认输出跳变阶段的所有rating")]
+        public string CalRating([PluginArgument(Name = "定数/歌曲名")] string constantOrName,
+            [PluginArgument(Name = "达成率", Min = 0, Max = 101)] double? rate = null)
         {
             SongChart song = null;
             if (!double.TryParse(constantOrName, out var constant))
@@ -439,7 +537,7 @@ namespace KouGamePlugin.Maimai
                 {
                     song = TryGetSongChartUseAliasOrNameOrId(constantOrName, out var type);
                     if (song == null) return $"不知道{constantOrName}是什么歌呢";
-                    constant = song.GetSpecificConstant(type) ?? 0;
+                    constant = song.GetChartConstantOfSpecificColor(type) ?? 0;
                     if (constant == 0) return $"Kou还不知道{type.GetKouEnumName()}{song.BasicInfo.SongTitle}的定数呢";
                 }
                 else
@@ -473,7 +571,7 @@ namespace KouGamePlugin.Maimai
         #endregion
 
         #region 歌曲别名
-        [KouPluginFunction(Name = "获取歌曲详情", ActivateKeyword = "alias")]
+        [PluginFunction(Name = "获取歌曲详情", ActivateKeyword = "alias")]
         public object GetSongByAlias(string aliasName)
         {
             var chart = TryGetSongChartUseAliasOrNameOrId(aliasName, out var type);
@@ -491,7 +589,7 @@ namespace KouGamePlugin.Maimai
             }
             else
             {
-                aliasOrName = aliasOrName[1..];
+                aliasOrName = aliasOrName[1..].Trim();
             }
 
             var list = SongChart.Find(p => p.BasicInfo.Aliases.Any(a => a.Alias.Equals(aliasOrName, StringComparison.OrdinalIgnoreCase)));
@@ -516,10 +614,10 @@ namespace KouGamePlugin.Maimai
             return song;
         }
 
-        [KouPluginFunction(ActivateKeyword = "add|教教", Name = "学新的歌曲别名", Help = "教kou一个歌曲的别名。")]
+        [PluginFunction(ActivateKeyword = "add|教教", Name = "学新的歌曲别名", Help = "教kou一个歌曲的别名。")]
         public object KouLearnAnotherName(
-            [KouPluginArgument(Name = "歌曲名/ID等")] string songName,
-            [KouPluginArgument(Name = "要学的歌曲别名")] string songAnotherName)
+            [PluginArgument(Name = "歌曲名/ID等")] string songName,
+            [PluginArgument(Name = "要学的歌曲别名")] string songAnotherName)
         {
             if (songName.IsNullOrWhiteSpace() || songAnotherName.IsNullOrWhiteSpace()) return "好好教我嘛";
             var haveTheAlias = SongAlias.SingleOrDefault(p => p.Alias == songAnotherName);
@@ -531,7 +629,7 @@ namespace KouGamePlugin.Maimai
             var song = chart.BasicInfo;
             var sourceUser = CurUser.FindThis(Context);
             var dbSong = song.FindThis(Context);
-            var havenHadAliases = dbSong.Aliases?.Select(p => p.Alias).ToStringJoin("、");
+            var havenHadAliases = dbSong.Aliases?.Select(p => p.Alias).StringJoin("、");
             var success = SongAlias.Add(alias =>
             {
                 alias.CorrespondingSong = dbSong;
@@ -541,7 +639,7 @@ namespace KouGamePlugin.Maimai
             if (success)
             {
                 SongChart.UpdateCache();
-                var reward = RandomTool.GenerateRandomInt(5, 15);
+                var reward = RandomTool.GetInt(5, 15);
                 CurUser.KouUser.GainCoinFree(reward);
                 return $"学会了，{song.SongTitle}可以叫做{songAnotherName}(ID{added.AliasID})" +
                        $"{havenHadAliases?.BeIfNotEmpty($"，我知道它还可以叫做{havenHadAliases}！")}\n" +
@@ -549,9 +647,9 @@ namespace KouGamePlugin.Maimai
             }
             return $"没学会，就突然：{error}";
         }
-        [KouPluginFunction(ActivateKeyword = "del|delete|忘记", Name = "忘记歌曲别名", Help = "叫kou忘掉一个歌曲的别名。")]
+        [PluginFunction(ActivateKeyword = "del|delete|忘记", Name = "忘记歌曲别名", Help = "叫kou忘掉一个歌曲的别名。")]
         public string KouForgetAnotherName(
-            [KouPluginArgument(Name = "别名或别名ID")] List<string> ids)
+            [PluginArgument(Name = "别名或别名ID")] List<string> ids)
         {
             if (ids.IsNullOrEmptySet()) return "这是叫我忘掉什么嘛";
             var result = new StringBuilder();
@@ -582,7 +680,7 @@ namespace KouGamePlugin.Maimai
 
         #region 地图
 
-        [KouPluginFunction(ActivateKeyword = "哪里少人|哪里人少", Name = "看哪个机厅人少", OnlyUsefulInGroup = true)]
+        [PluginFunction(ActivateKeyword = "哪里少人|哪里人少", Name = "看哪个机厅人少", OnlyUsefulInGroup = true)]
         public object GetLessPeopleArcade()
         {
             var config = this.GroupConfig()!;
@@ -601,8 +699,8 @@ namespace KouGamePlugin.Maimai
                 });
         }
 
-        [KouPluginFunction(ActivateKeyword = "地区", Name = "设置DX几卡查询默认地区", OnlyUsefulInGroup = true)]
-        public object SetDefaultArea([KouPluginArgument(Name = "地区名（如广州市）")] string area)
+        [PluginFunction(ActivateKeyword = "地区", Name = "设置DX几卡查询默认地区", OnlyUsefulInGroup = true)]
+        public object SetDefaultArea([PluginArgument(Name = "地区名（如广州市）")] string area)
         {
             var config = this.GroupConfig()!;
             config.MapDefaultArea = area;
@@ -610,17 +708,17 @@ namespace KouGamePlugin.Maimai
             return $"当前群查卡默认地区修改为{area}成功！";
         }
 
-        [KouPluginFunction(ActivateKeyword = "有谁", Name = "看谁加了卡", Help = "照抄几卡Bot")]
-        public object WhoAreThere([KouPluginArgument(Name = "机厅名")] string name)
+        [PluginFunction(ActivateKeyword = "有谁", Name = "看谁加了卡", Help = "照抄几卡Bot")]
+        public object WhoAreThere([PluginArgument(Name = "机厅名")] string name)
         {
             if (!TryGetArcade(name, out var arcade, out var reply)) return reply;
             return arcade.ToString(FormatType.Customize2);
         }
 
 
-        [KouPluginFunction(ActivateKeyword = "加卡", Name = "往机厅加卡", Help = "照抄几卡Bot")]
-        public object AlterCards([KouPluginArgument(Name = "机厅名")]string name, 
-            [KouPluginArgument(Name = "加1|-1等")] string alterCount)
+        [PluginFunction(ActivateKeyword = "加卡", Name = "往机厅加卡", Help = "照抄几卡Bot")]
+        public object AlterCards([PluginArgument(Name = "机厅名")]string name, 
+            [PluginArgument(Name = "加1|-1等")] string alterCount)
         {
             var isSub = false;
             if (alterCount.MatchOnceThenReplace("([+加减-])", out alterCount, out var result))
@@ -697,27 +795,27 @@ namespace KouGamePlugin.Maimai
             return true;
         }
 
-        [KouPluginFunction(ActivateKeyword = "几卡", Name = "机厅几卡", Help = "照抄几卡Bot")]
+        [PluginFunction(ActivateKeyword = "几卡", Name = "机厅几卡", Help = "照抄几卡Bot")]
         public object HowManyCards(string name)
         {
             if (!TryGetArcade(name, out var arcade, out var reply)) return reply;
             return arcade.ToString(FormatType.Customize1);
         }
 
-        [KouPluginFunction(ActivateKeyword = "加地区别名", Name = "增加地区别名")]
-        public object AddAreaAlias([KouPluginArgument(Name = "机厅名")] string name, [KouPluginArgument(Name = "别名")] List<string> aliases)
+        [PluginFunction(ActivateKeyword = "加地区别名", Name = "增加地区别名")]
+        public object AddAreaAlias([PluginArgument(Name = "机厅名")] string name, [PluginArgument(Name = "别名")] List<string> aliases)
         {
             if (!TryGetArcade(name, out var arcade, out var reply)) return reply;
             arcade.Aliases ??= new List<string>();
             aliases.AddRange(arcade.Aliases);
             aliases = aliases.Distinct().ToList();
-            if (!SessionService.AskConfirm($"{arcade.ArcadeName}的别名：{aliases.ToStringJoin(',')}，输入y确认"))
+            if (!SessionService.AskConfirm($"{arcade.ArcadeName}的别名：{aliases.StringJoin(',')}，输入y确认"))
                 return null;
             arcade.Aliases = aliases;
             ArcadeMap.Update(arcade, out _);
             return "添加成功";
         }
-        [KouPluginFunction(ActivateKeyword = "清除所有加卡记录", Authority = Authority.BotManager)]
+        [PluginFunction(ActivateKeyword = "清除所有加卡记录", Authority = Authority.BotManager)]
         public object ClearAreaCards()
         {
             using var context = new KouContext();
@@ -729,14 +827,14 @@ namespace KouGamePlugin.Maimai
             ArcadeMap.UpdateCache();
             return $"影响到了{effect}条记录";
         }
-        [KouPluginFunction(Name = "更新谱面统计数据", Authority = Authority.BotManager)]
+        [PluginFunction(Name = "更新谱面统计数据", Authority = Authority.BotManager)]
         public object UpdateChartStatus()
         {
             var statusData = DivingFishApi.GetChartStatusList();
             return $"影响到{statusData?.SaveToDb()}条记录";
         }
 
-        [KouPluginFunction(Name = "更新谱面数据", Authority = Authority.BotManager)]
+        [PluginFunction(Name = "更新谱面数据", Authority = Authority.BotManager)]
         public object UpdateChartInfos()
         {
             var statusData = DivingFishApi.GetChartInfoList();
@@ -747,7 +845,7 @@ namespace KouGamePlugin.Maimai
 
         #region 配置
 
-        [KouPluginFunction(ActivateKeyword = "config skin", Name = "签到皮肤", NeedCoin = 500)]
+        [PluginFunction(ActivateKeyword = "config skin", Name = "签到皮肤", NeedCoin = 500)]
         public object? ConfigUseHtml()
         {
             var config = this.UserConfig()!;
@@ -767,8 +865,20 @@ namespace KouGamePlugin.Maimai
 
 
         #endregion
-        
-        
+
+        #region 段位
+
+        [PluginFunction(ActivateKeyword = "段位表", Name = "段位表")]
+        public object? RankTable()
+        {
+            var dictionary = new Dictionary<string, int>()
+            {
+                {"初学者",0} ,{"实习生",250} ,{"初出茅庐",500} ,{"修行中",750} ,{"初段",1000} ,{"二段",1200} ,{"三段",1400} ,{"四段",1500} ,{"五段",1600} ,{"六段",1700} ,{"七段",1800} ,{"八段",1850} ,{"九段",1900} ,{"十段",1950} ,{"真传",2000} ,{"真传壹段",2010} ,{"真传贰段",2020} ,{"真传叁段",2030} ,{"真传肆段",2040} ,{"真传伍段",2050} ,{"真传陆段",2060} ,{"真传柒段",2070} ,{"真传捌段",2080} ,{"真传玖段",2090},{"真传拾段",2100}
+            };
+            return dictionary.Select(p => $"{p.Key}——{p.Value}").StringJoin('\n');
+        }
+
+        #endregion
         static KouMaimai()
         {
             AddEveryDayCronTab(() =>

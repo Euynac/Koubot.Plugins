@@ -17,32 +17,32 @@ public partial class Aircraft
     }
     [Key]
     public int AircraftID { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public string AircraftType { get; set; }
     public string? AircraftClass { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public string? Manufacturer { get; set; }
     public WakeTurbulanceType? WakeTurbulance { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public List<string>? Surname { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public int FueledWeight { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public int FuelCapacity { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public int Range { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public int PassengerSize { get; set; }
     [Column("CruiseAltd")]
-    [KouAutoModelField]
+    [AutoField]
     public int CruiseAltitude { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public int CruiseSpeed { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public int MinSpeed { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public int MaxSpeed { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public string? ICAOCode { get; set; }
     public DateTime? CreateTime { get; set; }
     public DateTime? UpdateTime { get; set; }

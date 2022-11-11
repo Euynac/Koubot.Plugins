@@ -63,26 +63,49 @@ namespace KouMaimai {
         /// <summary>
         ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
         ///&lt;html lang=&quot;en&quot;&gt;
-        ///  &lt;head&gt;
+        ///&lt;head&gt;
         ///    &lt;meta charset=&quot;utf-8&quot; /&gt;
         ///    &lt;title&gt;Record List&lt;/title&gt;
         ///    &lt;!-- &lt;link rel=&quot;stylesheet&quot; href=&quot;bootstrap.css&quot; /&gt; --&gt;
         ///    &lt;link rel=&quot;stylesheet&quot; href=&quot;static/koubot.css&quot; /&gt;
-        ///    &lt;link rel=&quot;stylesheet&quot; href=&quot;static/maimai.css&quot;/&gt;
+        ///    &lt;link rel=&quot;stylesheet&quot; href=&quot;static/maimai.css&quot; /&gt;
         ///    &lt;!-- &lt;script src=&quot;bootstrap.js&quot;&gt;&lt;/script&gt; --&gt;
         ///    &lt;style&gt;
-        ///      @font-face {
-        ///        font-family: cuteFont;
-        ///        src: url(&quot;/static/ACGN-MangaGB-Flash.ttf&quot;);
-        ///      }
+        ///        /* @font-face {
+        ///            font-family: cuteFont;
+        ///            src: url(&quot;/static/ACGN-MangaGB-Flash.ttf&quot;);
+        ///        } */
         ///
-        ///      body {
-        ///        background: beige;
-        ///        fon [rest of string was truncated]&quot;;.
+        ///        body {
+        ///            backgrou [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string MaimaiRecordListTemplate {
             get {
                 return ResourceManager.GetString("MaimaiRecordListTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///&lt;html lang=&quot;en&quot;&gt;
+        ///
+        ///&lt;head&gt;
+        ///  &lt;meta charset=&quot;utf-8&quot; /&gt;
+        ///  &lt;title&gt;Record List&lt;/title&gt;
+        ///  &lt;!-- &lt;link rel=&quot;stylesheet&quot; href=&quot;bootstrap.css&quot; /&gt; --&gt;
+        ///  &lt;link rel=&quot;stylesheet&quot; href=&quot;static/koubot.css&quot; /&gt;
+        ///  &lt;link rel=&quot;stylesheet&quot; href=&quot;static/maimai.css&quot; /&gt;
+        ///  &lt;link rel=&quot;stylesheet&quot; href=&quot;static/card1.css&quot; /&gt;
+        ///  &lt;link rel=&quot;stylesheet&quot; href=&quot;static/table1.css&quot; /&gt;
+        ///  &lt;link rel=&quot;stylesheet&quot; href=&quot;static/chartbox2.css&quot; /&gt;
+        ///  &lt;!-- &lt;script src=&quot;bootstrap.js&quot;&gt;&lt;/script&gt; --&gt;
+        ///  &lt;style&gt;
+        ///    @font-face {
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MaiSongInfoTemplate {
+            get {
+                return ResourceManager.GetString("MaiSongInfoTemplate", resourceCulture);
             }
         }
     }

@@ -54,37 +54,37 @@ public partial class SongRecord
     /// <summary>
     /// 成绩
     /// </summary>
-    [KouAutoModelField(ActivateKeyword = "达成率")]
+    [AutoField(ActivateKeyword = "达成率")]
     public double Achievements { get; set; }
     /// <summary>
     /// DX分数
     /// </summary>
-    [KouAutoModelField(ActivateKeyword = "DX分数")]
+    [AutoField(ActivateKeyword = "DX分数")]
     public int DxScore { get; set; }
     /// <summary>
     /// 难度类型
     /// </summary>
-    [KouAutoModelField(ActivateKeyword = "颜色")]
+    [AutoField(ActivateKeyword = "颜色")]
     [Column("RatingType")]
     public SongChart.RatingColor RatingColor { get; set; }
     /// <summary>
     /// 相关歌曲谱面信息
     /// </summary>
-    [KouAutoModelField(true)]
+    [AutoField(true)]
     public virtual SongChart CorrespondingChart { get; set; }
     /// <summary>
     /// 用户
     /// </summary>
-    [KouAutoModelField(Features = AutoModelFieldFeatures.AutoUseCurKouUser, ActivateKeyword = "玩家")]
+    [AutoField(Features = AutoModelFieldFeatures.AutoUseCurKouUser, ActivateKeyword = "玩家")]
     public virtual UserAccount User { get; set; }
     /// <summary>
     /// 多人谱面成就
     /// </summary>
-    [KouAutoModelField(ActivateKeyword = "同步")]
+    [AutoField(ActivateKeyword = "同步")]
     public FsType? FsStatus { get; set; }
     /// <summary>
     /// 单人谱面成就
     /// </summary>
-    [KouAutoModelField(ActivateKeyword = "成就")]
+    [AutoField(ActivateKeyword = "成就")]
     public FcType? FcStatus { get; set; }
 }

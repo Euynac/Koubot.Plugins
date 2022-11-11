@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace KouFunctionPlugin.Aeronautics;
 
 
-[KouAutoModelTable("term", new[] { nameof(KouAeronautics) }, SupportedActions = AutoModelActions.All, AlterAuthority = Authority.BotMaster)]
+[AutoTable("term", new[] { nameof(KouAeronautics) }, SupportedActions = AutoModelActions.All, AlterAuthority = Authority.BotMaster)]
 public partial class AeronauticsTerm : KouFullAutoModel<AeronauticsTerm>
 {
     public override bool UseAutoCache()

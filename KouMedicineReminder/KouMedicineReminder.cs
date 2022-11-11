@@ -9,39 +9,39 @@ using Koubot.Tool.General;
 
 namespace KouFunctionPlugin;
 
-[KouPluginClass("water", "喝水提醒小助手",
+[PluginClass("water", "喝水提醒小助手",
     PluginType = PluginType.Function)]
 public class KouMedicineReminder : KouPlugin<KouMedicineReminder>, IWantPluginUserConfig<WaterReminder>
 {
-    [KouPluginParameter(ActivateKeyword = "group", Name = "绑定该群提醒")]
+    [PluginParameter(ActivateKeyword = "group", Name = "绑定该群提醒")]
     public bool? BindGroup { get; set; }
 
-    [KouPluginParameter(ActivateKeyword = "private", Name = "私人提醒")]
+    [PluginParameter(ActivateKeyword = "private", Name = "私人提醒")]
     public bool? Private { get; set; }
 
-    [KouPluginParameter(ActivateKeyword = "times", Name = "一天次数")]
+    [PluginParameter(ActivateKeyword = "times", Name = "一天次数")]
     public int? Times { get; set; }
 
-    [KouPluginParameter(ActivateKeyword = "duration", Name = "每次间隔")]
+    [PluginParameter(ActivateKeyword = "duration", Name = "每次间隔")]
     public TimeSpan? Duration { get; set; }
 
-    [KouPluginParameter(ActivateKeyword = "enable", Name = "小助手开关")]
+    [PluginParameter(ActivateKeyword = "enable", Name = "小助手开关")]
     public bool? Enable { get; set; }
 
-    [KouPluginFunction(Name = "当前喝水状态")]
+    [PluginFunction(Name = "当前喝水状态")]
     public override object? Default(string? str = null)
     {
         var config = this.UserConfig();
         RefreshConfig(config);
         if (config.TodayHaveTimes > 0)
         {
-            return $"今天已经喝了{config.TodayHaveTimes}次水，是在今天{config.Record.Select(p=>p.ToString("T")).ToStringJoin("、")}时喝的{(config.RemainTimes > 0 ? $"，还有{config.RemainTimes}次水没喝哦":"今天已经完水啦" )}";
+            return $"今天已经喝了{config.TodayHaveTimes}次水，是在今天{config.Record.Select(p=>p.ToString("T")).StringJoin("、")}时喝的{(config.RemainTimes > 0 ? $"，还有{config.RemainTimes}次水没喝哦":"今天已经完水啦" )}";
         }
 
         return $"今天还没有喝水哦{(config.RemainTimes > 0 ? $"，还有{config.RemainTimes}次水没喝呢":null)}";
     }
 
-    [KouPluginFunction(ActivateKeyword = "have", Name = "现在喝一次水")]
+    [PluginFunction(ActivateKeyword = "have", Name = "现在喝一次水")]
     public object? HaveMedicine()
     {
         var reminder = this.UserConfig();
@@ -86,7 +86,7 @@ public class KouMedicineReminder : KouPlugin<KouMedicineReminder>, IWantPluginUs
             reminder.SaveChanges();
         }
     }
-    [KouPluginFunction(ActivateKeyword = "config", Name = "调整喝水提醒小助手", SupportedParameters =
+    [PluginFunction(ActivateKeyword = "config", Name = "调整喝水提醒小助手", SupportedParameters =
         new []{nameof(Times), nameof(Duration), nameof(Private), nameof(BindGroup), nameof(Enable)})]
     public object? CreateReminder()
     {

@@ -5,14 +5,14 @@ using Koubot.Shared.Protocol.KouEnum;
 
 namespace KouGamePlugin.Cytus
 {
-    [KouPluginClass("cy", "Cytus助手",
+    [PluginClass("cy", "Cytus助手",
         Introduction = "提供随机歌曲、计算小p等功能",
         Author = "7zou",
         PluginType = PluginType.Game,
         CanUseProxy = true)]
     public class KouCytus : KouPlugin<KouCytus>
     {
-        [KouPluginFunction(ActivateKeyword = "cal", Name = "计算小P")]
+        [PluginFunction(ActivateKeyword = "cal", Name = "计算小P")]
         public string CalTP(double tp, int perfect, int good = 0, int bad = 0, int miss = 0)
         {
             if (tp > 100 || tp <= 0) return "TP是不是有点奇怪...";
@@ -26,7 +26,7 @@ namespace KouGamePlugin.Cytus
             var tp_error = real_tp - tp;
             return $"彩P：{tp_perfect}\n黑P：{nm_perfect}\n真实TP：{real_tp:F5}";
         }
-        [KouPluginFunction]
+        [PluginFunction]
         public override object? Default(string? str = null) => ReturnHelp();
     }
 }

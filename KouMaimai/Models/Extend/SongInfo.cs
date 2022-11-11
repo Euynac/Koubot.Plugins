@@ -14,7 +14,7 @@ using System;
 
 namespace KouGamePlugin.Maimai.Models
 {
-    [KouAutoModelTable]
+    [AutoTable]
     public partial class SongInfo : KouFullAutoModel<SongInfo>
     {
         public override int GetHashCode() => HashCode.Combine(SongId, SongTitleKaNa);

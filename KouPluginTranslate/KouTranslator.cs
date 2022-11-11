@@ -17,39 +17,39 @@ using static Koubot.SDK.API.BaiduTranslateAPI;
 
 namespace KouFunctionPlugin
 {
-    [KouPluginClass("trans|echo", "翻译器",
+    [PluginClass("trans|echo", "翻译器",
         Introduction = "提供多种翻译、转换功能",
         Author = "7zou",
         PluginType = PluginType.Function)]
     public class KouTranslator : KouPlugin<KouTranslator>
     {
-        [KouPluginParameter(ActivateKeyword = "l", Name = "英文转小写", Help = "返回的结果中的英文全部转为大写小写")]
+        [PluginParameter(ActivateKeyword = "l", Name = "英文转小写", Help = "返回的结果中的英文全部转为大写小写")]
         public bool Lower { get; set; } = false;
-        [KouPluginParameter(ActivateKeyword = "u", Name = "英文转大写", Help = "返回的结果中的英文全部转为大写")]
+        [PluginParameter(ActivateKeyword = "u", Name = "英文转大写", Help = "返回的结果中的英文全部转为大写")]
         public bool Upper { get; set; } = false;
 
-        [KouPluginParameter(ActivateKeyword = "from", Help = "源语言", DefaultContent = "auto")]
+        [PluginParameter(ActivateKeyword = "from", Help = "源语言", DefaultContent = "auto")]
         public string From { get; set; } = null;
 
-        [KouPluginParameter(ActivateKeyword = "to", Help = "目标语言", DefaultContent = "zh")]
+        [PluginParameter(ActivateKeyword = "to", Help = "目标语言", DefaultContent = "zh")]
         public string To { get; set; } = null;
 
-        [KouPluginParameter(ActivateKeyword = "count", Help = "润色次数", DefaultContent = "5")]
+        [PluginParameter(ActivateKeyword = "count", Help = "润色次数", DefaultContent = "5")]
         public string Count { get; set; } = "5";
        
-        [KouPluginParameter(ActivateKeyword = "带空格", Name = "说 话 带 空 格", Help = "返回的结果中字符间带空格")]
+        [PluginParameter(ActivateKeyword = "带空格", Name = "说 话 带 空 格", Help = "返回的结果中字符间带空格")]
         public bool SpeakWithWhiteSpace { get; set; }
 
-        [KouPluginParameter(ActivateKeyword = "逆序", Name = "逆序", Help = "逆序输出结果，默认从尾到头逆序，赋值row按行逆序",
+        [PluginParameter(ActivateKeyword = "逆序", Name = "逆序", Help = "逆序输出结果，默认从尾到头逆序，赋值row按行逆序",
             DefaultContent = "all")]
         public string Reverse { get; set; }
-        [KouPluginParameter(ActivateKeyword = "简体", Name = "转简体")]
+        [PluginParameter(ActivateKeyword = "简体", Name = "转简体")]
         public bool ToSimplifiedChinese { get; set; }
-        [KouPluginParameter(ActivateKeyword = "繁体", Name = "转简体")]
+        [PluginParameter(ActivateKeyword = "繁体", Name = "转简体")]
         public bool ToTraditionalChinese { get; set; }
-        [KouPluginParameter(ActivateKeyword = "拼音", Name = "转拼音", Help = "带声调赋值tone", DefaultContent = "")]
+        [PluginParameter(ActivateKeyword = "拼音", Name = "转拼音", Help = "带声调赋值tone", DefaultContent = "")]
         public string ToPinyin { get; set; }
-        [KouPluginParameter(ActivateKeyword = "首拼音", Name = "转首字母拼音")]
+        [PluginParameter(ActivateKeyword = "首拼音", Name = "转首字母拼音")]
         public bool ToFirstPinyin { get; set; }
 
 
@@ -78,8 +78,8 @@ namespace KouFunctionPlugin
             _pronounceDict = JsonSerializer.Deserialize<Dictionary<SupportsPronounce, Dictionary<string, string>>>(json!);
         }
 
-        [KouPluginFunction(ActivateKeyword = "pronounce", Name = "发音转换", SupportedParameters = new []{nameof(To)}, 
-            Help = "当前支持日语、英文、法语、德语、俄语、韩语、泰语（使用-to）。https://github.com/Uahh/Fyzhq")]
+        [PluginFunction(ActivateKeyword = "pronounce", Name = "发音转换", SupportedParameters = new []{nameof(To)}, 
+            Help = "用外语说中文。当前支持日语、英文、法语、德语、俄语、韩语、泰语（使用-to）。https://github.com/Uahh/Fyzhq")]
         public object? PronounceConvert(string content)
         {
             var pinyinList = WordsHelper.GetPinyin(content, "|").ToLowerInvariant();
@@ -107,7 +107,7 @@ namespace KouFunctionPlugin
         }
 
 
-        [KouPluginFunction(Help = "基本复述", SupportedParameters = new[] { nameof(Lower), nameof(From), nameof(To), nameof(Upper), nameof(Reverse), nameof(ToTraditionalChinese), nameof(ToPinyin), nameof(ToFirstPinyin), nameof(ToSimplifiedChinese), nameof(SpeakWithWhiteSpace) })]
+        [PluginFunction(Help = "基本复述", SupportedParameters = new[] { nameof(Lower), nameof(From), nameof(To), nameof(Upper), nameof(Reverse), nameof(ToTraditionalChinese), nameof(ToPinyin), nameof(ToFirstPinyin), nameof(ToSimplifiedChinese), nameof(SpeakWithWhiteSpace) })]
         public override object? Default(string? str = null)
         {
             if (str.IsNullOrWhiteSpace()) return null;
@@ -179,7 +179,7 @@ namespace KouFunctionPlugin
             return ResultPipe(str);
         }
 
-        [KouPluginFunction(ActivateKeyword = "languages|支持语种", Help = "获取所有支持的翻译语种，两边都可以作为to参数使用")]
+        [PluginFunction(ActivateKeyword = "languages|支持语种", Help = "获取所有支持的翻译语种，两边都可以作为to参数使用")]
         public string SupportedLanguage()
         {
             string str = "";
@@ -193,7 +193,7 @@ namespace KouFunctionPlugin
             return str.TrimEnd();
         }
 
-        [KouPluginFunction(ActivateKeyword = "detect|语种", Help = "检测输入文本的语种")]
+        [PluginFunction(ActivateKeyword = "detect|语种", Help = "检测输入文本的语种")]
         public string DetectLanguage(string str)
         {
             if (string.IsNullOrWhiteSpace(str)) return "没有输入要检测语种的文本";
@@ -207,7 +207,7 @@ namespace KouFunctionPlugin
             return ResultPipe(result);
         }
 
-        [KouPluginFunction(ActivateKeyword = "润色|polish", Name = "润（sheng）色（cao）文章", Help = "<原文>[-count 润色次数]")]
+        [PluginFunction(ActivateKeyword = "润色|polish", Name = "润（sheng）色（cao）文章", Help = "<原文>[-count 润色次数]")]
         public string KouRandomTranslateToZh(string source)
         {
             if (int.TryParse(Count, out int count))
@@ -247,40 +247,40 @@ namespace KouFunctionPlugin
             return result;
         }
 
-        [KouPluginFunction(ActivateKeyword = "base64|转base64", Help = "转base64")]
+        [PluginFunction(ActivateKeyword = "base64|转base64", Help = "转base64")]
         public string ToBase64(string str = null)
         {
             return ResultPipe(WebTool.EncodeBase64(str));
         }
-        [KouPluginFunction(ActivateKeyword = "解base64|解码base64", Help = "解码base64")]
+        [PluginFunction(ActivateKeyword = "解base64|解码base64", Help = "解码base64")]
         public string DecodeBase64(string str)
         {
             return ResultPipe(WebTool.DecodeBase64(str));
         }
 
-        [KouPluginFunction(ActivateKeyword = "转繁体|fanti", Help = "转繁体")]
+        [PluginFunction(ActivateKeyword = "转繁体|fanti", Help = "转繁体")]
         public string ToTraditional(string str = null)
         {
             return ResultPipe(WordsHelper.ToTraditionalChinese(str));
         }
 
-        [KouPluginFunction(ActivateKeyword = "转简体|jianti", Help = "转简体")]
+        [PluginFunction(ActivateKeyword = "转简体|jianti", Help = "转简体")]
         public string ToSimplified(string str = null)
         {
             return ResultPipe(WordsHelper.ToSimplifiedChinese(str));
         }
 
-        [KouPluginFunction(ActivateKeyword = "转全角", Help = "转全角")]
+        [PluginFunction(ActivateKeyword = "转全角", Help = "转全角")]
         public string ToFullWidth(string str = null)
         {
             return ResultPipe(StringTool.ToFullWidth(str));
         }
-        [KouPluginFunction(ActivateKeyword = "转半角", Help = "转半角")]
+        [PluginFunction(ActivateKeyword = "转半角", Help = "转半角")]
         public string ToHalfWidth(string str = null)
         {
             return ResultPipe(StringTool.ToHalfWidth(str));
         }
-        [KouPluginFunction(ActivateKeyword = "转MD5|MD5|md5|转md5", Help = "计算MD5值")]
+        [PluginFunction(ActivateKeyword = "转MD5|MD5|md5|转md5", Help = "计算MD5值")]
         public string ToMD5(string str = null)
         {
             return ResultPipe(WebTool.StringHash(str));
@@ -288,7 +288,7 @@ namespace KouFunctionPlugin
 
         
         
-        [KouPluginFunction(ActivateKeyword = "转人民币", Help = "将输入的数字转中文大写")]
+        [PluginFunction(ActivateKeyword = "转人民币", Help = "将输入的数字转中文大写")]
         public string ToChineseRMB(double number)
         {
             return ResultPipe(WordsHelper.ToChineseRMB(number));

@@ -18,35 +18,35 @@ namespace KouFunctionPlugin
     /// <summary>
     /// Koubot Coin Plugin
     /// </summary>
-    [KouPluginClass("hb", "红包",
+    [PluginClass("hb", "红包",
         Introduction = "发各种红包",
         Author = "7zou",
         PluginType = PluginType.System)]
     public class KouRedPacketPlugin : KouPlugin<KouRedPacketPlugin>, IWantTargetGroup
     {
         #region 红包相关
-        [KouPluginParameter(
+        [PluginParameter(
             Name = "竞速",
             ActivateKeyword = "v",
             Help = "指示红包是竞速红包，会在10-30秒内随机发送红包，并显示抢红包的速度，如果是拼手气则还会变成越快越有利")]
         public bool IsCompeteInVelocity { get; set; }
 
-        [KouPluginParameter(
+        [PluginParameter(
             Help = "指示红包是均分发送，注意此时总金额变为每个红包金额",
             ActivateKeyword = "same",
             Name = "红包均分")]
         public bool IsIdentical { get; set; }
-        [KouPluginParameter(
+        [PluginParameter(
             Help = "红包有效期，默认五分钟。有效设定时间：（30s-30min）",
             ActivateKeyword = "t",
             Name = "设定有效时间")]
         public TimeSpan? Duration { get; set; }
-        [KouPluginParameter(
+        [PluginParameter(
             Help = "红包备注，收到红包的都会得到这个备注",
             ActivateKeyword = "remark",
             Name = "设定红包备注")]
         public string Remark { get; set; }
-        [KouPluginEventHandler]
+        [PluginEventHandler]
         public override KouEventHandlerResult OnReceiveGroupMessage(GroupMessageEventArgs e)
         {
             var red = KouRedPacket.TryGetGroupRedPacket(e.FromGroup, e.GroupMessage.Content);
@@ -62,7 +62,7 @@ namespace KouFunctionPlugin
             return null;
         }
 
-        [KouPluginFunction(ActivateKeyword = "op|open|o", Name = "打开口令红包")]
+        [PluginFunction(ActivateKeyword = "op|open|o", Name = "打开口令红包")]
         public object OpenPasswordRedPacket(string password)
         {
             var red = KouRedPacket.TryGetGlobalRedPacket(password);
@@ -96,15 +96,15 @@ namespace KouFunctionPlugin
         }
 
 
-        [KouPluginFunction(ActivateKeyword = "group|g", Name = "发群组口令红包", Help = "接下来该群组内回复包含该口令的语句即会领取红包",
+        [PluginFunction(ActivateKeyword = "group|g", Name = "发群组口令红包", Help = "接下来该群组内回复包含该口令的语句即会领取红包",
             SupportedParameters = new[]{nameof(IsIdentical)
                 , nameof(IsCompeteInVelocity),
                 nameof(Duration), nameof(Remark)},
             OnlyUsefulInGroup = true)]
         public object SendGroupPasswordRedPacket(
-            [KouPluginArgument(Name = "总金额", Min = 1, EnableDefaultRangeError = true)] int total,
-            [KouPluginArgument(Name = "数量", Min = 1, EnableDefaultRangeError = true)] int quantity,
-            [KouPluginArgument(Name = "口令(默认生成6位数字)")] string password = null)
+            [PluginArgument(Name = "总金额", Min = 1, EnableDefaultRangeError = true)] int total,
+            [PluginArgument(Name = "数量", Min = 1, EnableDefaultRangeError = true)] int quantity,
+            [PluginArgument(Name = "口令(默认生成6位数字)")] string password = null)
         {
             if (password == "") password = null;
             if (!ValidateAvailableTime()) return ConveyMessage;
@@ -127,7 +127,7 @@ namespace KouFunctionPlugin
                 if (IsCompeteInVelocity)
                 {
                     CurUser.SendMessage(CurGroup, "将随机在5~30秒内发送竞速红包");
-                    Thread.Sleep(RandomTool.GenerateRandomInt(5000, 30000));
+                    Thread.Sleep(RandomTool.GetInt(5000, 30000));
                 }
                 if (!redPacket.Sent(TargetGroup ?? CurGroup))
                 {
@@ -139,7 +139,7 @@ namespace KouFunctionPlugin
 
             return this.ReturnNullWithError(null, ErrorCodes.Core_BankNotEnoughMoney);
         }
-        [KouPluginFunction]
+        [PluginFunction]
         public override object? Default(string? str = null)
         {
             return ReturnHelp();
@@ -160,14 +160,14 @@ namespace KouFunctionPlugin
             return true;
         }
 
-        [KouPluginFunction(ActivateKeyword = "sent|s", Name = "发口令红包",
+        [PluginFunction(ActivateKeyword = "sent|s", Name = "发口令红包",
             SupportedParameters = new[]{nameof(IsIdentical),
                 nameof(IsCompeteInVelocity),
                 nameof(Duration), nameof(Remark)})]
         public object SendPasswordRedPacket(
-            [KouPluginArgument(Name = "总金额", Min = 1, EnableDefaultRangeError = true)] int total,
-            [KouPluginArgument(Name = "数量", Min = 1, EnableDefaultRangeError = true)] int quantity,
-            [KouPluginArgument(Name = "口令(默认生成6位数字)")] string password = null)
+            [PluginArgument(Name = "总金额", Min = 1, EnableDefaultRangeError = true)] int total,
+            [PluginArgument(Name = "数量", Min = 1, EnableDefaultRangeError = true)] int quantity,
+            [PluginArgument(Name = "口令(默认生成6位数字)")] string password = null)
         {
             if (password == "") password = null;
             if (!ValidateAvailableTime()) return ConveyMessage;
@@ -190,7 +190,7 @@ namespace KouFunctionPlugin
                 if (IsCompeteInVelocity)
                 {
                     CurUser.SendMessage(CurGroup, "将随机在5~30秒内发送竞速红包");
-                    Thread.Sleep(RandomTool.GenerateRandomInt(5000, 30000));
+                    Thread.Sleep(RandomTool.GetInt(5000, 30000));
                 }
                 if (!redPacket.Sent())
                 {

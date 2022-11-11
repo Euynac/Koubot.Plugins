@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace KouFunctionPlugin.Aeronautics;
 
-[KouAutoModelTable("airport", new[] { nameof(KouAeronautics) })]
+[AutoTable("airport", new[] { nameof(KouAeronautics) })]
 public partial class AirPort : KouFullAutoModel<AirPort>
 {
     public override bool UseAutoCache()
@@ -42,7 +42,7 @@ public partial class AirPort : KouFullAutoModel<AirPort>
         {
             FormatType.Brief => $"{Code4} {Name?.BeNullIfEmpty() ?? Surname?.FirstOrDefault()}",
             FormatType.Detail => $"{ID}.{Code4} {Name?.BeNullIfEmpty() ?? Surname?.FirstOrDefault()}" +
-                                 Surname?.BeIfNotEmptySet($"\n别名：{Surname.ToStringJoin('，')}") +
+                                 Surname?.BeIfNotEmptySet($"\n别名：{Surname.StringJoin('，')}") +
                                  Country?.BeIfNotEmpty($"\n国家：{Country}") +
                                  Longitude.BeIfNotDefault($"\n经纬度：({Longitude}, {Latitude})")
         };

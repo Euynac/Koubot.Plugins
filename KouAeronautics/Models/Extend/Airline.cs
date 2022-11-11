@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace KouFunctionPlugin.Aeronautics;
 
 
-[KouAutoModelTable("airline", new[] { nameof(KouAeronautics) })]
+[AutoTable("airline", new[] { nameof(KouAeronautics) })]
 public partial class Airline : KouFullAutoModel<Airline>
 {
     public override bool UseAutoCache()
@@ -45,7 +45,7 @@ public partial class Airline : KouFullAutoModel<Airline>
         {
             FormatType.Brief => $"{Code3} {CompanyName?.BeNullIfEmpty() ?? Surname?.FirstOrDefault()}{EnglishName?.BeIfNotEmpty("({0})",true)}",
             FormatType.Detail => $"{CompanyID}.{Code3} {CompanyName?.BeNullIfEmpty() ?? Surname?.FirstOrDefault()}{EnglishName?.BeIfNotEmpty("({0})", true)}" +
-                                 Surname?.BeIfNotEmptySet($"\n别名：{Surname.ToStringJoin(',')}") +
+                                 Surname?.BeIfNotEmptySet($"\n别名：{Surname.StringJoin(',')}") +
                                  SITAAddress?.BeIfNotEmpty("\nSITA:{0}",true) +
                                  AFTNAddress?.BeIfNotEmpty("\nAFTN:{0}",true)
         };

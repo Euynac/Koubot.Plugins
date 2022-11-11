@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace KouFunctionPlugin.Cook;
 
-[KouAutoModelTable("list", new []{nameof(KouFood)}, Name = "美食图鉴")]
+[AutoTable("list", new []{nameof(KouFood)}, Name = "美食图鉴")]
 public partial class Food : KouFullAutoModel<Food>
 {
     public static KouImage? SaveFoodImage(string foodName, KouImage foodImage)

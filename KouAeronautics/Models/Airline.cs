@@ -10,23 +10,23 @@ public partial class Airline
 {
     [Key]
     public int CompanyID { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public string Code3 { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public string? Code2 { get; set; }
-    [KouAutoModelField(ActivateKeyword = "公司")]
+    [AutoField(ActivateKeyword = "公司")]
     public string? CompanyName { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public string? EnglishName { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public List<string>? Surname { get; set; }
-    [KouAutoModelField]
+    [AutoField]
     public string? Country { get; set; }
     [Column("DomesticFlag")]
     public bool IsDomestic { get; set; }
-    [KouAutoModelField(ActivateKeyword = "sita")]
+    [AutoField(ActivateKeyword = "sita")]
     public string? SITAAddress { get; set; }
-    [KouAutoModelField(ActivateKeyword = "aftn")]
+    [AutoField(ActivateKeyword = "aftn")]
     public string? AFTNAddress { get; set; }
     public bool ServiceFlag { get; set; }
     public bool ProxyFlag { get; set; }

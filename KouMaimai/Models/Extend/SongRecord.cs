@@ -20,10 +20,10 @@ using KouMaimai;
 
 namespace KouGamePlugin.Maimai.Models;
 
-[KouAutoModelTable("record", new[] { nameof(KouMaimai) })]
+[AutoTable("record", new[] { nameof(KouMaimai) })]
 public partial class SongRecord : KouFullAutoModel<SongRecord>
 {
-    [KouAutoModelField(ActivateKeyword = "曲名")]
+    [AutoField(ActivateKeyword = "曲名")]
     [NotMapped] public string? SongTitle { get; set; }
 
     protected override KouMessage ReplyOnFailingToSearch() => "没有找到相应的成绩哦";
@@ -91,7 +91,7 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
     /// <summary>
     /// 当前成绩Rating
     /// </summary>
-    [KouAutoModelField(ActivateKeyword = "rating")]
+    [AutoField(ActivateKeyword = "rating")]
     public int Rating
     {
         get
@@ -173,22 +173,14 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
                         Title = p.CorrespondingChart.BasicInfo.SongTitle,
                         Achievement =  $"{p.Achievements}% {p.FcStatus?.Be($" {p.FcStatus.GetDescription()}")}{p.FsStatus?.Be($" {p.FsStatus.GetDescription()}")}",
                         ImageUrl = browser.ResolveFileUrl(p.CorrespondingChart.BasicInfo.JacketUrl, new SongChart()),
-                        ColorTypeStr = p.RatingColor switch
-                        {
-                            SongChart.RatingColor.Basic => "basic_color",
-                            SongChart.RatingColor.Advanced => "advanced_color",
-                            SongChart.RatingColor.Expert => "expert_color",
-                            SongChart.RatingColor.Master => "master_color",
-                            SongChart.RatingColor.ReMaster => "remaster_color",
-                            _ => ""
-                        },
+                        ColorTypeStr = SongChart.GetCssColorClass(p.RatingColor),
                         ChartType = p.CorrespondingChart.SongChartType.ToString(),
-                        ChartConstant = p.CorrespondingChart.GetSpecificConstant(p.RatingColor)?.ToString("F1"),
+                        ChartConstant = p.CorrespondingChart.GetChartConstantOfSpecificColor(p.RatingColor)?.ToString("F1"),
                         ChartLabel = p.CorrespondingChart.DifficultTag.ToString(),
                         Rating = p.Rating,
                     }).ToList()};
                 }),
-                new KouTemplate(TemplateResources.MaimaiRecordListTemplate).AppendModel(new ModelPage(pageSetting)))
+                new KouTemplate(TemplateResources.MaimaiRecordListTemplate).AppendModel(new ModelPage(pageSetting))){DpiRank = 2}
         };
     }
 }

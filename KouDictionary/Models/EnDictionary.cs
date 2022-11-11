@@ -7,13 +7,13 @@ using Koubot.Shared.Protocol.Enums;
 namespace KouFunctionPlugin.Models
 {
     [Table("plugin_en_dict")]
-    [KouAutoModelTable("en", new[] { nameof(KouDictionary) }, Name = "英文词典")]
+    [AutoTable("en", new[] { nameof(KouDictionary) }, Name = "英文词典")]
     public partial class EnDictionary
     {
         [Key]
         [Column("word")]
         [StringLength(25)]
-        [KouAutoModelField(
+        [AutoField(
             ActivateKeyword = "word",
             FilterSetting = FilterType.IgnoreCase |
                             FilterType.DisableLike,
@@ -28,12 +28,12 @@ namespace KouFunctionPlugin.Models
         public string UsPron { get; set; }
         [Column("population")]
         [StringLength(20)]
-        [KouAutoModelField(ActivateKeyword = "词频")]
+        [AutoField(ActivateKeyword = "词频")]
         public int Population { get; set; }
 
         [Column("definition")]
         [StringLength(200)]
-        [KouAutoModelField(ActivateKeyword = "解释|define")]
+        [AutoField(ActivateKeyword = "解释|define")]
         public string Definition { get; set; }
     }
 }

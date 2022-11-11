@@ -1,5 +1,6 @@
 using Castle.Core.Internal;
 using System;
+using Koubot.Tool.Extensions;
 
 namespace KouFunctionPlugin.Pixiv
 {

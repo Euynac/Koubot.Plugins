@@ -68,7 +68,7 @@ namespace KouGamePlugin.Maimai.Models
                             return $"{arcadeName}暂时没有人提供这边的消息";
                         case FormatType.Customize2:
                         {
-                            var records = PeopleCount.ToStringJoin('\n');
+                            var records = PeopleCount.StringJoin('\n');
                             return $"{LocationId}.{arcadeName}历史记录\n{records}";
                         }
                         case FormatType.Customize3 when PeopleCount.IsNullOrEmptySet():
@@ -85,7 +85,7 @@ namespace KouGamePlugin.Maimai.Models
                                 $"\n机台数量：{MachineCount}" +
                                 $"\n地址：{Address}" +
                                 $"\n商场名：{MallName}" +
-                                Aliases?.BeIfNotEmptySet($"\n别名：{Aliases.ToStringJoin(",")}") +
+                                Aliases?.BeIfNotEmptySet($"\n别名：{Aliases.StringJoin(",")}") +
                                 curPeople.BeIfNotDefault($"\n当前人数：{curPeople}\n更新时间：{modifiedTime:T}");
                     }
             }

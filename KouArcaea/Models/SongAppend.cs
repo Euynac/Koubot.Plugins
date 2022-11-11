@@ -8,7 +8,7 @@ namespace KouGamePlugin.Arcaea.Models
     public partial class SongAppend
     {
         [Column("chart_rating_class")]
-        [KouAutoModelField(ActivateKeyword = "难度类别")]
+        [AutoField(ActivateKeyword = "难度类别")]
         public Song.RatingClass ChartRatingClass { get; set; }
         [Column("song_en_id")]
         [StringLength(100)]
@@ -16,16 +16,16 @@ namespace KouGamePlugin.Arcaea.Models
         public virtual Song Song { get; set; }
         [Column("chart_rating")]
         [StringLength(10)]
-        [KouAutoModelField(ActivateKeyword = "难度")]
+        [AutoField(ActivateKeyword = "难度")]
         public string ChartRating { get; set; }
         [Column("chart_constant")]
-        [KouAutoModelField(ActivateKeyword = "定数", FilterSetting = FilterType.NumericInterval)]
+        [AutoField(ActivateKeyword = "定数", FilterSetting = FilterType.NumericInterval)]
         public double? ChartConstant { get; set; }
         [Column("chart_designer")]
         [StringLength(200)]
-        [KouAutoModelField(ActivateKeyword = "谱师")]
+        [AutoField(ActivateKeyword = "谱师")]
         public string ChartDesigner { get; set; }
-        [KouAutoModelField(ActivateKeyword = "总键数", FilterSetting = FilterType.NumericInterval)]
+        [AutoField(ActivateKeyword = "总键数", FilterSetting = FilterType.NumericInterval)]
         [Column("chart_all_notes")]
         public int? ChartAllNotes { get; set; }
         [Column("chart_floor_notes")]

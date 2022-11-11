@@ -13,26 +13,26 @@ namespace KouGamePlugin.Arcaea
     /// <summary>
     /// KouArcaea插件
     /// </summary>
-    [KouPluginClass("arc", "Arcaea助手",
+    [PluginClass("arc", "Arcaea助手",
         Author = "7zou",
         PluginType = PluginType.Game,
         CanUseProxy = true)]
     public class KouArcaea : KouPlugin<KouArcaea>
     {
-        [KouPluginFunction(Name = "获取当前用户最近一次成绩（施工中）", Help = "默认功能，需要先绑定")]
+        [PluginFunction(Name = "获取当前用户最近一次成绩（施工中）", Help = "默认功能，需要先绑定")]
         public override object? Default(string? str = null)
         {
             return null;
         }
-        [KouPluginFunction(ActivateKeyword = "bind|绑定", Help = "绑定arc账号(暂时只支持ID不支持名字)")]
+        [PluginFunction(ActivateKeyword = "bind|绑定", Help = "绑定arc账号(暂时只支持ID不支持名字)")]
         public string KouBindArc(string arcID = null)
         {
             return null;
         }
-        [KouPluginFunction(ActivateKeyword = "cal|计算", Name = "计算单曲ptt", Help = "计算出那个分数的ptt")]
-        public string KouCalConstant([KouPluginArgument(Name = "定数/歌曲名[+难度类型]")] string nameOrConstant,
-            [KouPluginArgument(Name = "分数")] int score,
-            [KouPluginArgument(Name = "歌曲ptt反推定数")] double? ptt = null)
+        [PluginFunction(ActivateKeyword = "cal|计算", Name = "计算单曲ptt", Help = "计算出那个分数的ptt")]
+        public string KouCalConstant([PluginArgument(Name = "定数/歌曲名[+难度类型]")] string nameOrConstant,
+            [PluginArgument(Name = "分数")] int score,
+            [PluginArgument(Name = "歌曲ptt反推定数")] double? ptt = null)
         {
             if (score < 0 || score > 11000000) return "这个分数怎么有点奇怪呢";
             string songName = nameOrConstant;

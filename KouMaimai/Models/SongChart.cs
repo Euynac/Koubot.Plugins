@@ -11,7 +11,7 @@ using Koubot.Tool.String;
 namespace KouGamePlugin.Maimai.Models
 {
     [Table("plugin_maimai_song_chart")]
-    [KouAutoModelTable("song",
+    [AutoTable("song",
         new[] { nameof(KouMaimai) },
         Name = "Maimai歌曲",
         Help = "萌娘wiki + 日服数据")]
@@ -19,17 +19,17 @@ namespace KouGamePlugin.Maimai.Models
     {
         [Key]
         [Column("id")]
-        [KouAutoModelField(ActivateKeyword = "id", UnsupportedActions = AutoModelActions.CannotAlter)]
+        [AutoField(ActivateKeyword = "id", UnsupportedActions = AutoModelActions.CannotAlter)]
         public int ChartId { get; set; }
         [Column("official_id")]
         public int? OfficialId { get; set; }
-        [KouAutoModelField(true)]
+        [AutoField(true)]
         public virtual SongInfo BasicInfo { get; set; }
         [Column("song_title_kana")]
         public string SongTitleKaNa { get; set; }
         [Column("song_type")]
         [StringLength(20)]
-        [KouAutoModelField(ActivateKeyword = "类型")]
+        [AutoField(ActivateKeyword = "类型")]
         public ChartType? SongChartType { get; set; }
         [StringLength(10)]
         [Column("chart_easy_rating")]
@@ -62,13 +62,13 @@ namespace KouGamePlugin.Maimai.Models
         [Column("chart_remaster_constant")]
         public double? ChartRemasterConstant { get; set; }
         [Column("date")]
-        [KouAutoModelField(ActivateKeyword = "日期")]
+        [AutoField(ActivateKeyword = "日期")]
         public int? Date { get; set; }
 
         #region 谱面数据
-        [KouAutoModelField(true)]
+        [AutoField(true)]
         public List<ChartData>? ChartDataList { get; set; }
-        [KouAutoModelField(true)]
+        [AutoField(true)]
         public List<ChartStatus>? ChartStatusList { get; set; }
         public class ChartStatus
         {
@@ -125,17 +125,17 @@ namespace KouGamePlugin.Maimai.Models
         public class ChartData
         {
             public List<int> Notes { get; set; }
-            [KouAutoModelField(ActivateKeyword = "谱师")]
+            [AutoField(ActivateKeyword = "谱师")]
             public string Charter { get; set; }
-            [KouAutoModelField]
+            [AutoField]
             public int Tap => Notes[0];
-            [KouAutoModelField]
+            [AutoField]
             public int Hold => Notes[1];
-            [KouAutoModelField]
+            [AutoField]
             public int Slide => Notes[2];
-            [KouAutoModelField]
+            [AutoField]
             public int Touch => Notes.Count == 5 ? Notes[3] : 0;
-            [KouAutoModelField]
+            [AutoField]
             public int Break => Notes[^1];
             public override string ToString()
             {

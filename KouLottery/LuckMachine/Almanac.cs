@@ -17,7 +17,7 @@ namespace KouFunctionPlugin.LuckMachine
     /// 黄历
     /// </summary>
     [Table("plugin_luck_almanac")]
-    [KouAutoModelTable("list", new[] { nameof(KouLuck) }, Name = "黄历")]
+    [AutoTable("list", new[] { nameof(KouLuck) }, Name = "黄历")]
     public class Almanac : KouFullAutoModel<Almanac>
     {
         [Key]

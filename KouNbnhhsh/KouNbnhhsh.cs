@@ -14,16 +14,16 @@ namespace KouFunctionPlugin
     /// <summary>
     /// 第三方api测试 能不能好好说话
     /// </summary>
-    [KouPluginClass("nbnhhsh", "能不能好好说话",
+    [PluginClass("nbnhhsh", "能不能好好说话",
         Introduction = "首字母缩写翻译工具；源项目地址https://github.com/itorr/nbnhhsh\n输入带首字母缩写的文字，返回结果（多个则随机）",
         Author = "7zou",
         PluginType = PluginType.Function)]
     public class KouNbnhhsh : KouPlugin<KouNbnhhsh>
     {
-        [KouPluginParameter(Help = "默认功能中使用会将所有结果输出")]
+        [PluginParameter(Help = "默认功能中使用会将所有结果输出")]
         public bool All { get; set; }
 
-        [KouPluginFunction(Name = "能不能好好说话的默认功能", Help = "输入带缩写的文字，返回一个结果（多个则随机）", SupportedParameters = new []{nameof(All)})]
+        [PluginFunction(Name = "能不能好好说话的默认功能", Help = "输入带缩写的文字，返回一个结果（多个则随机）", SupportedParameters = new []{nameof(All)})]
         public override object? Default(string? str = null)
         {
             if (str.IsNullOrWhiteSpace()) return "输入带首字母缩写的一段话";

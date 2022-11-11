@@ -9,7 +9,7 @@ using Koubot.Tool.String;
 
 namespace KouFunctionPlugin;
 
-[KouPluginClass("quotation", "语录",
+[PluginClass("quotation", "语录",
     Introduction = "",
     Author = "7zou",
     PluginType = PluginType.Function,
@@ -25,14 +25,14 @@ public class KouQuotation : KouPlugin<KouQuotation>, IWantPluginGlobalConfig<Quo
         Config = GetSingleton().GlobalConfig();
     }
 
-    [KouPluginFunction(Name = "随机获取一个语录")]
-    public object? Default([KouPluginArgument(Name = "指定类型的语录")]Quotation.QuotationType? type = null)
+    [PluginFunction(Name = "随机获取一个语录")]
+    public object? Default([PluginArgument(Name = "指定类型的语录")]Quotation.QuotationType? type = null)
     {
         return Quotation.RandomGetOne(p =>
                 type != null && p.Type == type || type == null)
             ?.GetParsedContent() ?? $"没有找到{(type != null ? $"{type.GetKouEnumName()}类型的" : "语录")}呢";
     }
-    [KouPluginEventHandler]
+    [PluginEventHandler]
     public override KouEventHandlerResult? OnReceiveGroupMessage(GroupMessageEventArgs e)
     {
         if (Config.IsEnable && Config.TriggerRate.ProbablyTrue() && e.FromUser != null &&  e.FromUser.PlatformUserId == "2734283478")
@@ -47,8 +47,8 @@ public class KouQuotation : KouPlugin<KouQuotation>, IWantPluginGlobalConfig<Quo
         return null;
     }
 
-    [KouPluginFunction(ActivateKeyword = "夸夸概率", Name = "设置夸夸概率")]
-    public object SetPraiseProbability([KouPluginArgument(Name = "夸夸概率", Max = 1, Min = 0)] double p)
+    [PluginFunction(ActivateKeyword = "夸夸概率", Name = "设置夸夸概率")]
+    public object SetPraiseProbability([PluginArgument(Name = "夸夸概率", Max = 1, Min = 0)] double p)
     {
         var config = this.GlobalConfig();
         var previous = config.TriggerRate;
@@ -58,7 +58,7 @@ public class KouQuotation : KouPlugin<KouQuotation>, IWantPluginGlobalConfig<Quo
         return $"夸夸概率：{previous:P} => {config.TriggerRate:P}";
     }
 
-    [KouPluginFunction(ActivateKeyword = "夸夸开关", Name = "开关夸夸功能")]
+    [PluginFunction(ActivateKeyword = "夸夸开关", Name = "开关夸夸功能")]
     public object PraiseSwitch()
     {
         var config = this.GlobalConfig();
@@ -68,8 +68,8 @@ public class KouQuotation : KouPlugin<KouQuotation>, IWantPluginGlobalConfig<Quo
         return $"夸夸开关：{config.IsEnable}";
     }
 
-    [KouPluginFunction(Name = "遗忘", ActivateKeyword = "del|delete")]
-    public string DeleteQuotation([KouPluginArgument(Name = "语录ID")] List<int> id)
+    [PluginFunction(Name = "遗忘", ActivateKeyword = "del|delete")]
+    public string DeleteQuotation([PluginArgument(Name = "语录ID")] List<int> id)
     {
         var result = new StringBuilder();
         foreach (var i in id)
@@ -89,9 +89,9 @@ public class KouQuotation : KouPlugin<KouQuotation>, IWantPluginGlobalConfig<Quo
         return result.ToString().TrimStart();
     }
 
-    [KouPluginFunction(Name = "加语录", ActivateKeyword = "add", EnableAutoNext = true)]
-    public string AddQuotation([KouPluginArgument(Name = "语录类型")] Quotation.QuotationType type,
-        [KouPluginArgument(Name = "语录内容")] string content)
+    [PluginFunction(Name = "加语录", ActivateKeyword = "add", EnableAutoNext = true)]
+    public string AddQuotation([PluginArgument(Name = "语录类型")] Quotation.QuotationType type,
+        [PluginArgument(Name = "语录内容")] string content)
     {
         if (Context.Set<Quotation>().Any(p => p.Content == content && p.Type == type))
         {
@@ -105,7 +105,7 @@ public class KouQuotation : KouPlugin<KouQuotation>, IWantPluginGlobalConfig<Quo
         }, out var added, out var error, Context);
         if (success)
         {
-            var reward = RandomTool.GenerateRandomInt(8, 15);
+            var reward = RandomTool.GetInt(8, 15);
             CurUser.KouUser.GainCoinFree(reward);
             return $"学会了说{type.GetKouEnumName()}：{added.ToString(FormatType.Brief)}\n" +
                    $"[您获得了{CurKouGlobalConfig.CoinFormat(reward)}!]";

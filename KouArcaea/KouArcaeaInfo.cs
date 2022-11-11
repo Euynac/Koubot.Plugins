@@ -16,23 +16,23 @@ namespace KouGamePlugin.Arcaea
     /// <summary>
     /// KouArcaea歌曲数据类
     /// </summary>
-    [KouPluginClass("arcinfo", "Arcaea歌曲数据服务",
+    [PluginClass("arcinfo", "Arcaea歌曲数据服务",
         Introduction = "提供歌曲详细信息查询、随机歌曲功能，可限定条件",
         Author = "7zou",
         PluginType = PluginType.Game)]
     public class KouArcaeaInfo : KouPlugin<KouArcaeaInfo>
     {
-        [KouPluginFunction(Name = "查询歌曲信息", Help = "请使用/arc.song help")]
+        [PluginFunction(Name = "查询歌曲信息", Help = "请使用/arc.song help")]
         public override object? Default(string? name = null)
         {
             return name == null ? ReturnHelp() : "歌曲信息查询请使用升级版的/arc.song help";
         }
 
         #region 歌曲别名
-        [KouPluginFunction(ActivateKeyword = "add|教教", Name = "学新的歌曲别名", Help = "教kou一个歌曲的别名。")]
+        [PluginFunction(ActivateKeyword = "add|教教", Name = "学新的歌曲别名", Help = "教kou一个歌曲的别名。")]
         public object KouLearnAnotherName(
-            [KouPluginArgument(Name = "歌曲名等")] string songName,
-            [KouPluginArgument(Name = "要学的歌曲别名")] string songAnotherName)
+            [PluginArgument(Name = "歌曲名等")] string songName,
+            [PluginArgument(Name = "要学的歌曲别名")] string songAnotherName)
         {
             if (songName.IsNullOrWhiteSpace() || songAnotherName.IsNullOrWhiteSpace()) return "好好教我嘛";
             var haveTheAlias = SongAlias.SingleOrDefault(p => p.Alias == songAnotherName);
@@ -53,7 +53,7 @@ namespace KouGamePlugin.Arcaea
 
             var sourceUser = CurUser.FindThis(Context);
             var dbSong = song.FindThis(Context);
-            var havenHadAliases = dbSong.Aliases?.Select(p => p.Alias).ToStringJoin("、");
+            var havenHadAliases = dbSong.Aliases?.Select(p => p.Alias).StringJoin("、");
             var success = SongAlias.Add(alias =>
             {
                 alias.CorrespondingSong = dbSong;
@@ -63,7 +63,7 @@ namespace KouGamePlugin.Arcaea
             if (success)
             {
                 Song.UpdateCache();
-                var reward = RandomTool.GenerateRandomInt(1, 2);
+                var reward = RandomTool.GetInt(1, 2);
                 CurUser.KouUser.GainCoinFree(reward);
                 return $"学会了，{song.SongTitle}可以叫做{songAnotherName}({added.AliasID})" +
                        $"{havenHadAliases?.BeIfNotEmpty($"，我知道它还可以叫做{havenHadAliases}！")}\n" +
@@ -71,9 +71,9 @@ namespace KouGamePlugin.Arcaea
             }
             return $"没学会，就突然：{error}";
         }
-        [KouPluginFunction(ActivateKeyword = "del|delete|忘记", Name = "忘记歌曲别名", Help = "叫kou忘掉一个歌曲的别名。")]
+        [PluginFunction(ActivateKeyword = "del|delete|忘记", Name = "忘记歌曲别名", Help = "叫kou忘掉一个歌曲的别名。")]
         public string KouForgetAnotherName(
-            [KouPluginArgument(Name = "别名ID")] List<int> ids)
+            [PluginArgument(Name = "别名ID")] List<int> ids)
         {
             if (ids.IsNullOrEmptySet()) return "这是叫我忘掉什么嘛";
             var result = new StringBuilder();

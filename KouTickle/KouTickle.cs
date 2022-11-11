@@ -17,7 +17,7 @@ using Koubot.Shared.Protocol.KouEnum;
 
 namespace KouFunctionPlugin
 {
-    [KouPluginClass(
+    [PluginClass(
         "poke",
         "戳一戳",
         Author = "7zou")]
@@ -55,7 +55,7 @@ namespace KouFunctionPlugin
         };
 
         private static readonly KouColdDown<PlatformGroup> _rankCD = new();
-        [KouPluginFunction(
+        [PluginFunction(
             Name = "本群戳一戳情况",
             ActivateKeyword = "rank",
             Help = "得到当前群的戳一戳次数排行",
@@ -110,11 +110,11 @@ namespace KouFunctionPlugin
                          $"{info.Value.TimesOfPokeOthers.BeIfNotDefault($"戳了其他人{info.Value.TimesOfPokeOthers}次，")}" +
                          $"{_descriptionList[i].RandomGetOne()}";
                 CurGroup.SendGroupMessage(reply);
-                Thread.Sleep(RandomTool.GenerateRandomInt(1500, 3500));
+                Thread.Sleep(RandomTool.GetInt(1500, 3500));
             }
             return null;
         }
-        [KouPluginFunction(Name = "帮助")]
+        [PluginFunction(Name = "帮助")]
         public override object? Default(string? str = null)
         {
             return ReturnHelp();
@@ -133,7 +133,7 @@ namespace KouFunctionPlugin
             new();
 
 
-        [KouPluginEventHandler]
+        [PluginEventHandler]
         public override KouEventHandlerResult OnReceiveTickleEvent(TickleEventArgs e)
         {
             if (e.FromGroup == null || e.TargetUser == null || e.FromUser == null) return null;
@@ -166,8 +166,8 @@ namespace KouFunctionPlugin
             return reply;
         }
 
-        [KouPluginFunction(Name = "遗忘", ActivateKeyword = "del|delete", Help = "删除学习过的戳一戳反馈")]
-        public string DeleteItem([KouPluginArgument(Name = "戳一戳ID")] List<int> id)
+        [PluginFunction(Name = "遗忘", ActivateKeyword = "del|delete", Help = "删除学习过的戳一戳反馈")]
+        public string DeleteItem([PluginArgument(Name = "戳一戳ID")] List<int> id)
         {
             var result = new StringBuilder();
             foreach (var i in id)
@@ -187,9 +187,9 @@ namespace KouFunctionPlugin
             return result.ToString().TrimStart();
         }
 
-        [KouPluginFunction(Help = "教Kou戳一戳怎么回应", Name = "教教", ActivateKeyword = "add", EnableAutoNext = true)]
+        [PluginFunction(Help = "教Kou戳一戳怎么回应", Name = "教教", ActivateKeyword = "add", EnableAutoNext = true)]
         public string AddItem(
-            [KouPluginArgument(Name = "回应内容")]
+            [PluginArgument(Name = "回应内容")]
             string reply)
         {
             if (reply.IsNullOrWhiteSpace()) return "好好教我嘛";
@@ -200,7 +200,7 @@ namespace KouFunctionPlugin
             }, out var added, out var error, Context);
             if (success)
             {
-                var reward = RandomTool.GenerateRandomInt(1, 2);
+                var reward = RandomTool.GetInt(1, 2);
                 CurUser.KouUser.GainCoinFree(reward);
                 return $"学会了，别人戳我我就：\n{added.ToString(FormatType.Brief)}\n" +
                        $"[您获得了{CurKouGlobalConfig.CoinFormat(reward)}!]";

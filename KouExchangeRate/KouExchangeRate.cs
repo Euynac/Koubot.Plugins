@@ -2,12 +2,13 @@
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;
 using Koubot.Tool.Extensions;
+using Koubot.Tool.General;
 using KouExchangeRate;
 using KouFunctionPlugin.Currency.Models;
 
 namespace KouFunctionPlugin.Currency
 {
-    [KouPluginClass("rate",
+    [PluginClass("rate",
         "汇率转换", 
         PluginType = PluginType.Function)]
     public class KouExchangeRate : KouPlugin<KouExchangeRate>, IWantPluginGlobalConfig<RateConfig>
@@ -19,6 +20,7 @@ namespace KouFunctionPlugin.Currency
                 var success = ExchangeRateApi.UpdateDataToDb();
                 var config = GetSingleton().GlobalConfig();
                 config.LastUpdateTime = DateTime.Now;
+                KouLog.QuickAdd($"尝试刷新汇率：{success.IIf("成功","失败")}");
                 if (success)
                 {
                     config.LastSuccessUpdateTime = config.LastUpdateTime;
@@ -28,7 +30,7 @@ namespace KouFunctionPlugin.Currency
             });
         }
 
-        [KouPluginFunction(ActivateKeyword = "status", Name = "更新状态")]
+        [PluginFunction(ActivateKeyword = "status", Name = "更新状态")]
         public object UpdateStatus()
         {
             var config = this.GlobalConfig();
@@ -41,8 +43,8 @@ namespace KouFunctionPlugin.Currency
             return $"汇率上次成功刷新时间：{config.LastSuccessUpdateTime}";
         }
 
-        [KouPluginFunction(Name = "是多少RMB")]
-        public override object? Default([KouPluginArgument(Name = "数字+国家/货币名/货币代号")]string? str = null)
+        [PluginFunction(Name = "是多少RMB")]
+        public override object? Default([PluginArgument(Name = "数字+国家/货币名/货币代号")]string? str = null)
         {
             
             if (!str.MatchOnceThenReplace(@"\d+(\.\d+)?", out string name, out var valueGroup))

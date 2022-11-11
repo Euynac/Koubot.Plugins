@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace KouFunctionPlugin;
 
-[KouAutoModelTable("list", new []{nameof(KouQuotation)})]
+[AutoTable("list", new []{nameof(KouQuotation)})]
 public partial class Quotation : KouFullAutoModel<Quotation>
 {
     public override Action<EntityTypeBuilder<Quotation>>? ModelSetup()

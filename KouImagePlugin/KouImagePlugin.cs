@@ -14,61 +14,61 @@ using ThoughtWorks.QRCode.Codec.Data;
 
 namespace KouFunctionPlugin
 {
-    [KouPluginClass("img", "图片处理",
+    [PluginClass("img", "图片处理",
         Introduction = "图片系统衍生插件",
         Author = "7zou",
         PluginType = PluginType.Function)]
     public class KouImagePlugin : KouPlugin<KouImagePlugin>
     {
-        [KouPluginParameter(ActivateKeyword = "rotate", Name = "图片顺时针旋转(度数)")]
+        [PluginParameter(ActivateKeyword = "rotate", Name = "图片顺时针旋转(度数)")]
         public double RotateDegree { get; set; }
 
-        [KouPluginParameter(ActivateKeyword = "grey", Name = "变成灰度图")]
+        [PluginParameter(ActivateKeyword = "grey", Name = "变成灰度图")]
         public bool ToGrey { get; set; }
 
-        [KouPluginParameter(ActivateKeyword = "flip", Name = "翻转（默认水平，可选垂直）", DefaultContent = "水平")]
+        [PluginParameter(ActivateKeyword = "flip", Name = "翻转（默认水平，可选垂直）", DefaultContent = "水平")]
         public FlipType? Flip { get; set; }
 
-        [KouPluginParameter(ActivateKeyword = "resize", Name = "尺寸改变（百分比）",
+        [PluginParameter(ActivateKeyword = "resize", Name = "尺寸改变（百分比）",
             Min = 0.01, Max = 2)]
         public double ResizePercent { get; set; }
 
-        [KouPluginParameter(ActivateKeyword = "blur", Name = "高斯模糊", Max = 100, Min = 1, DefaultContent = "3")]
+        [PluginParameter(ActivateKeyword = "blur", Name = "高斯模糊", Max = 100, Min = 1, DefaultContent = "3")]
         public double Blur { get; set; }
 
-        [KouPluginParameter(Name = "宽度设置",
+        [PluginParameter(Name = "宽度设置",
             Min = 1, Max = 3000)]
         public int? Width { get; set; }
 
-        [KouPluginParameter(Name = "高度设置",
+        [PluginParameter(Name = "高度设置",
             Min = 1, Max = 3000)]
         public int? Height { get; set; }
 
-        [KouPluginParameter(ActivateKeyword = "背景颜色", Name = "更改背景颜色")]
+        [PluginParameter(ActivateKeyword = "背景颜色", Name = "更改背景颜色")]
         public KouColor? SetBackgroundColor { get; set; }
-        [KouPluginParameter(ActivateKeyword = "字体颜色")]
+        [PluginParameter(ActivateKeyword = "字体颜色")]
         public KouColor? SetFontColor { get; set; }
 
-        [KouPluginParameter(ActivateKeyword = "透明", Name = "将指定颜色背景转换为透明底", DefaultContent = "白")]
+        [PluginParameter(ActivateKeyword = "透明", Name = "将指定颜色背景转换为透明底", DefaultContent = "白")]
         public KouColor? ToTransparent { get; set; }
 
-        [KouPluginParameter(ActivateKeyword = "filter", Name = "使用滤镜", Help = "目前有二值化、复古、油画三种")]
+        [PluginParameter(ActivateKeyword = "filter", Name = "使用滤镜", Help = "目前有二值化、复古、油画三种")]
         public Filters? UseFilter { get; set; }
-        [KouPluginParameter(ActivateKeyword = "png", Name = "保存为png", Authority = Authority.BotManager)]
+        [PluginParameter(ActivateKeyword = "png", Name = "保存为png", Authority = Authority.BotManager)]
         public bool SaveToPng { get; set; }
-        [KouPluginParameter(ActivateKeyword = "gif", Name = "保存为gif")]
+        [PluginParameter(ActivateKeyword = "gif", Name = "保存为gif")]
         public bool SaveToGif { get; set; }
 
-        [KouPluginParameter(ActivateKeyword = "jpg", Name = "保存为jpg")]
+        [PluginParameter(ActivateKeyword = "jpg", Name = "保存为jpg")]
         public bool SaveToJpg { get; set; }
 
-        [KouPluginParameter(ActivateKeyword = "speed", Name = "设定gif速度(1-300)", Min = 1, Max = 300)]
+        [PluginParameter(ActivateKeyword = "speed", Name = "设定gif速度(1-300)", Min = 1, Max = 300)]
         public int? SpeedUpGifFactor { get; set; }
 
-        [KouPluginParameter(ActivateKeyword = "fontSize|字体大小", Name = "字体大小", Max = 200, Min = 1)]
+        [PluginParameter(ActivateKeyword = "fontSize|字体大小", Name = "字体大小", Max = 200, Min = 1)]
         public int? FontSize { get; set; }
 
-        [KouPluginParameter(ActivateKeyword = "half", Name = "gif帧丢弃一半")]
+        [PluginParameter(ActivateKeyword = "half", Name = "gif帧丢弃一半")]
         public bool HalfGifFrame { get; set; }
         public enum Filters
         {
@@ -89,10 +89,10 @@ namespace KouFunctionPlugin
             Vertical
         }
 
-        [KouPluginFunction(Name = "返回使用参数处理后的图片", EnableAutoNext = true)]
+        [PluginFunction(Name = "返回使用参数处理后的图片", EnableAutoNext = true)]
         public dynamic? Default(KouImage image)
         {
-            if (!CurCommand.ExplicitParameterExecutionList.IsNullOrEmpty())
+            if (!CurCommand.ExplicitParameterExecutionList.IsNullOrEmptySet())
             {
                 if (!ToMutateImage(image, out var mutatedImage)) return ConveyMessage;
                 return mutatedImage;
@@ -100,7 +100,7 @@ namespace KouFunctionPlugin
             return image;
         }
 
-        [KouPluginFunction(ActivateKeyword = "gqrcode", Name = "生成二维码")]
+        [PluginFunction(ActivateKeyword = "gqrcode", Name = "生成二维码")]
         public object GenerateQRCode(string content)
         {
             var encoder = new QRCodeEncoder();
@@ -110,7 +110,7 @@ namespace KouFunctionPlugin
             tmpStream.Seek(0, SeekOrigin.Begin);
             return new KouMutateImage(tmpStream).SaveTemporarily();
         }
-        [KouPluginFunction(ActivateKeyword = "pqrcode", Name = "解析二维码", EnableAutoNext = true)]
+        [PluginFunction(ActivateKeyword = "pqrcode", Name = "解析二维码", EnableAutoNext = true)]
         public object ParseQRCode(KouImage code)
         {
             using var mutating = code.StartMutate()!;
@@ -119,8 +119,8 @@ namespace KouFunctionPlugin
             return encoder.decode(new QRCodeBitmapImage(new Bitmap(saved.FileUri.LocalPath)));
         }
 
-        [KouPluginFunction(ActivateKeyword = "info", Name = "图片信息", EnableAutoNext = true)]
-        public string? Info([KouPluginArgument(Name = "图片", ArgumentAttributes = KouParameterAttribute.NotSaveAsTemporaryImg)]KouImage image)
+        [PluginFunction(ActivateKeyword = "info", Name = "图片信息", EnableAutoNext = true)]
+        public string? Info([PluginArgument(Name = "图片", ArgumentAttributes = KouParameterAttribute.NotSaveAsTemporaryImg)]KouImage image)
         {
             var url = image.IsNetworkFile ? image.FileUri.ToString() : null;
             image.SaveAsTemporary(out var temporaryImage);
@@ -135,8 +135,8 @@ namespace KouFunctionPlugin
             return $"{url?.Be($"网络路径：{url}\n")}{mutateImage?.ToString()}";
         }
 
-        [KouPluginFunction(Name = "颜色鉴别", EnableAutoNext = true)]
-        public object? ColorDetect([KouPluginArgument(Name = "纯色图片", ArgumentAttributes = KouParameterAttribute.AllowDuplicate)] KouImage img)
+        [PluginFunction(Name = "颜色鉴别", EnableAutoNext = true)]
+        public object? ColorDetect([PluginArgument(Name = "纯色图片")] KouImage img)
         {
             using var mutateImage = img.StartMutate();
             if(mutateImage == null) return "读取图片失败";
@@ -146,8 +146,8 @@ namespace KouFunctionPlugin
             return $"{image.SaveTemporarily().ToKouResourceString()}\n{color}";
         }
 
-        [KouPluginFunction(Name = "调色板")]
-        public object? ColorInfo([KouPluginArgument(Name = "颜色描述", Help = "支持hex,rgb,hsl,hsv,cmyk,颜色名")]string colorDescribe)
+        [PluginFunction(Name = "调色板")]
+        public object? ColorInfo([PluginArgument(Name = "颜色描述", Help = "支持hex,rgb,hsl,hsv,cmyk,颜色名")]string colorDescribe)
         {
             if (!KouColorBase.TryGetColor(colorDescribe, out var colorBase))
             {
@@ -157,8 +157,8 @@ namespace KouFunctionPlugin
             image.SetBackgroundColor(colorBase);
             return $"{image.SaveTemporarily().ToKouResourceString()}\n{colorBase}";
         }
-        [KouPluginFunction(ActivateKeyword = "文字转图片", Name = "文字转图片", SupportedParameters = new[] { nameof(FontSize), nameof(SetBackgroundColor), nameof(SetFontColor) })]
-        public object StringToImg([KouPluginArgument(Name = "要转换的内容")] string content)
+        [PluginFunction(ActivateKeyword = "文字转图片", Name = "文字转图片", SupportedParameters = new[] { nameof(FontSize), nameof(SetBackgroundColor), nameof(SetFontColor) })]
+        public object StringToImg([PluginArgument(Name = "要转换的内容")] string content)
         {
             if (content.Length > 1000) return "暂不支持过大的内容";
             var fontSize = FontSize ?? 10;
@@ -172,8 +172,8 @@ namespace KouFunctionPlugin
         }
 
 
-        [KouPluginFunction(ActivateKeyword = "frame", Name = "获取图片帧", EnableAutoNext = true)]
-        public object? FrameCount([KouPluginArgument(Name = "指定帧数")] int at, [KouPluginArgument(Name = "GIF图片")] KouImage image)
+        [PluginFunction(ActivateKeyword = "frame", Name = "获取图片帧", EnableAutoNext = true)]
+        public object? FrameCount([PluginArgument(Name = "指定帧数")] int at, [PluginArgument(Name = "GIF图片")] KouImage image)
         {
             if (!ToMutateImage(image, out var mutatedImage)) return ConveyMessage;
             using var mutating = mutatedImage.StartMutate();
@@ -185,8 +185,8 @@ namespace KouFunctionPlugin
             return frame.SaveTemporarily();
         }
 
-        [KouPluginFunction(ActivateKeyword = "变透明gif", Name = "将透明的png变成透明gif", EnableAutoNext = true)]
-        public object? PngToTwoFrameGifToBeTransparent([KouPluginArgument(Name = "透明图片")] KouImage image)
+        [PluginFunction(ActivateKeyword = "变透明gif", Name = "将透明的png变成透明gif", EnableAutoNext = true)]
+        public object? PngToTwoFrameGifToBeTransparent([PluginArgument(Name = "透明图片")] KouImage image)
         {
             if (!ToMutateImage(image, out var mutatedImage)) return ConveyMessage;
             using var mutating = mutatedImage!.StartMutate();
@@ -196,8 +196,8 @@ namespace KouFunctionPlugin
         }
 
 
-        [KouPluginFunction(ActivateKeyword = "ocr", Name = "OCR提取图片中的文字", EnableAutoNext = true, NeedCoin = 100)]
-        public object? OCR([KouPluginArgument(Name = "包含文字的图片")] KouImage image)
+        [PluginFunction(ActivateKeyword = "ocr", Name = "OCR提取图片中的文字", EnableAutoNext = true, NeedCoin = 100)]
+        public object? OCR([PluginArgument(Name = "包含文字的图片")] KouImage image)
         {
             using var mutate = image.StartMutate();
             var base64 = mutate?.ToBase64String();

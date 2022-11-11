@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KouGamePlugin.Maimai.Models
 {
-    [KouAutoModelTable("alias", new[] { nameof(KouMaimai) }, Name = "Mai歌曲别名")]
+    [AutoTable("alias", new[] { nameof(KouMaimai) }, Name = "Mai歌曲别名")]
     [Table("plugin_maimai_song_alias")]
     public partial class SongAlias
     {
