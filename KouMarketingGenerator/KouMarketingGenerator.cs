@@ -41,9 +41,9 @@ namespace KouFunctionPlugin
         }
         public string Generate(string main, string events, string anotherEvent)
         {
-            string result = $"   {main}{events}是怎么回事呢？{main}相信大家都很熟悉，但是{main}{events}是怎么回事呢，下面就让小编带大家一起了解吧。\n" +
-                $"   {main}{events}，其实就是{anotherEvent}，大家可能会很惊讶{main}怎么会{events}呢？但事实就是这样，小编也感到非常惊讶。\n" +
-                $"   这就是关于{main}{events}的事情了，{Ends.RandomGetOne()}";
+            var result = $"   {main}{events}是怎么回事呢？{main}相信大家都很熟悉，但是{main}{events}是怎么回事呢，下面就让小编带大家一起了解吧。\n" +
+                         $"   {main}{events}，其实就是{anotherEvent}，大家可能会很惊讶{main}怎么会{events}呢？但事实就是这样，小编也感到非常惊讶。\n" +
+                         $"   这就是关于{main}{events}的事情了，{Ends.RandomGetOne()}";
             return result;
         }
 

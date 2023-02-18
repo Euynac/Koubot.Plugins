@@ -193,7 +193,7 @@ public class DivingFishChartInfoDto
                     dbInfo.Version = item.basic_info.@from.ToKouEnum<SongVersion>();
                     dbInfo.SongArtist = item.basic_info.artist.BeNullIfWhiteSpace() ?? dbInfo.SongArtist;
                     dbChartInfo.OfficialId = int.Parse(item.id);
-                    for (int i = 0; i < 5; i++)
+                    for (var i = 0; i < 5; i++)
                     {
                         var rating = item.level.ElementAtOrDefault(i);
                         var constant = item.ds.ElementAtOrDefault(i);

@@ -51,9 +51,9 @@ namespace KouFunctionPlugin
         {
             var red = KouRedPacket.TryGetGroupRedPacket(e.FromGroup, e.GroupMessage.Content);
             if (red == null) return null;
-            if (red.Open(e.FromUser, out int coinsGot))
+            if (red.Open(e.FromUser, out var coinsGot))
             {
-                string speedAppend =
+                var speedAppend =
                     red.IsCompeteInVelocity ? $"（耗时{(DateTime.Now - red.StartTime).TotalSeconds:0.##}秒）" : null;
                 speedAppend += red.Remark?.Be($"\n红包留言：{red.Remark}");
                 return $"{e.FromUser.Name}打开{(red.FromUser.KouUser == e.FromUser.KouUser ? "自己" : red.FromUser.Name)}的红包获得了{e.GroupMessage.GetBotSetting().CoinFormat(coinsGot)}！{speedAppend}";
@@ -67,7 +67,7 @@ namespace KouFunctionPlugin
         {
             var red = KouRedPacket.TryGetGlobalRedPacket(password);
             if (red == null) return "找不到对应的红包诶...";
-            string speedAppend =
+            var speedAppend =
                 red.IsCompeteInVelocity ? $"（耗时{(DateTime.Now - red.StartTime).TotalSeconds:0.##}秒）" : null;
             speedAppend += red.Remark?.Be($"\n红包留言：{red.Remark}");
             if (red.TestIfHaveOpened(CurUser)) return $"{CurUser.Name}已经抢过该红包啦";
@@ -78,7 +78,7 @@ namespace KouFunctionPlugin
         private void RedPacketEndAction(KouRedPacket r)
         {
             string reply;
-            int exp = r.TotalCoins - r.RemainCoins - r.FromUserGet;
+            var exp = r.TotalCoins - r.RemainCoins - r.FromUserGet;
             r.FromUser.KouUser.GainExp(exp);
             if (r.RemainCount == 0)
             {
@@ -108,7 +108,7 @@ namespace KouFunctionPlugin
         {
             if (password == "") password = null;
             if (!ValidateAvailableTime()) return ConveyMessage;
-            KouRedPacket redPacket = new KouRedPacket(CurUser, total, quantity, IsIdentical, password, Duration)
+            var redPacket = new KouRedPacket(CurUser, total, quantity, IsIdentical, password, Duration)
             {
                 EndAction = RedPacketEndAction,
                 IsCompeteInVelocity = IsCompeteInVelocity,
@@ -119,7 +119,7 @@ namespace KouFunctionPlugin
             var rest = CurKouUser.CoinFree - redPacket.TotalCoins;
             if (rest >= 0)
             {
-                string ask =
+                var ask =
                     $"发送总额为{CurKouGlobalConfig.CoinFormat(redPacket.TotalCoins)}的{quantity}个群组{IsCompeteInVelocity.BeIfTrue("竞速")}红包{password?.Be($"(口令为\"{password}\")")}" +
                     $"(成功后余额为{CurKouGlobalConfig.CoinFormat(rest)})\n" +
                     $"输入\"y\"确认";
@@ -139,12 +139,6 @@ namespace KouFunctionPlugin
 
             return this.ReturnNullWithError(null, ErrorCodes.Core_BankNotEnoughMoney);
         }
-        [PluginFunction]
-        public override object? Default(string? str = null)
-        {
-            return ReturnHelp();
-        }
-
 
 
         private bool ValidateAvailableTime()
@@ -171,7 +165,7 @@ namespace KouFunctionPlugin
         {
             if (password == "") password = null;
             if (!ValidateAvailableTime()) return ConveyMessage;
-            KouRedPacket redPacket = new KouRedPacket(CurUser, total, quantity, IsIdentical, password, Duration)
+            var redPacket = new KouRedPacket(CurUser, total, quantity, IsIdentical, password, Duration)
             {
                 EndAction = RedPacketEndAction,
                 IsCompeteInVelocity = IsCompeteInVelocity,
@@ -182,7 +176,7 @@ namespace KouFunctionPlugin
             var rest = CurKouUser.CoinFree - redPacket.TotalCoins;
             if (rest >= 0)
             {
-                string ask =
+                var ask =
                     $"发送总额为{CurKouGlobalConfig.CoinFormat(redPacket.TotalCoins)}的{quantity}个{IsCompeteInVelocity.BeIfTrue("竞速")}红包{password?.Be($"(口令为\"{password}\")")}" +
                     $"(成功后余额为{CurKouGlobalConfig.CoinFormat(rest)})\n" +
                     $"输入\"y\"确认";

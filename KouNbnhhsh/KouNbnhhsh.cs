@@ -32,7 +32,7 @@ namespace KouFunctionPlugin
             {
                 if (All)
                 {
-                    StringBuilder result = new StringBuilder();
+                    var result = new StringBuilder();
                     foreach (var item in list)
                     {
                         if (!item.Trans.IsNullOrEmptySet())
@@ -52,7 +52,7 @@ namespace KouFunctionPlugin
                     foreach (var item in list)
                     {
                         if (item.Trans.IsNullOrEmptySet()) continue;
-                        Regex regex1 = new Regex(item.Name);
+                        var regex1 = new Regex(item.Name);
                         str = regex1.Replace(str, item.Trans.RandomGetOne(), 1);
                     }
                     return str.IsNullOrEmpty() ? "不懂" : str.Trim();

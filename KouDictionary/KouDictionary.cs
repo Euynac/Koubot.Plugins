@@ -6,7 +6,6 @@ namespace KouFunctionPlugin
 {
     [PluginClass("dict", "词典",
         Introduction = "词典",
-        Author = "7zou",
         PluginType = PluginType.Function)]
     public class KouDictionary : KouPlugin<KouDictionary>
     {
@@ -14,6 +13,16 @@ namespace KouFunctionPlugin
         public override object? Default(string? str = null)
         {
             return ReturnHelp(true);
+        }
+
+        [PluginFunction(Name = "成语接龙", ActivateKeyword = "成语接龙", OnlyUsefulInGroup = true)]
+        public object? ChineseIdiomSolitaire()
+        {
+            ConnectRoom("创建了成语接龙房间", new ChineseIdiomSolitaireRoom("成语接龙", CurUser, CurGroup)
+            {
+
+            });
+            return null;
         }
     }
 }

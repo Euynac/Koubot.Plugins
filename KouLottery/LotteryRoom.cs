@@ -1,23 +1,39 @@
-﻿using Koubot.SDK.System;
+﻿using Koubot.SDK.System.Session;
 using Koubot.Shared.Models;
+using Koubot.Tool.Extensions;
+using Koubot.Tool.Random;
 
 namespace KouFunctionPlugin
 {
     public class LotteryRoom : KouSessionRoom
     {
+        protected override bool AutoJoinRoom => false;
 
-        public override bool OwnerSay(string line, out string result)
+        public override RoomReaction OwnerSay(string line)
         {
-            if (line == "开始")
+            if (line == "抽取")
             {
-
+                return JoinedUsers.RandomGetOne().Name;
             }
-            throw new System.NotImplementedException();
+            return base.OwnerSay(line);
         }
 
-        public override bool Say(PlatformUser speaker, string line)
+        public override RoomReaction Say(PlatformUser speaker, string line)
         {
-            throw new System.NotImplementedException();
+            if (line == "1")
+            {
+                if (JoinedUsers.Contains(speaker))
+                {
+                    return $"{speaker.Name}已经在抽奖列表里了";
+                }
+
+                return $"{speaker.Name}已加入";
+            }
+            return false;
+        }
+
+        public LotteryRoom(string roomName, PlatformUser ownerUser, PlatformGroup? roomGroup) : base(roomName, ownerUser, roomGroup)
+        {
         }
     }
 }

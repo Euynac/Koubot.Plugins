@@ -20,7 +20,21 @@ namespace KouFunctionPlugin
         [PluginParameter(ActivateKeyword = "source", Name = "来源")]
         public string? Source { get; set; }
 
-        [PluginFunction(ActivateKeyword = "add vpn", Name = "增加VPN资源")]
+        [PluginFunction(Name = "减少VPN资源")]
+        public object? DelVpn([PluginArgument(Name = "资源名")] List<string> sourceNames)
+        {
+            var config = this.GroupConfig()!;
+            config.VpnList.AddRange(sourceNames);
+            var hash = sourceNames.ToHashSet();
+            config.VpnList.RemoveAll(p => hash.Contains(p));
+            foreach (var s in hash)
+            {
+                config.UseStatus.Remove(s);
+            }
+            if (!config.SaveChanges()) return "移除失败";
+            return $"移除成功！当前群可用的VPN：{config.VpnList.StringJoin('、')}";
+        }
+        [PluginFunction(Name = "增加VPN资源")]
         public object? AddVpn([PluginArgument(Name = "资源名")] List<string> sourceNames)
         {
             var config = this.GroupConfig()!;
@@ -45,7 +59,19 @@ namespace KouFunctionPlugin
                 return $"现在正在使用{config.UseStatus.First(p=>p.Value == CurKouUser).Key}VPN";
             }
 
-            if (specificName != null && config.UseStatus.TryGetValue(specificName, out var userUsed)) return $"{specificName}VPN已被{userUsed.Nickname}占用";
+            if (specificName != null)
+            {
+                specificName = config.VpnList.OrderBy(p=>p.Length).FirstOrDefault(p => p.StartsWith(specificName));
+                if (specificName == null)
+                {
+                    return $"可用列表里没有找到{specificName}有关的VPN";
+                }
+                if (config.UseStatus.TryGetValue(specificName, out var userUsed))
+                {
+                    return $"{specificName}VPN已被{userUsed.Nickname}占用";
+                }
+            }
+            
             var used = config.UseStatus.Keys.ToHashSet();
             var rest = config.VpnList.Where(p => !used.Contains(p)).ToList();
             if (rest.IsNullOrEmptySet()) return $"已经没有可供分配的VPN，再等等吧\n{config.GetAllSourceStatus()}";

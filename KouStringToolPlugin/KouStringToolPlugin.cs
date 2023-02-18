@@ -10,6 +10,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Fare;
 using Koubot.SDK.PluginInterface;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;
@@ -23,15 +24,15 @@ namespace KouFunctionPlugin
     /// </summary>
     [PluginClass(
         "str|grep",
-        "字符串工具",
-        Author = "7zou")]
+        "字符串工具")]
     public class KouStringToolPlugin : KouPlugin<KouStringToolPlugin>
     {
+        
         [PluginParameter(ActivateKeyword = "dsc", Name = "降序排序")]
         public bool Descending { get; set; }
         [PluginParameter(ActivateKeyword = "i", Name = "忽略大小写（ignoreCase）")]
         public bool IgnoreCase { get; set; }
-        [PluginParameter(ActivateKeyword = "c", Name = "显示匹配的行数（count）")]
+        [PluginParameter(ActivateKeyword = "rc", Name = "显示匹配的行数（row count）")]
         public bool RowCount { get; set; }
         [PluginParameter(ActivateKeyword = "v", Name = "只显示不匹配的（Invert）")]
         public bool Invert { get; set; }
@@ -39,11 +40,18 @@ namespace KouFunctionPlugin
         [PluginParameter(ActivateKeyword = "rg", Name = "正则捕获组名")]
         public string? RegexGroupName { get; set; }
 
+        [PluginParameter(ActivateKeyword = "separator", Name = "分隔符")]
+        public string? Separator { get; set; }
+
+        [PluginParameter(ActivateKeyword = "count", Name = "个数", Min = 1, Max = 1000)]
+        public int? Count { get; set; }
+
         [PluginFunction(Name = "分割去重")]
         public object? Distinct([PluginArgument(SplitChar = ",，、 \n")]List<string> list)
         {
             return list.Distinct().StringJoin(' ');
         }
+
         [PluginFunction(Name = "整体去重", Help = "当作单个字符去重")]
         public object? WholeDistinct(string str)
         {
@@ -60,11 +68,13 @@ namespace KouFunctionPlugin
                 factor);
             return strList.StringJoin("\n");
         }
+
         [PluginFunction(ActivateKeyword = "rmb", Name = "移除空格")]
         public object RemoveBlankSpace(string value)
         {
             return value.IsNullOrWhiteSpace() ? value : value.Replace(" ", "");
         }
+
         [PluginFunction(ActivateKeyword = "rm|remove", Name = "移除指定字符")]
         public object Remove(string strToRemove, string value)
         {
@@ -96,6 +106,7 @@ namespace KouFunctionPlugin
         {
             return strList.Select(p => content + p).StringJoin(" ");
         }
+
         [PluginFunction(ActivateKeyword = "append end", Name = "在字符串最后面添加")]
         public object? StringAppendEnd([PluginArgument(Name = "添加的内容")] string content, [PluginArgument(Name = "字符串列表", SplitChar = "\n ")] List<string> strList)
         {
@@ -150,6 +161,8 @@ namespace KouFunctionPlugin
         //    return frequencies.MostCommon().Select(p => $"{p.Key} {p.Value}").StringJoin(' ');
         //}
 
+        [PluginFunction(Name = "获取字符Length")]
+        public object? Length(string str) => str.Length;
 
         [PluginFunction(ActivateKeyword = "count", Name = "统计子字符串出现次数")]
         public object? CountSpecificString(string subStr, string wholeStr)
@@ -181,7 +194,7 @@ namespace KouFunctionPlugin
             return LevenshteinDistance.Similarity(str1, str2).ToString("P");
         }
 
-        [PluginFunction(ActivateKeyword = "matched", Name = "正则获取匹配项")]
+        [PluginFunction(ActivateKeyword = "matched", Name = "正则获取匹配项", SupportedParameters = new []{nameof(RegexGroupName)})]
         public object? GetMatched(string pattern, string source)
         {
             return RegexGroupName != null
@@ -189,19 +202,47 @@ namespace KouFunctionPlugin
                 : source.Matches(pattern).StringJoin(' ');
         }
 
-        [PluginFunction(ActivateKeyword = "random string", Name = "生成随机字符串")]
-        public object? GenerateRandomStr([PluginArgument(Name = "随机模板字符串")] string pattern,
-            [PluginArgument(Name = "生成数量", Min = 1, Max = 1000)] int count = 1, [PluginArgument(Name = "分割符")] string separator = "\n")
+
+        [PluginFunction(ActivateKeyword= "random regex", Name = "根据正则模式生成随机字符串", SupportedParameters = new []{nameof(Separator), nameof(Count)})]
+        public object? GenerateRandomStrFromRegex([PluginArgument(Name = "正则模式")] string pattern)
+        {
+            try
+            {  
+                var gen = new Xeger(pattern);
+                var sb = new StringBuilder();
+                Count ??= 1;
+                Separator ??= "\n";
+                while (Count -- > 0)
+                {
+                    sb.Append(gen.Generate() + Separator);
+                }
+
+                return sb.ToString().TrimEndOnce(Separator);
+
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
+         
+        }
+
+
+
+        [PluginFunction(ActivateKeyword = "random string", Name = "生成随机字符串", SupportedParameters = new []{nameof(Separator), nameof(Count)})]
+        public object? GenerateRandomStr([PluginArgument(Name = "随机模板字符串")] string pattern)
         {
             var sb = new StringBuilder();
             var id = 1;
-            while (count -- > 0)
+            Count ??= 1;
+            Separator ??= "\n";
+            while (Count -- > 0)
             {
-                sb.Append(RandomTool.GetString(pattern, true, id) + separator);
+                sb.Append(RandomTool.GetString(pattern, true, id) + Separator);
                 id++;
             }
 
-            return sb.ToString().TrimEndOnce(separator);
+            return sb.ToString().TrimEndOnce(Separator);
         }
         public override object? Default(string? str = null)
         {
@@ -245,6 +286,9 @@ namespace KouFunctionPlugin
             return result;
 
         }
+
+
+
 
         /// <summary>
         /// 支持多种list，适配AutoModel类list转换为string

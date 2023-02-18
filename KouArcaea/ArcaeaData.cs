@@ -18,7 +18,7 @@
         {
             if (score >= 10000000) return constant + 2;
             else if (score > 9800000) return constant + 1 + (score - 9800000) / 200000.0;
-            double value = constant + (score - 9500000) / 300000.0;
+            var value = constant + (score - 9500000) / 300000.0;
             return value < 0 ? 0 : value;
         }
         /// <summary>
@@ -29,7 +29,7 @@
         {
             if (score >= 10000000) return ptt - 2;
             else if (score > 9800000) return ptt - (1 + (score - 9800000) / 200000.0);
-            double value = ptt - ((score - 9500000) / 300000.0);
+            var value = ptt - ((score - 9500000) / 300000.0);
             return value < 0 ? 0 : value;
         }
     }

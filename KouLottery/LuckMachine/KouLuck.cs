@@ -164,7 +164,7 @@ namespace KouFunctionPlugin.LuckMachine
         {
             if (item.IsNullOrWhiteSpace() || itemIntro.IsNullOrWhiteSpace() ||
                 item.Length <= 1) return "好好教我嘛";
-            bool isOminous = item.StartsWith("忌");
+            var isOminous = item.StartsWith("忌");
             if (isOminous || item.StartsWith("宜"))
             {
                 item = item.Substring(1);

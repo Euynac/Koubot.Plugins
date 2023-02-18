@@ -112,7 +112,7 @@ namespace KouFunctionPlugin
         {
             if (str.IsNullOrWhiteSpace()) return null;
             Language fromLanguage = Language.auto, toLanguage = Language.zh;
-            bool translateFlag = false; //指示是否需要翻译语言
+            var translateFlag = false; //指示是否需要翻译语言
             if (!string.IsNullOrWhiteSpace(From))
             {
                 if (Enum.TryParse(From, out fromLanguage) ||
@@ -167,7 +167,7 @@ namespace KouFunctionPlugin
 
             if (translateFlag) //若是调用了翻译API
             {
-                BaiduTranslateAPI translator = new BaiduTranslateAPI();
+                var translator = new BaiduTranslateAPI();
                 str = translator.Translate(str, fromLanguage, toLanguage);
                 if (str == null)
                 {
@@ -182,8 +182,8 @@ namespace KouFunctionPlugin
         [PluginFunction(ActivateKeyword = "languages|支持语种", Help = "获取所有支持的翻译语种，两边都可以作为to参数使用")]
         public string SupportedLanguage()
         {
-            string str = "";
-            int count = 1;
+            var str = "";
+            var count = 1;
             foreach (var (language, code) in SupportedLanguagesZh)
             {
                 str += $"{count}.{language} - {code}\n";
@@ -197,7 +197,7 @@ namespace KouFunctionPlugin
         public string DetectLanguage(string str)
         {
             if (string.IsNullOrWhiteSpace(str)) return "没有输入要检测语种的文本";
-            BaiduTranslateAPI translator = new BaiduTranslateAPI();
+            var translator = new BaiduTranslateAPI();
             var result = translator.DetectLanguage(str);
             if (result == null)
             {
@@ -210,7 +210,7 @@ namespace KouFunctionPlugin
         [PluginFunction(ActivateKeyword = "润色|polish", Name = "润（sheng）色（cao）文章", Help = "<原文>[-count 润色次数]")]
         public string KouRandomTranslateToZh(string source)
         {
-            if (int.TryParse(Count, out int count))
+            if (int.TryParse(Count, out var count))
             {
                 return ResultPipe(RandomTranslateToZh(source, count));
             }
@@ -228,8 +228,8 @@ namespace KouFunctionPlugin
             if (source.IsNullOrWhiteSpace()) return source;
             if (count <= 0) count = 1;
             else if (count >= 20) count = 20;
-            BaiduTranslateAPI translator = new BaiduTranslateAPI();
-            for (int i = 0; i < count; i++)
+            var translator = new BaiduTranslateAPI();
+            for (var i = 0; i < count; i++)
             {
                 source = translator.Translate(source, Language.auto, RandomTool.EnumRandomGetOne<Language>());
                 if (source == null)
@@ -333,7 +333,7 @@ namespace KouFunctionPlugin
             if (input.IsNullOrWhiteSpace()) return input;
             if (row)
             {
-                StringBuilder stringBuilder = new StringBuilder();
+                var stringBuilder = new StringBuilder();
                 foreach (var s in input.Split('\n', '\r'))
                 {
                     stringBuilder.Append(ReverseStr(s));
@@ -343,8 +343,8 @@ namespace KouFunctionPlugin
                 return stringBuilder.ToString();
             }
 
-            StringBuilder stringBuilder2 = new StringBuilder();
-            for (int i = input.Length - 1; i >= 0; i--)
+            var stringBuilder2 = new StringBuilder();
+            for (var i = input.Length - 1; i >= 0; i--)
             {
                 stringBuilder2.Append(input[i]);
             }
@@ -359,7 +359,7 @@ namespace KouFunctionPlugin
         public string ToSpeakWithWhiteSpace(string line)
         {
             if (line.IsNullOrEmpty()) return line;
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
             foreach (var chr in line)
             {
                 stringBuilder.Append(chr.ToString() + ' ');

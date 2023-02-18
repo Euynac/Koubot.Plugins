@@ -68,7 +68,7 @@ namespace KouFunctionPlugin.Pixiv
         {
             if (CDOfFunctionGroupIsIn(new TimeSpan(0, 0, 10), out var remain))
                 return $"大触们还在休息中（剩余{remain.TotalSeconds:0.#}秒）";
-            PixivWork? img = str == null
+            var img = str == null
                 ? PixivWork.RandomGetOne(p => !p.R18)
                 : PixivWork.RandomGetOne(p => !p.R18 && (p.Tags.Any(t => t.Name.Contains(str, StringComparison.OrdinalIgnoreCase)) || p.Title.Contains(str, StringComparison.OrdinalIgnoreCase)));
             if (img == null)

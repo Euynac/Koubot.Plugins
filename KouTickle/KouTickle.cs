@@ -74,7 +74,7 @@ namespace KouFunctionPlugin
             }
             if (groupInfoDict.Count == 2)
             {
-                string reply = $"自从我上次重启以来({KouGlobalConfig.SystemStartTime})，只有两个人：\n";
+                var reply = $"自从我上次重启以来({KouGlobalConfig.SystemStartTime})，只有两个人：\n";
                 foreach (var info in groupInfoDict)
                 {
                     reply += $"{info.Key.Name}，" +
@@ -83,15 +83,15 @@ namespace KouFunctionPlugin
 
                 return reply.TrimEnd();
             }
-            string prologue = $"接下来公布一下自本Kou上次醒来({KouGlobalConfig.SystemStartTime})，本群最闲着没事干玩戳一戳的人";
+            var prologue = $"接下来公布一下自本Kou上次醒来({KouGlobalConfig.SystemStartTime})，本群最闲着没事干玩戳一戳的人";
             CurGroup.SendGroupMessage(prologue);
             Thread.Sleep(2000);
             var list = groupInfoDict.OrderByDescending(p => p.Value.Total)
                 .ToList();
-            for (int i = 2; i >= 0; i--)
+            for (var i = 2; i >= 0; i--)
             {
                 var info = list[i];
-                string reply = "";
+                var reply = "";
                 switch (i)
                 {
                     case 2:
@@ -114,12 +114,7 @@ namespace KouFunctionPlugin
             }
             return null;
         }
-        [PluginFunction(Name = "帮助")]
-        public override object? Default(string? str = null)
-        {
-            return ReturnHelp();
-        }
-
+        
         class PokeInfo
         {
             public int TimesOfPokeBot;

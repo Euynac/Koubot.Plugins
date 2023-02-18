@@ -3,6 +3,7 @@ using Castle.Core.Internal;
 using Koubot.SDK.API;
 using Koubot.SDK.PluginInterface;
 using Koubot.SDK.System;
+using Koubot.SDK.System.Messages;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;
 using Koubot.Tool.Extensions;
@@ -82,14 +83,14 @@ namespace KouFunctionPlugin
         }
         public enum FlipType
         {
-            None,
+            None,   
             [KouEnumName("水平", "horizontal")]
             Horizontal,
             [KouEnumName("垂直", "vertical")]
             Vertical
         }
 
-        [PluginFunction(Name = "返回使用参数处理后的图片", EnableAutoNext = true)]
+        [PluginFunction(Name = "返回使用参数处理后的图片", EnableAutoNext = true, SupportedParameters = new []{nameof(RotateDegree), nameof(ToGrey),nameof(Flip), nameof(ResizePercent), nameof(Blur), nameof(Width), nameof(Height),nameof(SetBackgroundColor), nameof(ToTransparent), nameof(UseFilter),nameof(SaveToGif),nameof(SaveToPng),nameof(SaveToJpg),nameof(FontSize),nameof(HalfGifFrame),nameof(SpeedUpGifFactor)})]
         public dynamic? Default(KouImage image)
         {
             if (!CurCommand.ExplicitParameterExecutionList.IsNullOrEmptySet())
@@ -195,6 +196,8 @@ namespace KouFunctionPlugin
             return mutating.SaveTemporarily(100, KouImageFormat.Gif);
         }
 
+        [PluginFunction(ActivateKeyword= "markdown", Name = "Markdown文档生成", Authority = Authority.BotMaster, Help = "暂时不开放")]
+        public object? MarkdownGen([PluginArgument(Name = "内容")] string content) => new MarkdownMessage(content) {DpiRank = 2};
 
         [PluginFunction(ActivateKeyword = "ocr", Name = "OCR提取图片中的文字", EnableAutoNext = true, NeedCoin = 100)]
         public object? OCR([PluginArgument(Name = "包含文字的图片")] KouImage image)

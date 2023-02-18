@@ -66,14 +66,11 @@ namespace KouFunctionPlugin
         }
 
         [PluginFunction(Name = "当前群自由抽签", ActivateKeyword = "抽奖会场",
-            Help = "当前群所有回复1的人加入抽奖")]
+            Help = "当前群所有回复1的人加入抽奖", OnlyUsefulInGroup = true)]
         public object CurrentGroup([PluginArgument(Name = "抽取个数（默认一个）")] int count = 1)
         {
-            return "施工中";
-            var message = SessionService.AskGroup($"开始抽奖啦，抽取{count}个人，回复1加入抽签", setting =>
-            {
-                setting.Attribute = KouSessionSetting.SessionAttribute.CircularSession;
-            });
+            var room = new LotteryRoom("抽奖", CurUser, CurGroup);
+            ConnectRoom($"开始抽奖啦，抽取{count}个人，回复1加入抽签", room);
             return null;
         }
 
@@ -175,7 +172,7 @@ namespace KouFunctionPlugin
         {
             coinStr ??= "5";
             var coin = 0;
-            bool wholeCoins = false;
+            var wholeCoins = false;
             if (coinStr.Equals("all", StringComparison.OrdinalIgnoreCase))
             {
                 wholeCoins = true;
@@ -200,8 +197,8 @@ namespace KouFunctionPlugin
             var chance = luckAppend + 0.003;
             chance *= chanceBonus;
 
-            int i = 0;
-            bool success = false;
+            var i = 0;
+            var success = false;
             int atLastCoins;
             int? rank = null;
             _coinPoolLock.EnterWriteLock();
@@ -258,17 +255,17 @@ namespace KouFunctionPlugin
                 Name = "自定义签",
                 SplitChar = " ")]List<string> lotList)
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             if (CanRepeat)
             {
-                for (int i = 0; i < Count; i++)
+                for (var i = 0; i < Count; i++)
                 {
                     result.Append(lotList.RandomGetOne() + "、");
                 }
             }
             else result.Append(lotList.RandomGet(Count).StringJoin("、"));
 
-            string verb = prepList.RandomGetOne() + (KouStaticData.Verb.Any(s => result.ToString().StartsWith(s)) ?
+            var verb = prepList.RandomGetOne() + (KouStaticData.Verb.Any(s => result.ToString().StartsWith(s)) ?
                 null : verbList.ProbablyDo(0.35)?.RandomGetOne());
             return string.Format(speakList.RandomGetOne(), result.ToString().TrimEnd('、'), verb)
                 .ProbablyBe(rejectList.RandomGetOne(), 0.05);
@@ -336,18 +333,18 @@ namespace KouFunctionPlugin
             }
 
             Count = Count.LimitInRange(1, 100);
-            string result = "Kou抽出了：";
+            var result = "Kou抽出了：";
             if (CanRepeat)
             {
-                for (int i = 0; i < Count; i++)
+                for (var i = 0; i < Count; i++)
                 {
                     result += interval.GetInt() + "、";
                 }
             }
             else
             {
-                int minValue = interval.GetLeftIntervalNearestNumber();
-                int maxValue = interval.GetRightIntervalNearestNumber();
+                var minValue = interval.GetLeftIntervalNearestNumber();
+                var maxValue = interval.GetRightIntervalNearestNumber();
                 var generator = new LotteryGenerator(Count, minValue, maxValue);
                 return result + generator.DrawLottery().StringJoin("、");
             }

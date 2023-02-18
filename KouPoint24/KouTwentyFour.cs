@@ -24,7 +24,7 @@ namespace KouGamePlugin
             List<int> useNumList)
         {
             if (useNumList.Count > 5) return "最多只能算5个数";
-            TwentyFour a = new TwentyFour();
+            var a = new TwentyFour();
             string answerStr = null;
             List<string> answers = null;
             var success = All
@@ -44,7 +44,7 @@ namespace KouGamePlugin
             List<int> useNumList)
         {
             if (useNumList.Count > 5) return "最多只能算5个数";
-            TwentyFour a = new TwentyFour();
+            var a = new TwentyFour();
             if (!a.TryTest(Target, useNumList, out var answers))
             {
                 return $"我算了{a.CalCount}次，也没能算出答案呢...";
@@ -52,13 +52,6 @@ namespace KouGamePlugin
 
             return $"使用[{useNumList.StringJoin(',')}]计算{Target}点发现了答案噢";
         }
-
-        [PluginFunction]
-        public override object? Default(string? str = null)
-        {
-            return ReturnHelp();
-        }
-
 
     }
 }

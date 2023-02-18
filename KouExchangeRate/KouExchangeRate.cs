@@ -47,9 +47,9 @@ namespace KouFunctionPlugin.Currency
         public override object? Default([PluginArgument(Name = "数字+国家/货币名/货币代号")]string? str = null)
         {
             
-            if (!str.MatchOnceThenReplace(@"\d+(\.\d+)?", out string name, out var valueGroup))
+            if (!str.MatchOnceThenReplace(@"\d+(\.\d+)?", out var name, out var valueGroup))
                 return "请输入诸如“100日元”之类的格式";
-            if (!double.TryParse(valueGroup[0].Value, out double value))
+            if (!double.TryParse(valueGroup[0].Value, out var value))
             {
                 return "请输入正确的数字";
             }

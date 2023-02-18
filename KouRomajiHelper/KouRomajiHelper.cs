@@ -58,7 +58,7 @@ namespace KouFunctionPlugin.Romaji
             {
                 return "听不懂听不懂 我要小写的罗马音 不带空格的那种";
             }
-            if (!romajiHelper.AddPair(key, value, out string sqlValue, out int id))
+            if (!romajiHelper.AddPair(key, value, out var sqlValue, out var id))
             {
                 if (sqlValue != null)
                 {
@@ -72,7 +72,7 @@ namespace KouFunctionPlugin.Romaji
         [PluginFunction(ActivateKeyword = "delete|忘记|忘掉", Name = "叫Kou忘掉谐音", Help = "从数据库删除 用法：<ID或罗马音>")]
         public string KouDeletePair(string idStr)
         {
-            if (!int.TryParse(idStr, out int id))
+            if (!int.TryParse(idStr, out var id))
             {
                 var pair = romajiHelper.kouContext.Set<RomajiPair>().SingleOrDefault(x => x.RomajiKey == idStr);
                 if (pair != null)

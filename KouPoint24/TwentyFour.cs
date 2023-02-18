@@ -21,7 +21,7 @@ namespace KouGamePlugin
             curCalArr = arr;
             _target = target;
             answer = null;
-            if (TryCalTo(_target, out List<string> answerList))
+            if (TryCalTo(_target, out var answerList))
             {
                 answer = answerList[0];
                 return true;
@@ -87,7 +87,7 @@ namespace KouGamePlugin
             public override string ToString()
             {
                 if (_notComeFromCal) return ((int)Value).ToString();
-                string result = $"{_x}{_way.GetDescription()}{_y}";
+                var result = $"{_x}{_way.GetDescription()}{_y}";
                 //if (_way.EqualsAny(Operator.Add, Operator.Sub))
                 return $"({result})";
                 return result;
@@ -109,20 +109,20 @@ namespace KouGamePlugin
 
                 return false;
             }
-            for (int i = 0; i < numList.Count - 1; i++)
+            for (var i = 0; i < numList.Count - 1; i++)
             {
-                for (int j = i + 1; j < numList.Count; j++)
+                for (var j = i + 1; j < numList.Count; j++)
                 {
-                    Num x = numList[i];
-                    Num y = numList[j];
-                    List<Num> newList = new List<Num>();
-                    for (int k = 0; k < numList.Count; k++)
+                    var x = numList[i];
+                    var y = numList[j];
+                    var newList = new List<Num>();
+                    for (var k = 0; k < numList.Count; k++)
                     {
                         if (k == i || k == j) continue;
                         newList.Add(numList[k]);
                     }
 
-                    for (int o = 0; o < 6; o++)
+                    for (var o = 0; o < 6; o++)
                     {
                         Num combinedNum = null;
                         switch (o)

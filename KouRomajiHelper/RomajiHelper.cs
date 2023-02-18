@@ -64,9 +64,9 @@ namespace KouRomajiHelper
             var pair = kouContext.Set<RomajiPair>().SingleOrDefault(x => x.RomajiKey == key);
             if (pair == null)
             {
-                RomajiPair romajiPair = new RomajiPair { RomajiKey = key, ZhValue = value };
+                var romajiPair = new RomajiPair { RomajiKey = key, ZhValue = value };
                 kouContext.Add(romajiPair);
-                bool result = kouContext.SaveChanges() > 0;
+                var result = kouContext.SaveChanges() > 0;
                 if (result) RomajiToZhDict.Add(key, value);
                 id = romajiPair.Id;
                 sqlValue = key;
@@ -96,7 +96,7 @@ namespace KouRomajiHelper
                 {
                     this.InheritError(limiter, "发生在" + nameof(KouRomajiHelper) + "中的" + nameof(CallAPI));
                 }
-                string data = "mode=japanese&q=" + HttpUtility.UrlEncode(japanese);
+                var data = "mode=japanese&q=" + HttpUtility.UrlEncode(japanese);
                 result = WebHelper.HttpPost("http://www.kawa.net/works/ajax/romanize/romanize.cgi ", data, WebContentType.General);
             }
             return result;
@@ -110,25 +110,25 @@ namespace KouRomajiHelper
         public List<List<KeyValuePair<string, string>>> ParseXml(string xmlResult)
         {
             if (xmlResult.IsNullOrWhiteSpace()) return null;
-            List<List<KeyValuePair<string, string>>> romajiResults = new List<List<KeyValuePair<string, string>>>();
-            XmlDocument xmlDocument = new XmlDocument();
+            var romajiResults = new List<List<KeyValuePair<string, string>>>();
+            var xmlDocument = new XmlDocument();
             xmlDocument.LoadXml(xmlResult);
-            XmlNode ul = xmlDocument.SelectSingleNode("ul");
+            var ul = xmlDocument.SelectSingleNode("ul");
             var liList = ul.ChildNodes;
             foreach (XmlNode li in liList)
             {
-                List<KeyValuePair<string, string>> romajiLine = new List<KeyValuePair<string, string>>();//<日语，罗马音>
+                var romajiLine = new List<KeyValuePair<string, string>>();//<日语，罗马音>
                 foreach (XmlNode span in li)
                 {
 
-                    XmlElement xmlElement = (XmlElement)span;
-                    string jap = xmlElement.InnerText;
-                    string romaji = "";
+                    var xmlElement = (XmlElement)span;
+                    var jap = xmlElement.InnerText;
+                    var romaji = "";
                     if (xmlElement.HasAttribute("title"))
                     {
                         romaji = xmlElement.GetAttribute("title");
                     }
-                    KeyValuePair<string, string> pair = new KeyValuePair<string, string>(jap, romaji);
+                    var pair = new KeyValuePair<string, string>(jap, romaji);
                     romajiLine.Add(pair);
                 }
                 romajiResults.Add(romajiLine);
@@ -143,10 +143,10 @@ namespace KouRomajiHelper
         /// <returns></returns>
         public string ToZhHomophonic(string str)
         {
-            List<string> romajiList = str.Split(' ').ToList();
+            var romajiList = str.Split(' ').ToList();
             if (!romajiList.IsNullOrEmptySet())
             {
-                string ret = "";
+                var ret = "";
                 foreach (var romaji in romajiList)
                 {
                     if (RomajiToZhDict.ContainsKey(romaji))
@@ -170,14 +170,14 @@ namespace KouRomajiHelper
         /// <returns></returns>
         public string ToZhHomophonic(List<List<KeyValuePair<string, string>>> result, bool needDetail = false)
         {
-            string ret = "";
+            var ret = "";
             foreach (var line in result)
             {
                 foreach (var word in line)
                 {
                     if (!word.Value.IsNullOrWhiteSpace()) //存在罗马音的
                     {
-                        List<string> romajiList = word.Value.Split('/').ToList();//多音字的转成list
+                        var romajiList = word.Value.Split('/').ToList();//多音字的转成list
                         if (needDetail) ret += word.Key + "(";
                         foreach (var romaji in romajiList)
                         {
@@ -215,7 +215,7 @@ namespace KouRomajiHelper
         /// <returns></returns>
         public string OnlyRomaji(List<List<KeyValuePair<string, string>>> result)
         {
-            string ret = "";
+            var ret = "";
             foreach (var line in result)
             {
                 foreach (var word in line)
@@ -240,7 +240,7 @@ namespace KouRomajiHelper
         /// <returns></returns>
         public string RomajiAndJapanese(List<List<KeyValuePair<string, string>>> result)
         {
-            string ret = "";
+            var ret = "";
             foreach (var line in result)
             {
                 foreach (var word in line)
@@ -268,14 +268,14 @@ namespace KouRomajiHelper
             //{
             //    "b","p","m","f","d","t","n","l","g","k","h","j","q","x","zh","ch","sh","r","z","c","s","y","w"
             //};
-            string result = "";
+            var result = "";
             longRomaji = longRomaji.Replace("tt", "t");
             longRomaji = longRomaji.ToLower();
-            List<string> romajiList = RomajiToZhDict.Keys.ToList();
+            var romajiList = RomajiToZhDict.Keys.ToList();
             romajiList.Sort(CompareUseLengthDesc);
             while (longRomaji != string.Empty)
             {
-                bool hasRomaji = false;
+                var hasRomaji = false;
                 foreach (var romaji in romajiList)
                 {
                     if (longRomaji.StartsWith(romaji))

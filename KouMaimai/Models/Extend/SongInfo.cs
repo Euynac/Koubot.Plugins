@@ -61,6 +61,7 @@ namespace KouGamePlugin.Maimai.Models
                 {
                     FormatType.Brief => $"{SongTitle}",
                     FormatType.Detail => $"{SongId}.{SongTitle}",
+                    FormatType.Customize1=>$"{this.ToJsonStringForce()}",
                     _ => throw new NotImplementedException(),
                 };
             }
@@ -74,8 +75,8 @@ namespace KouGamePlugin.Maimai.Models
                     return
                         $"{SongTitle}({songType}) {(constantData is null ? $"*[{chartInfo.ToRatingString()}]" : $"[{constantData}]")}";
                 case FormatType.Detail:
-                    string difficultData = $"{chartInfo.ToRatingString()?.Be("\n难度：{0}", true)}" +
-                                           $"{constantData?.Be("\n定数：{0}", true)}";
+                    var difficultData = $"{chartInfo.ToRatingString()?.Be("\n难度：{0}", true)}" +
+                                        $"{constantData?.Be("\n定数：{0}", true)}";
                     return
                         $"{JacketUrl?.Be(new KouImage(JacketUrl, chartInfo).ToKouResourceString())}" + //BUG 需要解决翻页可能会使得图片资源字符串裂开的问题
                         $"{id}.{SongTitle} [{songType}]" +

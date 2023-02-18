@@ -35,13 +35,13 @@ namespace KouGamePlugin.Arcaea
             [PluginArgument(Name = "歌曲ptt反推定数")] double? ptt = null)
         {
             if (score < 0 || score > 11000000) return "这个分数怎么有点奇怪呢";
-            string songName = nameOrConstant;
+            var songName = nameOrConstant;
             if (ptt != null)
             {
                 return $"{score}分的谱面ptt={ptt}时，谱面定数约为{ArcaeaData.CalSongChartConstant(ptt.Value, score):F3}";
             }
 
-            Song.RatingClass ratingClass = Song.RatingClass.Future;
+            var ratingClass = Song.RatingClass.Future;
             if (songName.MatchOnceThenReplace(@"[,，]?(ftr|pst|prs|byd|byn|future|past|present|beyond)",
                 out songName, out var matched, RegexOptions.IgnoreCase | RegexOptions.RightToLeft))
             {
@@ -66,7 +66,7 @@ namespace KouGamePlugin.Arcaea
             }
             if (satisfiedSongs.Count == 0)
             {
-                if (KouStringTool.TryToDouble(nameOrConstant, out double constant))
+                if (KouStringTool.TryToDouble(nameOrConstant, out var constant))
                 {
                     return $"定数{constant}时，{score}分的ptt为{ArcaeaData.CalSongScorePtt(constant, score):F3}";
                 }

@@ -20,10 +20,10 @@ namespace KouFunctionPlugin
 
         public int[] DrawLottery()
         {
-            int total = _lotteryMaxValue - _lotteryMinValue + 1;
+            var total = _lotteryMaxValue - _lotteryMinValue + 1;
             if (_lotteryAmount > total) _lotteryAmount = total;
             _bingoArray = new int[_lotteryAmount];
-            for (int i = 0; i < _lotteryAmount; i++)
+            for (var i = 0; i < _lotteryAmount; i++)
             {
                 int bingo;
                 do
@@ -37,7 +37,7 @@ namespace KouFunctionPlugin
 
         private bool IsContain(int value)//判断是否重复
         {
-            foreach (int bingo in _bingoArray)
+            foreach (var bingo in _bingoArray)
             {
                 if (bingo == 0) break;//0说明还没生成
                 if (bingo == value) return false;
