@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using Koubot.SDK.PluginExtension.Result;
 using Koubot.SDK.Services;
 using Koubot.SDK.System;
+using Koubot.SDK.System.Image;
 using Koubot.SDK.System.Messages;
 using Koubot.SDK.Templates;
 using KouMaimai;

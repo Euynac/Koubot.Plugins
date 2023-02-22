@@ -3,6 +3,7 @@ using Castle.Core.Internal;
 using Koubot.SDK.API;
 using Koubot.SDK.PluginInterface;
 using Koubot.SDK.System;
+using Koubot.SDK.System.Image;
 using Koubot.SDK.System.Messages;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;

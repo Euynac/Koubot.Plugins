@@ -87,6 +87,18 @@ namespace KouFunctionPlugin
             return value;
         }
 
+        [PluginFunction(Name = "找出两字符数组的不同", ActivateKeyword = "array diff")]
+        public object? ArrayDifference([PluginArgument(Name = "字符组1")] List<string> array1,
+            [PluginArgument(Name = "字符组2")] List<string> array2)
+        {
+            var str1Array = array1.ToHashSet();
+            var str2Array = array2.ToHashSet();
+            var redundant = str1Array.Where(str => !str2Array.Contains(str)).ToList();
+            var lack = str2Array.Where(str => !str1Array.Contains(str)).ToList();
+            return $"第一组数据相比于第二组：\n缺少：{lack.StringJoin(" ")}\n多余：{redundant.StringJoin(" ")}";
+        }
+
+
         [PluginFunction(ActivateKeyword = "title case", Name = "每个英文首字母大写")]
         public object? ToTitleCase(string str) => str.ToTitleCase();
 
