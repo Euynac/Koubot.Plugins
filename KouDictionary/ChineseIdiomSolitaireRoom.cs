@@ -44,16 +44,9 @@ public class IdiomCache
 
 public class ChineseIdiomSolitaireRoom : KouGameRoom<ChineseSolitaireAchievement>
 {
-    public const string Help = "同音成语接龙。每十轮奖池增益10%，开始游戏后，默认10分钟后结算成绩，玩家不可重复使用已用过的词。\n" +
-                               "此游戏基于Kou会话房间，消耗房间入场券入场，入场券全部投入奖池。当前房间信息通过【/room】查看。\n" +
-                               "成功创建房间后，通过房间钥匙（前缀）加入以及后续交互，默认钥匙是空格，开始后直接空格+成语参与游戏\n" +
-                               "【 开始】开始游戏\n" +
-                               "【 排行榜】查看战况\n" +
-                               "【 结束】房主可提前结算游戏，按排名分配奖池硬币\n" +
-                               "【 提示】消耗奖池硬币的1%给予提示";
+    public const string Help = "同音成语接龙。每十轮奖池增益10%，开始游戏后，默认10分钟后结算成绩，玩家不可重复使用已用过的词。";
     public IdiomCache? CurrentIdiom { get; set; }
     private readonly object _lock = new();
-    private int RoundCount = 0;
     public HashSet<string> UserPreviousUseWord { get; set; } = new();
 
     private static readonly Lazy<List<IdiomCache>> _idiomDictionary = new(() =>
@@ -62,7 +55,7 @@ public class ChineseIdiomSolitaireRoom : KouGameRoom<ChineseSolitaireAchievement
         return context.Set<IdiomDictionary>().AsNoTracking()
             .Select(p => new IdiomCache() {Word = p.Word, Pinyin = ParsePinyin(p.Pinyin)}).ToList();
     }, true);
-    public DateTime CurIdiomStartTime { get; set; }
+
     public ChineseIdiomSolitaireRoom(string roomName, PlatformUser ownerUser, PlatformGroup roomGroup, int? fee = 10) : base(roomName, ownerUser, roomGroup, fee)
     {
         RoomHelp = Help;
@@ -73,13 +66,9 @@ public class ChineseIdiomSolitaireRoom : KouGameRoom<ChineseSolitaireAchievement
         UserCorrectEvent += achievement =>
         {
             achievement.SuccessTimes++;
-            achievement.TotalConsumeTime = achievement.TotalConsumeTime.Add(DateTime.Now - CurIdiomStartTime);
+            achievement.TotalConsumeTime = achievement.TotalConsumeTime.Add(DateTime.Now - CurRoundStartTime);
         };
-        NextRoundEvent += (sender, args) =>
-        {
-            CurIdiomStartTime = DateTime.Now;
-            RoundCount++;
-        };
+
     }
 
     private static string ParsePinyin(string pinyin)
@@ -157,10 +146,10 @@ public class ChineseIdiomSolitaireRoom : KouGameRoom<ChineseSolitaireAchievement
     {
         RandomNewIdiom();
         if (CurrentIdiom == null) return "成语数据缺失";
-        RecordNextRound();
+        RecordNewRound();
         StartAutoClose();
         using var context = new KouContext();
-        return $"成语接龙开始啦，{(RewordPool != 0).BeIfTrue($"当前奖池{RewordPool}枚硬币，")}我先来一个：{GetCurIdiomDesc(context)}";
+        return $"成语接龙开始啦，可以同音不同调，参与需要前面加空格，例如【 一个顶俩】。{(RewordPool != 0).BeIfTrue($"当前奖池{RewordPool}枚硬币，")}我先来一个：{GetCurIdiomDesc(context)}";
     }
 
     public override RoomReaction Say(PlatformUser speaker, string line)
@@ -195,7 +184,7 @@ public class ChineseIdiomSolitaireRoom : KouGameRoom<ChineseSolitaireAchievement
                         RandomNewIdiom();
                         return $"我居然接不上，你太厉害了，奖池已增加1000个硬币！我再出一个新的：{GetCurIdiomDesc(context)}{RoundReword()}";
                     }
-                    RecordNextRound();
+                    RecordNewRound();
                     return $"{line}{idiom.Explanation?.Be($"，意思是{idiom.Explanation}")}\n嗯...不错，那我接{GetCurIdiomDesc(context)}{RoundReword()}";
                 }
                 return $"虽然是成语，但是需要尾字相同，或者读音相同，声调不同也可以。当前【{CurrentIdiom.Word}】";

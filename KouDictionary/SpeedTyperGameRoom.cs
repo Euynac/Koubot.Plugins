@@ -32,13 +32,8 @@ public class SpeedTyperLeaderBoard : IGameRoomLeaderBoardInfo<SpeedTyperLeaderBo
 
 public class SpeedTyperGameRoom : KouGameRoom<SpeedTyperLeaderBoard>
 {
-    public const string Help = "手速竞技，每轮不定时放出图片，玩家需要输入图片中的内容，最先输入的计分。开始游戏后，默认5分钟后结算成绩。\n" +
-                               "此游戏基于Kou会话房间，消耗房间入场券入场，入场券全部投入奖池。当前房间信息及帮助通过【/room】查看。\n" +
-                               "成功创建房间后，通过房间钥匙（前缀）加入以及后续交互，默认钥匙是空格，开始后直接空格+答案参与游戏\n" +
-                               "【 开始】开始游戏\n" +
-                               "【 排行榜】查看战况\n" +
-                               "【 结束】房主可提前结算游戏，按排名分配奖池硬币\n";
-    private readonly object _lock = new ();
+    public const string Help = "手速竞技，每轮不定时放出图片，玩家需要输入图片中的内容，最先输入的计分。开始游戏后，默认5分钟后结算成绩。";
+    private readonly object _roundLock = new ();
 
     public class RecordContent
     {
@@ -48,24 +43,14 @@ public class SpeedTyperGameRoom : KouGameRoom<SpeedTyperLeaderBoard>
 
     public KouMessage? CurImage { get; set; }
     public RecordContent? CurAnswer { get; set; }
-    public DateTime CurRoundStartTime { get; set; }
-    public bool HasFinishCurRound { get; set; }
-    public int RoundCount { get; set; }
     public SpeedTyperGameRoom(string roomName, PlatformUser ownerUser, PlatformGroup? roomGroup, int? fee) : base(roomName, ownerUser, roomGroup, fee)
     {
         RoomHelp = Help;
         UserCorrectEvent += achievement =>
         {
-            HasFinishCurRound = true;
+            CurRoundHasEnd = true;
             achievement.SuccessTimes++;
             achievement.TotalConsumeTime = achievement.TotalConsumeTime.Add(DateTime.Now - CurRoundStartTime);
-        };
-
-        NextRoundEvent += (sender, args) =>
-        {
-            HasFinishCurRound = false;
-            RoundCount++;
-            CurRoundStartTime = DateTime.Now;
         };
     }
 
@@ -76,7 +61,7 @@ public class SpeedTyperGameRoom : KouGameRoom<SpeedTyperLeaderBoard>
         if (CurAnswer == null) return "数据库缺失，开始失败";
         return "游戏开始啦，最先输入图片中的文字的计一分，将随机一小段时间内放出图片";
     }
-    public void NewRound()
+    public override void NewRound(bool isRenew = false)
     {
         var fromEn = 0.5.ProbablyTrue();
         if (fromEn)
@@ -95,32 +80,27 @@ public class SpeedTyperGameRoom : KouGameRoom<SpeedTyperLeaderBoard>
         KouTaskDelayer.DelayInvoke(RandomTool.GetInt(5000, 15000), () =>
         {
             if(HasClosed) return;
-            RecordNextRound();
-            KouCommand.ResponseThoughPipe(CurImage, CurKouGlobalConfig?.BotPlatformUser, OwnerUser, OwnerGroup);
+            RecordNewRound(isRenew);
+            
+            RoomBroadcast(CurImage);
         });
+    }
+
+    public override RoomReaction PromptSayWhenRoundStart(PlatformUser speaker, string content)
+    {
+        if (content == CurAnswer!.Word)
+        {
+            RecordLastRoundWinner(speaker);
+            NewRound();
+            var cost = DateTime.Now - CurRoundStartTime;
+            return $"{speaker.Name}{(cost.TotalSeconds < 4).IIf("仅花", "耗费")}{cost.ToZhFormatString()}拿下一分{(cost.TotalSeconds < 2).BeIfTrue((cost.TotalSeconds < 1).IIf("，一定是开了挂吧？？", "，什么神仙"))}";
+        }
+
+        return false;
     }
 
     public override RoomReaction Say(PlatformUser speaker, string line)
     {
-        if (CurImage == null || CurAnswer == null)
-        {
-            return DescNotStartGame();
-        }
-        if (!HasFinishCurRound)
-        {
-            lock (_lock)
-            {
-                if (HasFinishCurRound) return false;
-                if (line == CurAnswer.Word)
-                {
-                    RecordLastRoundWinner(speaker);
-                    NewRound();
-                    var cost = DateTime.Now - CurRoundStartTime;
-                    return $"{speaker.Name}{(cost.TotalSeconds < 4).IIf("仅花", "耗费")}{cost.ToZhFormatString()}拿下一分{(cost.TotalSeconds < 2).BeIfTrue((cost.TotalSeconds < 1).IIf("，一定是开了挂吧？？", "，什么神仙"))}";
-                }
-            }
-        }
-
         return false;
     }
 }

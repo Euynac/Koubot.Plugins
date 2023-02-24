@@ -43,16 +43,9 @@ public class WordCache
 
 public class EnglishWordSolitaireRoom : KouGameRoom<EnglishSolitaireAchievement>
 {
-    public const string Help = "单词接龙。每十轮奖池增益10%，开始游戏后，默认10分钟后结算成绩，玩家不可重复使用已用过的词。\n" +
-                               "此游戏基于Kou会话房间，消耗房间入场券入场，入场券全部投入奖池。当前房间信息通过【/room】查看。\n" +
-                               "成功创建房间后，通过房间钥匙（前缀）加入以及后续交互，默认钥匙是空格，开始后直接空格+单词参与游戏\n" +
-                               "【 开始】开始游戏\n" +
-                               "【 排行榜】查看战况\n" +
-                               "【 结束】房主可提前结算游戏，按排名分配奖池硬币\n" +
-                               "【 提示】消耗奖池硬币的1%给予提示";
+    public const string Help = "单词接龙。每十轮奖池增益10%，开始游戏后，默认10分钟后结算成绩，玩家不可重复使用已用过的词。";
     public WordCache? CurrentWord { get; set; }
     private readonly object _lock = new();
-    private int RoundCount = 0;
     public HashSet<string> UserPreviousUseWord { get; set; } = new();
 
     private static readonly Lazy<List<WordCache>> _wordDictionary = new(() =>
@@ -61,7 +54,6 @@ public class EnglishWordSolitaireRoom : KouGameRoom<EnglishSolitaireAchievement>
         return context.Set<EnDictionary>().AsNoTracking()
             .Select(p => new WordCache() {Word = p.Word}).ToList();
     }, true);
-    public DateTime CurWordStartTime { get; set; }
     public EnglishWordSolitaireRoom(string roomName, PlatformUser ownerUser, PlatformGroup roomGroup, int? fee = 10) : base(roomName, ownerUser, roomGroup, fee)
     {
         RoomHelp = Help;
@@ -72,12 +64,7 @@ public class EnglishWordSolitaireRoom : KouGameRoom<EnglishSolitaireAchievement>
         UserCorrectEvent += achievement =>
         {
             achievement.SuccessTimes++;
-            achievement.TotalConsumeTime = achievement.TotalConsumeTime.Add(DateTime.Now - CurWordStartTime);
-        };
-        NextRoundEvent += (sender, args) =>
-        {
-            CurWordStartTime = DateTime.Now;
-            RoundCount++;
+            achievement.TotalConsumeTime = achievement.TotalConsumeTime.Add(DateTime.Now - CurRoundStartTime);
         };
     }
 
@@ -145,7 +132,7 @@ public class EnglishWordSolitaireRoom : KouGameRoom<EnglishSolitaireAchievement>
     {
         RandomNewWord();
         if (CurrentWord == null) return "单词数据缺失";
-        RecordNextRound();
+        RecordNewRound();
         StartAutoClose();
         using var context = new KouContext();
         return $"单词接龙开始啦，{(RewordPool != 0).BeIfTrue($"当前奖池{RewordPool}枚硬币，")}我先来一个：{GetCurWordDesc(context)}";
@@ -183,7 +170,7 @@ public class EnglishWordSolitaireRoom : KouGameRoom<EnglishSolitaireAchievement>
                         RandomNewWord();
                         return $"我居然接不上，你太厉害了，奖池已增加1000个硬币！我再出一个新的：{GetCurWordDesc(context)}{RoundReword()}";
                     }
-                    RecordNextRound();
+                    RecordNewRound();
                     return $"{line}{word.Definition?.Be($"，意思是{word.Definition}")}\n嗯...不错，那我接{GetCurWordDesc(context)}{RoundReword()}";
                 }
                 return $"虽然是单词，但是开头需要是{CurrentWord.Word.Last()}呢。当前【{CurrentWord.Word}】";

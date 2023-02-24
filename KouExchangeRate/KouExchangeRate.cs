@@ -15,19 +15,26 @@ namespace KouFunctionPlugin.Currency
     {
         static KouExchangeRate()
         {
-            AddCronTab(new TimeSpan(1,0,0,0), () =>
+            AddCronTab(new TimeSpan(1,0,0,0), RefreshRate);
+        }
+        private static void RefreshRate()
+        {
+            var success = ExchangeRateApi.UpdateDataToDb();
+            var config = GetSingleton().GlobalConfig();
+            config.LastUpdateTime = DateTime.Now;
+            KouLog.QuickAdd($"尝试刷新汇率：{success.IIf("成功","失败")}");
+            if (success)
             {
-                var success = ExchangeRateApi.UpdateDataToDb();
-                var config = GetSingleton().GlobalConfig();
-                config.LastUpdateTime = DateTime.Now;
-                KouLog.QuickAdd($"尝试刷新汇率：{success.IIf("成功","失败")}");
-                if (success)
-                {
-                    config.LastSuccessUpdateTime = config.LastUpdateTime;
-                    config.LastUpdateSuccess = true;
-                }
-                config.SaveChanges();
-            });
+                config.LastSuccessUpdateTime = config.LastUpdateTime;
+                config.LastUpdateSuccess = true;
+            }
+            config.SaveChanges();
+        }
+        [PluginFunction(Name = "刷新汇率")]
+        public object? Refresh()
+        {
+            RefreshRate();
+            return "汇率已刷新";
         }
 
         [PluginFunction(ActivateKeyword = "status", Name = "更新状态")]

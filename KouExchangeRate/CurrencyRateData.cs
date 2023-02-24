@@ -160,6 +160,7 @@ public enum CurrencyCode
     SEK,
     SGD,
     SHP,
+    SLE,
     SLL,
     SOS,
     SRD,
@@ -195,5 +196,5 @@ public enum CurrencyCode
     YER,
     ZAR,
     ZMW,
-    ZWL
+    ZWL,
 }

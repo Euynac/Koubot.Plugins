@@ -3,8 +3,14 @@ using Koubot.Tool.Extensions;
 using Koubot.Tool.String;
 using KouGamePlugin.Arcaea.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using KouArcaea.Room;
+using Koubot.SDK.PluginExtension;
+using Koubot.SDK.System;
+using Koubot.Shared.Interface;
+using Koubot.Shared.Protocol;
 using Koubot.Shared.Protocol.Attribute;
 using Koubot.Shared.Protocol.KouEnum;
 
@@ -19,6 +25,28 @@ namespace KouGamePlugin.Arcaea
         CanUseProxy = true)]
     public class KouArcaea : KouPlugin<KouArcaea>
     {
+
+        static KouArcaea()
+        {
+            PluginEventList.FetchGroupGameInfo += sender =>
+            {
+                if (sender.CurGroup?.HasInstallPlugin(GetPluginMetadataStatic().Info) is true)
+                {
+                    var info = GetPluginMetadataStatic().Info;
+                    var func = info.GetFunctionInfo(nameof(GuessImage));
+                    return new PluginEventList.GameInfo()
+                    {
+                        GameCommand =
+                            $"{KouCommand.GetPluginRoute(sender.CurKouGlobalConfig, info, nameof(GuessImage))} --help",
+                        Introduce = func?.FunctionHelp ?? "??",
+                        GameName = func?.FunctionName ?? "??",
+                        IsSessionRoomGame = true
+                    };
+                }
+
+                return null;
+            };
+        }
         [PluginFunction(Name = "获取当前用户最近一次成绩（施工中）", Help = "默认功能，需要先绑定")]
         public override object? Default(string? str = null)
         {
@@ -77,5 +105,42 @@ namespace KouGamePlugin.Arcaea
             if (songConstant == null) return $"{song.SongTitle}还没有{ratingClass}的定数信息呢...";
             return $"{song.SongTitle}[{ratingClass}{songConstant.Value:0.#}]{score}分的ptt为{ArcaeaData.CalSongScorePtt(songConstant.Value, score):F3}";
         }
+
+        #region 游戏房间
+
+        [PluginFunction(Name = "Arcaea猜图游戏", ActivateKeyword = "guess image|猜图",Help = ArcaeaImageGuessGameRoom.Help
+            , OnlyUsefulInGroup = true, NeedCoin = 10, CanEarnCoin = true)]
+        public object? GuessImage([PluginArgument(Name = "入场费(最低10)", Min = 10)] int? fee = null)
+        {
+            fee ??= 10;
+            if (!CurKouUser.ConsumeCoinFree(fee.Value)) return FormatNotEnoughCoin(fee.Value, CurUserName);
+            var room = new ArcaeaImageGuessGameRoom("Arcaea猜图", CurUser, CurGroup, fee)
+            {
+                LastTime = CurCommand.CustomTimeSpan ?? new TimeSpan(0,10,0)
+            };
+            ConnectRoom(
+                $"{CurUserName}消耗{CurKouGlobalConfig.CoinFormat(fee.Value)}创建了游戏房间：{room.RoomName}，后续收到的入场费({CurKouGlobalConfig.CoinFormat(fee.Value)})将累计在奖池中，按排名发放奖励",
+                room);
+            return null;
+        }
+
+        [PluginFunction(Name = "检查图片情况", Authority = Authority.BotMaster)]
+        public object? CheckImage()
+        {
+            var list = new List<string>();
+            foreach (var (url, p) in Song.GetCache()!.Select(p=>(p.JacketUrl, p)))
+            {
+                if(url.IsNullOrWhiteSpace()) continue;
+                var u = new KouImage(url, new Song());
+                if (!u.LocalExists())
+                {
+                    list.Add(p.ToString(FormatType.Brief));
+                }
+            }
+
+            return $"共找到{list.Count}个缺失：\n{list.StringJoin("\n")}";
+        }
+
+        #endregion
     }
 }

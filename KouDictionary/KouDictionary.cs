@@ -27,6 +27,7 @@ namespace KouFunctionPlugin
                         GameCommand = $"{KouCommand.GetPluginRoute(sender.CurKouGlobalConfig, info, nameof(EnglishWordSolitaire))} --help",
                         Introduce = func?.FunctionHelp ?? "??",
                         GameName = func?.FunctionName ?? "??",
+                        IsSessionRoomGame = true
                     };
                 }
 
@@ -43,6 +44,7 @@ namespace KouFunctionPlugin
                         GameCommand = $"{KouCommand.GetPluginRoute(sender.CurKouGlobalConfig, info, nameof(ChineseIdiomSolitaire))} --help",
                         Introduce = func?.FunctionHelp ?? "??",
                         GameName = func?.FunctionName ?? "??",
+                        IsSessionRoomGame = true
                     };
                 }
 
@@ -59,6 +61,7 @@ namespace KouFunctionPlugin
                         GameCommand = $"{KouCommand.GetPluginRoute(sender.CurKouGlobalConfig, info, nameof(TypeContest))} --help",
                         Introduce = func?.FunctionHelp ?? "??",
                         GameName = func?.FunctionName ?? "??",
+                        IsSessionRoomGame = true
                     };
                 }
 
