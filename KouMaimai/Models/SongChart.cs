@@ -92,6 +92,14 @@ namespace KouGamePlugin.Maimai.Models
             /// </summary>
             public double AverageRate { get; set; }
             /// <summary>
+            /// 平均DX分数
+            /// </summary>
+            public double? AverageDxScore { get; set; }
+            /// <summary>
+            /// 拟合定数
+            /// </summary>
+            public double? FitConstant { get; set; }
+            /// <summary>
             /// 记录总人数
             /// </summary>
             public int TotalCount { get; set; }
@@ -99,6 +107,9 @@ namespace KouGamePlugin.Maimai.Models
             /// 记录中，SSS以上成绩的人数
             /// </summary>
             public int SSSCount { get; set; }
+            /// <summary>
+            /// SSS比例
+            /// </summary>
             [JsonIgnore]
             public double SSSPeopleRatio => SSSCount/(double)TotalCount;
             /// <summary>
@@ -109,15 +120,20 @@ namespace KouGamePlugin.Maimai.Models
             /// 相同难度SSS比例排名
             /// </summary>
             public int SSSRankOfSameDifficult { get; set; }
+            /// <summary>
+            /// 谱面难度
+            /// </summary>
+            public string ChartRating { get; set; }
             [JsonIgnore]
-            public string SSSRankString => $"{SSSRankOfSameDifficult + 1}/{SameDifficultCount}";
+            public string SSSRankString => $"{SSSRankOfSameDifficult}/{SameDifficultCount}";
             public override string ToString()
             {
                 return
-                    $"Tag：{DifficultTag}\n"+
+                    $"Tag：{DifficultTag}\n" +
                     $"SSS比例排名：{SSSRankString}\n" +
-                       $"SSS人数：{SSSCount}/{TotalCount}({SSSPeopleRatio:P}) \n" +
-                       $"平均达成率：{AverageRate:0.##}%";
+                    $"SSS人数：{SSSCount}/{TotalCount}({SSSPeopleRatio:P}) \n" +
+                    $"平均达成率：{AverageRate:0.##}%\n" +
+                    $"拟合定数：{FitConstant:0.##}";
             }
         }
 

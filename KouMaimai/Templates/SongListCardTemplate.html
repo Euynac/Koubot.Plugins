@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Cards</title>
+    <link rel="stylesheet" href="static/card-list.css">
+    <link rel="stylesheet" href="static/font-effect.css">
+</head>
+<style>
+    footer {
+        text-align: center;
+        color: black;
+        font-family: consolas;
+        margin: 1rem;
+    }
+    h1 {
+        font-family: "Microsoft YaHei";
+    }
+    body {
+        background: #f1f1f1;
+        font-family: Impact, sans-serif, "Microsoft YaHei";
+        /* color: white; */
+    }
+</style>
+<body>
+<h1 class="font-border ">{{Header}}</h1>
+<div class="parent">
+    {{ for container in Containers }}
+    <div class="container">
+        <div class="left-bar">
+            {{ container.Constant }}
+        </div>
+        <div class="cards-list">
+            {{ for item in container.Items }}
+            <div class="card {{item.DenseDegree}} {{item.Color}}">
+                <div class="card_image {{ if item.IsDiscarded }}obsolete{{else}} {{end}}"> <img src="{{item.ImageUrl}}" /> </div>
+                {{ if item.Achievement }}
+                <div class="card_title title-white">
+                    <p>{{item.Achievement}}</p>
+                </div>
+                {{ end }}
+                {{ if item.IsDiscarded }}
+                <div class="discard_overlay">
+                    <span class="discard_cross">&#10060;</span>
+                </div>
+                {{ end }}
+                <div class="card_id_tag">
+                    <p>{{ item.Id }}</p>
+                </div>
+                {{ if item.IsDx}}
+                <div class="card_tag">
+                    <p>DX</p>
+                </div>
+                {{ end }}
+            </div>
+            {{ end }}
+        </div>
+    </div>
+    {{ end }}
+</div>
+<footer>
+    Copyright © 2023 Koubot
+</footer>
+</body>
+</html>

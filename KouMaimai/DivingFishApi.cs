@@ -45,8 +45,7 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
         var response = KouHttp.Create("https://www.diving-fish.com/api/maimaidxprober/chart_stats").SetBody().SendRequest(HttpMethods.GET);
         if (response == null) return null;
         var body = response.Body;
-        var parsed = $"{{\"data\":{body}}}";
-        return JsonSerializer.Deserialize<DivingFishChartStatusDto>(parsed);
+        return JsonSerializer.Deserialize<DivingFishChartStatusDto>(body);
     }
     public static DivingFishChartInfoDto.Root? GetChartInfoList()
     {
@@ -69,6 +68,11 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
             username = Username,
             password = Password,
         }, o => o.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull).SendRequest(HttpMethods.POST);
+        if (response.HasError)
+        {
+            ErrorMsg = $"{response.ExceptionStatus}";
+            return this.ReturnFalseWithError("获取Token失败" + ErrorMsg);
+        }
         var node = JsonNode.Parse(response.Body)!;
         if (node["errcode"] is not null)
         {

@@ -17,6 +17,7 @@ namespace KouMaimai.Room;
 
 public class MaiImageGuessLeaderBoard : IGameRoomLeaderBoardInfo<MaiImageGuessLeaderBoard>
 {
+    public int TryTimes { get; set; }
     public int SuccessTimes { get; set; }
     public TimeSpan TotalConsumeTime { get; set; } = new();
     public TimeSpan CorrectAverageTime => new(TotalConsumeTime.Ticks / (SuccessTimes.BeNullIfDefault() ?? 1));
@@ -28,8 +29,8 @@ public class MaiImageGuessLeaderBoard : IGameRoomLeaderBoardInfo<MaiImageGuessLe
 
     public KouMessageTableElement GetUserLeaderBoardInfo(PlatformUser user)
     {
-        var element = new KouMessageTableElement("参赛人员", "抢占数", "平均耗时");
-        element.AddRow(user.Name ?? "??", SuccessTimes.ToString(), CorrectAverageTime.ToZhFormatString());
+        var element = new KouMessageTableElement("参赛人员", "尝试数", "抢占数", "平均耗时");
+        element.AddRow(user.Name ?? "??",TryTimes.ToString(), SuccessTimes.ToString(), CorrectAverageTime.ToZhFormatString());
         return element;
     }
 }
@@ -62,6 +63,10 @@ public class MaiImageGuessGameRoom : KouGameRoom<MaiImageGuessLeaderBoard>
             CurRoundHasEnd = true;
             achievement.SuccessTimes++;
             achievement.TotalConsumeTime = achievement.TotalConsumeTime.Add(DateTime.Now - CurRoundStartTime);
+        };
+        UserTakePartInEvent += a =>
+        {
+            a.TryTimes++;
         };
     }
    
@@ -101,7 +106,7 @@ public class MaiImageGuessGameRoom : KouGameRoom<MaiImageGuessLeaderBoard>
         if (!CurRoundHasEnd)
         {
             RoomBroadcast(
-                $"答案公布：{CurAnswer.SongTitle}\\n{new KouImage(CurAnswer.JacketUrl, new Song()).ToKouResourceString()}");
+                $"答案公布：{CurAnswer.SongTitle}\\n{new KouImage(CurAnswer.JacketUrl, new SongChart()).ToKouResourceString()}");
         }
         return base.FinishGame();
     }
@@ -117,10 +122,11 @@ public class MaiImageGuessGameRoom : KouGameRoom<MaiImageGuessLeaderBoard>
         StartAutoClose();
         return "游戏开始啦，参与游戏开头需要加空格，最先答对歌曲名称或别名的计一分，将随机一小段时间内放出图片";
     }
+
     public override void NewRound(bool isRenew = false)
     {
         var hash = NotExistSet.Value;
-        var info = SongChart.GetCache()!.Where(p=>!hash.Contains(p.ChartId)).ToList().RandomGetOne()?.BasicInfo;
+        var info = SongChart.GetCache()!.Where(p => !hash.Contains(p.ChartId)).ToList().RandomGetOne()?.BasicInfo;
         if (info == null) return;
         CurAnswer = info;
         CurImage = null;
@@ -130,6 +136,7 @@ public class MaiImageGuessGameRoom : KouGameRoom<MaiImageGuessLeaderBoard>
             KouLog.QuickAdd($"{info.SongTitle}图片文件不存在", KouLog.LogLevel.Error);
             return;
         }
+
         using var mutated = image.StartMutate();
         var rank = (5 - RoundCount / 10).LimitInRange(1, 5);
         mutated!.RandomCrop(rank / 10.0);
@@ -137,6 +144,7 @@ public class MaiImageGuessGameRoom : KouGameRoom<MaiImageGuessLeaderBoard>
         {
             mutated.Flip(FlipMode.Horizontal);
         }
+
         if (RoundCount >= 20 && 0.5.ProbablyTrue())
         {
             mutated.Rotate(new[] {90, 180, 270}.RandomGetOne());
@@ -146,10 +154,12 @@ public class MaiImageGuessGameRoom : KouGameRoom<MaiImageGuessLeaderBoard>
         {
             mutated.Flip(FlipMode.Vertical);
         }
-        if (RoundCount >=40)
+
+        if (RoundCount >= 40)
         {
             mutated.FilterGreyscale();
         }
+
         CurImage = mutated.SaveTemporarily();
         KouTaskDelayer.DelayInvoke(RandomTool.GetInt(5000, 15000), () =>
         {
@@ -160,11 +170,12 @@ public class MaiImageGuessGameRoom : KouGameRoom<MaiImageGuessLeaderBoard>
                 if (RoundCount % 10 == 0)
                 {
                     RewordPool = (RewordPool * 1.15).Ceiling();
-                    RoomBroadcast($"当前已到第{RoundCount}轮，难度已提升为{(RoundCount/10+1).LimitInRange(5)}级，奖池增益15%，当前奖池{CurKouGlobalConfig?.CoinFormat(RewordPool)}");
+                    RoomBroadcast(
+                        $"当前已到第{RoundCount}轮，难度已提升为{(RoundCount / 10 + 1).LimitInRange(5)}级，奖池增益15%，当前奖池{CurKouGlobalConfig?.CoinFormat(RewordPool)}");
                     Thread.Sleep(1000);
                 }
             }
-           
+
 
             RoomBroadcast(CurImage);
         });
@@ -190,7 +201,7 @@ public class MaiImageGuessGameRoom : KouGameRoom<MaiImageGuessLeaderBoard>
     public override RoomReaction PromptSayWhenRoundStart(PlatformUser speaker, string content)
     {
         var distance = TestAnswer(content);
-        if (distance == 1)
+        if (distance == 1 || content == CurAnswer.SongTitle)
         {
             var previous = CurAnswer;
             RecordLastRoundWinner(speaker);

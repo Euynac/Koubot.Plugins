@@ -244,9 +244,16 @@ namespace KouGamePlugin.Maimai
             {
                 remarkList.Add($"定数{constant}，100% Rating {DxCalculator.CalSongRating(100, constant)}，100.5% Rating {DxCalculator.CalSongRating(100.5, constant)}");
             }
+            
 
-
-
+            using var context = new KouContext();
+            var record =
+                SongRecord.SingleOrDefault(
+                    p => p.User == CurKouUser && p.CorrespondingChart.Equals(chart) && p.RatingColor == color, context);
+            if (record != null)
+            {
+                remarkList.Add($"{CurUserName}的"+record.ToString(FormatType.Customize1));
+            }
             remarkList = remarkList.Select(p => p.Replace("\n", "</br>")).ToList();
             return new HtmlMessage(new
             {
@@ -262,6 +269,7 @@ namespace KouGamePlugin.Maimai
                 SongType = chart.SongChartType,
                 CurColorClass = SongChart.GetCssColorClass(color),
                 Chart = data,
+                FitConstant = $"{status.FitConstant:0.##}",
                 Status = status,
                 SSSRank =
                         (((status.SSSRankOfSameDifficult + 1) / (double)status.SameDifficultCount) * 100).Round(1),
@@ -277,6 +285,18 @@ namespace KouGamePlugin.Maimai
             { DpiRank = 3 };
         }
 
+        private double GetAchievementFromGivenNum(double? line)
+        {
+            line ??= 100.5;
+            if (line.Value.NearlyEqual(5)) line = 100.5;
+            if (line > 1.01)
+            {
+                line /= 100.0;
+            }
+
+            line *= 100;
+            return line.Value;
+        }
         [PluginFunction(ActivateKeyword = "分数线|line", Name = "计算分数线", Help =
                   "例如：/mai line 白潘 100\n" +
                   "命令将返回分数线允许的TAP GREAT容错以及BREAK 50落等价的TAP GREAT数。\n" +
@@ -288,7 +308,7 @@ namespace KouGamePlugin.Maimai
                   "TOUCH  1/2.5/5\n" +
                   "BREAK  5/12.5/25(外加200落)\n鸣谢：Chiyuki-Bot")]
         public object? CalScoreLine([PluginArgument(Name = "难度+曲名/id/别名")] string name,
-                  [PluginArgument(Name = "达成率", Min = 0, Max = 101)] double? line = null)
+                  [PluginArgument(Name = "达成率", Min = 0, Max = 101, Help = "快捷输入：1代表100，5代表100.5")] double? line = null)
         {
             if (this.UserConfig().UseHtml == true)
             {
@@ -297,14 +317,7 @@ namespace KouGamePlugin.Maimai
 
             var chart = TryGetSongChartUseAliasOrNameOrId(name, out var type);
             if (chart == null) return $"不知道{name}这首歌呢";
-            line ??= 100.5;
-            if (line > 1.01)
-            {
-                line /= 100.0;
-            }
-
-            line *= 100;
-
+            line = GetAchievementFromGivenNum(line);
             var data = chart.GetChartData(type);
             if (data is null) return $"没有{chart.BasicInfo.SongTitle}({type})的谱面数据哦";
             double totalScore = 500 * data.Tap + 1500 * data.Slide + 1000 * data.Hold + 500 * data.Touch +
@@ -356,13 +369,13 @@ namespace KouGamePlugin.Maimai
         public object? UpdateSongInfos()
         {
             var updater = new SongInfoUpdater();
-            if (!updater.StartUpdate())
+            if (!updater.StartUpdate(out var changedRow))
             {
                 return updater.ErrorMsg;
             }
 
             var sb = new StringBuilder();
-            sb.Append($"数据库影响了{updater.SaveToDb()}条数据");
+            sb.Append($"数据库影响了{changedRow}条数据");
 
             sb.Append($"相似{updater._similarDict.Count}个，");
             sb.Append($"添加{updater.AddedList.Count}个，");
@@ -383,7 +396,7 @@ namespace KouGamePlugin.Maimai
         #endregion
         #region 配置
 
-        [PluginFunction(ActivateKeyword = "config skin", Name = "签到皮肤", NeedCoin = 500)]
+        [PluginFunction(ActivateKeyword = "config skin", Name = "maimai皮肤", NeedCoin = 500)]
         public object? ConfigUseHtml()
         {
             var config = this.UserConfig()!;
@@ -392,7 +405,7 @@ namespace KouGamePlugin.Maimai
             {
                 if (!CurKouUser.HasEnoughFreeCoin(500)) return FormatNotEnoughCoin(500);
                 CurKouUser.ConsumeCoinFree(500);
-                consumeDesc = $"\n[{FormatConsumeFreeCoin(500)}]";
+                consumeDesc = $"\n获得分数卡片、分数列表、难度信息皮肤[{FormatConsumeFreeCoin(500)}]";
                 config.UseHtml = false;
             }
 
@@ -481,7 +494,7 @@ namespace KouGamePlugin.Maimai
         public object? CheckImage()
         {
             var list = new List<string>();
-            foreach (var (url, p) in SongChart.GetCache()!.Select(p=>(p.BasicInfo.JacketUrl, p)))
+            foreach (var (url, p) in SongInfo.GetCache()!.Select(p=>(p.JacketUrl, p)))
             {
                 if(url.IsNullOrWhiteSpace()) continue;
                 var u = new KouImage(url, new SongChart());

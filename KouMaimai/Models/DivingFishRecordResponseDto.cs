@@ -59,45 +59,82 @@ public class DivingFishBest40ResponseDto
 
 public class DivingFishChartStatusDto
 {
-    public Dictionary<string,List<ChartStatus>> data { get; set; }
+    public Dictionary<string,List<ChartStatus>> charts { get; set; }
+
     public class ChartStatus
     {
-        public int count { get; set; }
+        public double cnt { get; set; }
+        /// <summary>
+        /// 拟合定数
+        /// </summary>
+        public double fit_diff { get; set; }
         public double avg { get; set; }
-        public int sssp_count { get; set; }
-        public string tag { get; set; }
-        public int v { get; set; }
-        public int t { get; set; }
+        public double avg_dx { get; set; }
+        /// <summary>
+        /// 明面难度
+        /// </summary>
+        public string diff { get; set; }
+        public List<int> dist { get; set; }
+        //public int sssp_count { get; set; }
+        //public string tag { get; set; }
+        //public int v { get; set; }
+        //public int t { get; set; }
 
         public SongChart.ChartStatus ToDbChartStatus()
         {
             return new SongChart.ChartStatus
             {
-                DifficultTag = tag.IsNullOrEmpty() ? SongChart.ChartStatus.Tag.None : tag.ToKouEnum<SongChart.ChartStatus.Tag>(),
+                //DifficultTag = tag.IsNullOrEmpty() ? SongChart.ChartStatus.Tag.None : tag.ToKouEnum<SongChart.ChartStatus.Tag>(),
                 AverageRate = avg,
-                SSSRankOfSameDifficult = v,
-                SameDifficultCount = t,
-                SSSCount = sssp_count,
-                TotalCount = count,
+                //SSSRankOfSameDifficult = v,
+                //SameDifficultCount = t,
+                ChartRating = diff,
+                SSSCount =  dist?.TakeLast(2).Sum() ?? 0,
+                TotalCount = (int)cnt,
+                AverageDxScore = avg_dx,
+                FitConstant = fit_diff,
             };
         }
     }
 
     public int SaveToDb()
     {
-        if (data == null) return -1;
+        if (charts == null) return -1;
         using var context = new KouContext();
-        foreach (var (id, statusList) in data)
+        var chartsInDb = context.Set<SongChart>().ToList();
+        foreach (var (id, statusList) in charts)
         {
             if (!id.IsInt(out var idInt)) continue;
-            var chart = context.Set<SongChart>().SingleOrDefault(p => p.OfficialId == idInt);
+            var chart = chartsInDb.SingleOrDefault(p => p.OfficialId == idInt);
             if(chart == null)
             {
-                statusList.PrintLn("No data:");
+                statusList.PrintLn($"No data:{idInt}");
                 continue;
             }
             chart.ChartStatusList = statusList.Select(p => p.ToDbChartStatus()).Where(p => p!=null).ToList();
-            context.Set<SongChart>().Update(chart);
+            //context.Set<SongChart>().Update(chart);
+        }
+
+        var sameDiffChartStatus = chartsInDb.Where(p=>p.ChartStatusList != null).SelectMany(p => p.ChartStatusList).OrderByDescending(p=>p.SSSPeopleRatio).GroupBy(p=>p.ChartRating).ToList();
+        foreach (var (id, statusList) in charts)
+        {
+            if (!id.IsInt(out var idInt)) continue;
+            var chart = chartsInDb.SingleOrDefault(p => p.OfficialId == idInt);
+            if(chart?.ChartStatusList == null)
+            {
+                continue;
+            }
+
+            foreach (var status in  chart.ChartStatusList)
+            {
+                var difficult = status.ChartRating;
+                status.SameDifficultCount = sameDiffChartStatus.SingleOrDefault(p => p.Key == difficult)?.Count() ?? 0;
+                status.SSSRankOfSameDifficult = sameDiffChartStatus.SingleOrDefault(p => p.Key == difficult)?.ToList().IndexOf(status) + 1 ?? 0;
+                status.DifficultTag =
+                    (SongChart.ChartStatus.Tag)
+                    ((status.SSSRankOfSameDifficult / (double) status.SameDifficultCount) * 5).Ceiling() - 1;
+            }
+            //context.Set<SongChart>().Update(chart);
         }
 
         var effect = context.SaveChanges();

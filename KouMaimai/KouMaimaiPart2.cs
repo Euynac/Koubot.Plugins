@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FuzzySharp;
 using Koubot.SDK.Models.Entities;
 using Koubot.SDK.PluginInterface;
+using Koubot.SDK.Services;
+using Koubot.SDK.System.Messages;
 using Koubot.SDK.Tool;
 using Koubot.Shared.Interface;
 using Koubot.Shared.Protocol.Attribute;
@@ -13,6 +16,7 @@ using Koubot.Tool.General;
 using Koubot.Tool.Random;
 using Koubot.Tool.String;
 using KouGamePlugin.Maimai.Models;
+using KouMaimai;
 
 namespace KouGamePlugin.Maimai;
 
@@ -20,9 +24,77 @@ public partial class KouMaimai
 {
     #region Diving-Fish
 
+    [PluginFunction(Name = "获取指定难度所有歌曲信息", ActivateKeyword = "难度")]
+    public object? GetSpecificDifficultSongs([PluginArgument(Name = "难度如14+")] string givenRating,
+        [PluginArgument(Name = "达成率阈值")] double? threshold = null)
+    {
+        if (this.UserConfig().UseHtml != true)
+        {
+            return "还没有开启maimai皮肤噢，使用 /mai config skin 开启";
+        }
+        givenRating = givenRating.Replace("＋", "+");
+        using var context = new KouContext();
+        var records = SongRecord.DbWhere(p =>
+                    p.User == CurKouUser && p.CorrespondingChart.GetChartRatingOfSpecificColor(p.RatingColor) == givenRating,
+                context)
+            .OrderByDescending(p => p.Achievements).ToList();
+        var charts = SongChart.GetCache();
+        if(charts.IsNullOrEmptySet()) return "当前没有歌曲信息哦";
+        //var matchedCharts = new List<(SongChart.RatingColor Color, double? Contant, int? DenseDegree, string ImageUrl,
+        //    double? Achievement, bool IsDx)>();
+        var matchedCharts = new List<dynamic>();
+        foreach (var chart in charts)
+        {
+            foreach (var color in Enum.GetValues<SongChart.RatingColor>())
+            {
+                var rating = chart.GetChartRatingOfSpecificColor(color);    
+                var constant = chart.GetChartConstantOfSpecificColor(color);
+                if(rating.IsNullOrWhiteSpace() || rating != givenRating) continue;
+                var status = chart.GetChartStatus(color);
+                if (status == null)
+                {
+                    continue;
+                }
+                var achievement = records.FirstOrDefault(p => p.CorrespondingChart.Equals(chart) && p.RatingColor == color)?.Achievements;
+                
+                matchedCharts.Add(new
+                {
+                    Color = SongChart.GetCssColorClass(color),
+                    Constant = constant,
+                    DenseDegree = GetDenseCss(status?.DifficultTag.ToInt()),
+                    FitConstant = status?.FitConstant ?? constant,
+                    ImageUrl = StaticServices.BrowserService?.ResolveFileUrl(chart.BasicInfo.JacketUrl, new SongChart()),
+                    Achievement = achievement?.ToString("F4"),
+                    IsDx = chart.SongChartType == SongChart.ChartType.DX,
+                    Id = chart.ChartId,
+                    IsDiscarded = threshold != null && achievement != null && achievement >= GetAchievementFromGivenNum(threshold),
+                });
+            }
+        }
+
+        var containers = matchedCharts.Where(p=>p.Constant != null && p.Constant != 0).OrderByDescending(p => p.Constant).ThenByDescending(p => p.FitConstant).GroupBy(p => p.Constant).Select(tuples => (tuples.Key?.ToString() ?? "未知", tuples.ToList())).Select(dummy => new {Constant = dummy.Item1, Items = dummy.Item2}).ToList();
+
+        return new HtmlMessage(new {Header = $"maimai DX {givenRating} 歌曲", Containers = containers},
+            new KouTemplate(TemplateResources.SongListCardTemplate)){ DpiRank = 2 };
+
+
+        static string GetDenseCss(int? degree)
+        {
+            return degree switch
+            {
+                4 => "dense5",
+                3 => "dense4",
+                2 => "dense3",
+                1 => "dense2",
+                _ => "dense1"
+            };
+        }
+    }
+
     [PluginFunction(ActivateKeyword = "难度成绩", Name = "获取指定难度成绩")]
     public object GetDifficultRecords([PluginArgument(Name = "难度如14+")] string rating)
     {
+        rating = rating.Replace("＋", "+");
         using var context = new KouContext();
         var records = SongRecord.DbWhere(p =>
                     p.User == CurKouUser && p.CorrespondingChart.GetChartRatingOfSpecificColor(p.RatingColor) == rating,
@@ -329,16 +401,16 @@ public partial class KouMaimai
                                        a.Alias.Contains(aliasOrName, StringComparison.OrdinalIgnoreCase)) ||
                                    p.BasicInfo.SongTitle.Contains(aliasOrName, StringComparison.OrdinalIgnoreCase) ||
                                    p.BasicInfo.SongTitleKaNa.Contains(aliasOrName, StringComparison.OrdinalIgnoreCase));
-        if (list.Count == 0 && aliasOrName.Length > 6)
+        if (list.Count == 0 && aliasOrName.Length > 3)
         {
             var similarityList = SongChart.GetCache()!
-                .OrderByDescending(p => StringTool.Similarity(p.BasicInfo.SongTitle, aliasOrName))
+                .OrderByDescending(p => Fuzz.PartialRatio(p.BasicInfo.SongTitle, aliasOrName))
                 .Take(5).ToList();
             if (similarityList.Count == 0) return null;
             using (SessionService)
             {
                 var id = SessionService.Ask<int>(
-                    $"为你找到以下可能的歌[相似度依次为{similarityList.Select(p => $"{StringTool.Similarity(p.BasicInfo.SongTitle, aliasOrName):P}").StringJoin(",")}]，输入id：\n{similarityList.ToKouSetStringWithID(5)}");
+                    $"为你找到以下可能的歌[相似度依次为{similarityList.Select(p => $"{Fuzz.PartialRatio(p.BasicInfo.SongTitle, aliasOrName)/100.0:P}").StringJoin(",")}]，输入id：\n{similarityList.ToKouSetStringWithID(5)}");
                 song = similarityList.ElementAtOrDefault(id - 1);
             }
         }

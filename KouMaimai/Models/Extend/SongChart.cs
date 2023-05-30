@@ -82,7 +82,8 @@ namespace KouGamePlugin.Maimai.Models
         public double? AverageRate => ChartStatusList?.ElementAtOrDefault((int)SongRatingColor.Value)?.AverageRate;
         [AutoField(ActivateKeyword = "鸟比例")]
         public double? SSSPeopleRatio => ChartStatusList?.ElementAtOrDefault((int)SongRatingColor.Value)?.SSSPeopleRatio;
-
+        [AutoField(ActivateKeyword = "里定数|拟合定数")]
+        public double? FitConstant => ChartStatusList?.ElementAtOrDefault((int)SongRatingColor.Value)?.FitConstant;
         /// <summary>
         /// 相同难度SSS比例排名
         /// </summary>
@@ -297,6 +298,7 @@ namespace KouGamePlugin.Maimai.Models
                 $"{citedFieldNames.BeIfContains(nameof(ChartStatus.AverageRate), $"\n   {SongRatingColor.Value.GetKouEnumName()}平均达成率：{GetChartStatus(SongRatingColor.Value)?.AverageRate:0.##}%")}" +
                 $"{citedFieldNames.BeIfContains(nameof(ChartStatus.SSSRankOfSameDifficult), $"\n   {SongRatingColor.Value.GetKouEnumName()}同难度排名：{GetChartStatus(SongRatingColor.Value)?.SSSRankString}")}" +
                 $"{citedFieldNames.BeIfContains(nameof(ChartStatus.SSSPeopleRatio), $"\n   {SongRatingColor.Value.GetKouEnumName()}SSS人数比例：{GetChartStatus(SongRatingColor.Value)?.SSSPeopleRatio:P}")}" +
+                $"{citedFieldNames.BeIfContains(nameof(ChartStatus.FitConstant), $"\n   {SongRatingColor.Value.GetKouEnumName()}拟合定数：{GetChartStatus(SongRatingColor.Value)?.FitConstant:0.##}")}" +
                 $"{citedFieldNames.BeIfContains(nameof(BasicInfo.SongGenreOld), $"\n   分类：{BasicInfo.SongGenre}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(BasicInfo.SongArtist), $"\n   曲师：{BasicInfo.SongArtist}")}" +
                    $"{citedFieldNames.BeIfContains(nameof(BasicInfo.Version), $"\n   版本：{BasicInfo.Version}")}" +
@@ -314,7 +316,7 @@ namespace KouGamePlugin.Maimai.Models
      
         public string ToConstantString()
         {
-            if (ChartExpertConstant == null && ChartAdvancedConstant == null) return null;
+            if ((ChartExpertConstant ?? 0) == 0 && (ChartAdvancedConstant ?? 0) == 0) return null;
             return $"B{ChartBasicConstant?.BeIfNotDefault("{0}",true)}/A{ChartAdvancedConstant?.BeIfNotDefault("{0:F1}", true)}" +
                    $"/E{ChartExpertConstant?.BeIfNotDefault("{0:F1}", true)}" +
                    $"/M{ChartMasterConstant?.BeIfNotDefault("{0:F1}", true)}" +
@@ -432,7 +434,7 @@ namespace KouGamePlugin.Maimai.Models
                     .WithMany(p => p.ChartInfo)
                     .IsRequired()
                     .HasForeignKey(p => p.SongTitleKaNa)
-                    .HasPrincipalKey(p => p.SongTitleKaNa);
+                    .HasPrincipalKey(p => p.SongTitleKaNa).OnDelete(DeleteBehavior.Cascade);
             };
         }
     }

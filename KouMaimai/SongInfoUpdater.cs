@@ -10,6 +10,7 @@ using Koubot.Tool.Algorithm;
 using Koubot.Tool.Extensions;
 using Koubot.Tool.Web;
 using KouGamePlugin.Maimai.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace KouMaimai;
 
@@ -19,8 +20,35 @@ public class SongInfoUpdater : IKouError
     public Dictionary<Root, List<SongInfo>> _similarDict { get; set; } = new();
     public List<SongInfo> UpdatedList { get; set; }
     public List<SongInfo> AddedList { get; set; }
-    public bool StartUpdate()
+
+    private SongChart FillDxChartData(SongChart chart, Root song)
     {
+        chart.SongChartType = SongChart.ChartType.DX;
+        chart.SongTitleKaNa = song.title_kana;
+        chart.ChartBasicRating = song.dx_lev_bas;
+        chart.ChartAdvancedRating = song.dx_lev_adv;
+        chart.ChartExpertRating = song.dx_lev_exp;
+        chart.ChartMasterRating = song.dx_lev_mas;
+        chart.ChartRemasterRating = song.dx_lev_remas;
+        return chart;
+    }
+
+    private SongChart FillSdChartData(SongChart chart, Root song)
+    {
+        chart.SongChartType = SongChart.ChartType.SD;
+        chart.SongTitleKaNa = song.title_kana;
+        chart.ChartBasicRating = song.lev_bas;
+        chart.ChartAdvancedRating = song.lev_adv;
+        chart.ChartExpertRating = song.lev_exp;
+        chart.ChartMasterRating = song.lev_mas;
+        chart.ChartRemasterRating = song.lev_remas;
+        return chart;
+    }
+
+
+    public bool StartUpdate(out int changedRow)
+    {
+        changedRow = 0;
         var res = KouHttp.Create("https://maimai.sega.jp/data/maimai_songs.json").SendRequest(HttpMethods.GET);
         if (res.HasError)
         {
@@ -30,7 +58,7 @@ public class SongInfoUpdater : IKouError
         var list = JsonSerializer.Deserialize<List<Root>>(res.Body);
         if (list.IsNullOrEmptySet()) return this.ReturnNullWithError("获取到0条歌曲记录");
         using var context = new KouContext();
-        _originDictionary = context.Set<SongInfo>().ToDictionary(p => p.SongTitleKaNa, p => p);
+        _originDictionary = context.Set<SongInfo>().Include(p=>p.ChartInfo).ToDictionary(p => p.SongTitleKaNa, p => p);
         UpdatedList = new List<SongInfo>();
         AddedList = new List<SongInfo>();
         foreach (var song in list)
@@ -42,7 +70,7 @@ public class SongInfoUpdater : IKouError
                     continue;
                 }
 
-                AddedList.Add(new SongInfo()
+                var newSong = new SongInfo()
                 {
                     SongTitle = song.title,
                     SongTitleKaNa = song.title_kana,
@@ -50,36 +78,29 @@ public class SongInfoUpdater : IKouError
                     SongGenre = song.catcode,
                     JacketUrl = $"https://maimaidx.jp/maimai-mobile/img/Music/{song.image_url}",
                     ChartInfo = new List<SongChart>()
-                    {
-                        new()
-                        {
-                            SongChartType = song.IsDx ? SongChart.ChartType.DX : SongChart.ChartType.SD,
-                            SongTitleKaNa = song.title_kana,
-                            ChartBasicRating = song.IsDx ? song.dx_lev_bas : song.lev_bas,
-                            ChartAdvancedRating = song.IsDx ? song.dx_lev_adv: song.lev_adv,
-                            ChartExpertRating =  song.IsDx ? song.dx_lev_exp: song.lev_exp,
-                            ChartMasterRating =  song.IsDx ? song.dx_lev_mas:song.lev_mas,
-                            ChartRemasterRating = song.IsDx ? song.dx_lev_remas: song.lev_remas
-                        }
-                    }
-                });
+                };
+                if (song.HasDx)
+                {
+                    newSong.ChartInfo.Add(FillDxChartData(new SongChart(), song));
+                }
+
+                if (song.HasSd)
+                {
+                    newSong.ChartInfo.Add(FillSdChartData(new SongChart(), song));
+                }
+
+                AddedList.Add(newSong);
             }
             else
             {
                 if(NeedUpdate(song, originSong)) UpdatedList.Add(originSong);
             }
         }
-
+        context.Set<SongInfo>().AddRange(AddedList);
+        context.Set<SongInfo>().UpdateRange(UpdatedList);
+        changedRow = context.SaveChanges();
         return true;
     }
-
-    public int SaveToDb()
-    {
-        using var context = new KouContext();
-        context.Set<SongInfo>().AddRange(AddedList);
-        return context.SaveChanges();
-    }
-
     private bool NeedUpdate(Root data, SongInfo origin)
     {
         var updated = false;
@@ -101,21 +122,23 @@ public class SongInfoUpdater : IKouError
             updated = true;
         }
 
-        if (origin.ChartInfo.IsNullOrEmptySet())
+        var shouldHaveCount = 0;
+        if (data.HasDx) shouldHaveCount++;
+        if (data.HasSd) shouldHaveCount++;
+        origin.ChartInfo ??= new List<SongChart>();
+        if (origin.ChartInfo.IsNullOrEmptySet() || origin.ChartInfo.Count != shouldHaveCount)
         {
-            origin.ChartInfo = new List<SongChart>()
+            //origin.ChartInfo.Clear();
+            origin.ChartInfo = new List<SongChart>();
+            if (data.HasDx)
             {
-                new()
-                {
-                    SongChartType = data.IsDx ? SongChart.ChartType.DX : SongChart.ChartType.SD,
-                    SongTitleKaNa = data.title_kana,
-                    ChartBasicRating = data.IsDx ? data.dx_lev_bas : data.lev_bas,
-                    ChartAdvancedRating = data.IsDx ? data.dx_lev_adv: data.lev_adv,
-                    ChartExpertRating =  data.IsDx ? data.dx_lev_exp: data.lev_exp,
-                    ChartMasterRating =  data.IsDx ? data.dx_lev_mas:data.lev_mas,
-                    ChartRemasterRating = data.IsDx ? data.dx_lev_remas: data.lev_remas
-                }
-            };
+                origin.ChartInfo.Add(FillDxChartData(new SongChart(), data));
+            }
+
+            if (data.HasSd)
+            {
+                origin.ChartInfo.Add(FillSdChartData(new SongChart(), data));
+            }
             updated = true;
         }
         return updated;
@@ -157,7 +180,8 @@ public class SongInfoUpdater : IKouError
         public string title { get; set; }
         public string title_kana { get; set; }
         public string version { get; set; }
-        public bool IsDx => (dx_lev_bas != null || dx_lev_adv != null )&& lev_bas == null && lev_mas == null;
+        public bool HasDx => dx_lev_bas != null || dx_lev_adv != null || dx_lev_exp != null;
+        public bool HasSd => lev_bas != null || lev_adv != null || lev_exp != null;
     }
 
     public string ErrorMsg { get; set; }

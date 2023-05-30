@@ -43,9 +43,10 @@ public partial class Airline : KouFullAutoModel<Airline>
     {
         return formatType switch
         {
-            FormatType.Brief => $"{Code3} {CompanyName?.BeNullIfEmpty() ?? Surname?.FirstOrDefault()}{EnglishName?.BeIfNotEmpty("({0})",true)}",
+            FormatType.Brief => $"{Code3} [{Code2}]{CompanyName?.BeNullIfEmpty() ?? Surname?.FirstOrDefault()}{EnglishName?.BeIfNotEmpty("({0})",true)}",
             FormatType.Detail => $"{CompanyID}.{Code3} {CompanyName?.BeNullIfEmpty() ?? Surname?.FirstOrDefault()}{EnglishName?.BeIfNotEmpty("({0})", true)}" +
                                  Surname?.BeIfNotEmptySet($"\n别名：{Surname.StringJoin(',')}") +
+                                 Code2?.BeIfNotEmpty("\n二字码：{0}", true) +
                                  SITAAddress?.BeIfNotEmpty("\nSITA:{0}",true) +
                                  AFTNAddress?.BeIfNotEmpty("\nAFTN:{0}",true)
         };

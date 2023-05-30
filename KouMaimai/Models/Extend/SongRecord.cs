@@ -124,8 +124,8 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
     {
         return builder =>
         {
-            builder.HasOne(p => p.User).WithMany();
-            builder.HasOne(p => p.CorrespondingChart).WithMany();
+            builder.HasOne(p => p.User).WithMany().OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(p => p.CorrespondingChart).WithMany().OnDelete(DeleteBehavior.Cascade);
         };
     }
 
@@ -140,6 +140,9 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
         }
         return formatType switch
         {
+            FormatType.Customize1=>$"成绩：{Achievements / 100.0:P4} {FcStatus?.Be($"{FcStatus.GetDescription()}")}{FsStatus?.Be($" {FsStatus.GetDescription()}")}" +
+                                   $"\nDX分数：{DxScore}" +
+                                   $"\nRating：{CorrespondingChart.CalRating(RatingColor, Achievements)}",
             FormatType.Brief =>
                 $"{CorrespondingChart.ToSpecificRatingString(RatingColor)}({Achievements / 100.0:P4}{FcStatus?.Be($"{FcStatus.GetDescription()}")}{FsStatus?.Be($" {FsStatus.GetDescription()}")})" +
                 $"——{Rating}",
@@ -149,7 +152,7 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
                                  $"\n成绩：{Achievements / 100.0:P4}" +
                                  $"{FcStatus?.Be($" {FcStatus.GetDescription()}")}" +
                                  $"{FsStatus?.Be($" {FsStatus.GetDescription()}")}" +
-                                 $"\nDX分数:{DxScore}" +
+                                 $"\nDX分数：{DxScore}" +
                                  $"\nRating：{CorrespondingChart.CalRating(RatingColor, Achievements)}",
 
             _ => throw new ArgumentOutOfRangeException(nameof(formatType), formatType, null)

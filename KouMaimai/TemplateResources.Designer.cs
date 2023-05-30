@@ -90,22 +90,48 @@ namespace KouMaimai {
         ///&lt;html lang=&quot;en&quot;&gt;
         ///
         ///&lt;head&gt;
-        ///  &lt;meta charset=&quot;utf-8&quot; /&gt;
-        ///  &lt;title&gt;Record List&lt;/title&gt;
-        ///  &lt;!-- &lt;link rel=&quot;stylesheet&quot; href=&quot;bootstrap.css&quot; /&gt; --&gt;
-        ///  &lt;link rel=&quot;stylesheet&quot; href=&quot;static/koubot.css&quot; /&gt;
-        ///  &lt;link rel=&quot;stylesheet&quot; href=&quot;static/maimai.css&quot; /&gt;
-        ///  &lt;link rel=&quot;stylesheet&quot; href=&quot;static/card1.css&quot; /&gt;
-        ///  &lt;link rel=&quot;stylesheet&quot; href=&quot;static/table1.css&quot; /&gt;
-        ///  &lt;link rel=&quot;stylesheet&quot; href=&quot;static/chartbox2.css&quot; /&gt;
-        ///  &lt;!-- &lt;script src=&quot;bootstrap.js&quot;&gt;&lt;/script&gt; --&gt;
-        ///  &lt;style&gt;
-        ///    @font-face {
-        /// [rest of string was truncated]&quot;;.
+        ///    &lt;meta charset=&quot;utf-8&quot; /&gt;
+        ///    &lt;title&gt;Record List&lt;/title&gt;
+        ///    &lt;!-- &lt;link rel=&quot;stylesheet&quot; href=&quot;bootstrap.css&quot; /&gt; --&gt;
+        ///    &lt;link rel=&quot;stylesheet&quot; href=&quot;static/koubot.css&quot; /&gt;
+        ///    &lt;link rel=&quot;stylesheet&quot; href=&quot;static/maimai.css&quot; /&gt;
+        ///    &lt;link rel=&quot;stylesheet&quot; href=&quot;static/card1.css&quot; /&gt;
+        ///    &lt;link rel=&quot;stylesheet&quot; href=&quot;static/table1.css&quot; /&gt;
+        ///    &lt;link rel=&quot;stylesheet&quot; href=&quot;static/chartbox2.css&quot; /&gt;
+        ///    &lt;!-- &lt;script src=&quot;bootstrap.js&quot;&gt;&lt;/script&gt; --&gt;
+        ///    &lt;style&gt; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string MaiSongInfoTemplate {
             get {
                 return ResourceManager.GetString("MaiSongInfoTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;html lang=&quot;en&quot;&gt;
+        ///&lt;head&gt;
+        ///    &lt;meta charset=&quot;UTF-8&quot;&gt;
+        ///    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+        ///    &lt;title&gt;Image Cards&lt;/title&gt;
+        ///    &lt;link rel=&quot;stylesheet&quot; href=&quot;static/card-list.css&quot;&gt;
+        ///    &lt;link rel=&quot;stylesheet&quot; href=&quot;static/font-effect.css&quot;&gt;
+        ///&lt;/head&gt;
+        ///&lt;style&gt;
+        ///    footer {
+        ///        text-align: center;
+        ///        color: black;
+        ///        font-family: consolas;
+        ///        margin: 1rem;
+        ///    }
+        ///
+        ///    body {
+        ///        background: #f1f1f1;
+        ///        font-family: &quot;Microsoft YaHei&quot;;
+        ///    [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string SongListCardTemplate {
+            get {
+                return ResourceManager.GetString("SongListCardTemplate", resourceCulture);
             }
         }
     }

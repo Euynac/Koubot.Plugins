@@ -187,7 +187,7 @@ public class ArcaeaImageGuessGameRoom : KouGameRoom<ArcaeaImageGuessLeaderBoard>
     public override RoomReaction PromptSayWhenRoundStart(PlatformUser speaker, string content)
     {
         var distance = TestAnswer(content);
-        if (distance == 1)
+        if (distance == 1 || content == CurAnswer.SongTitle)
         {
             var previous = CurAnswer;
             RecordLastRoundWinner(speaker);
