@@ -41,7 +41,9 @@ namespace KouGamePlugin.Maimai.Models
                 entity.Property(p => p.Version)
                     .HasConversion(v => v.GetKouEnumName(1) ?? v.ToString(),
                     s => s.ToKouEnum<SongVersion>());
-
+                entity.Property(p => p.DxVersion)
+                    .HasConversion(v => v.GetKouEnumName(1) ?? v.ToString(),
+                        s => s.ToKouEnum<SongVersion>());
                 entity.HasIndex(e => e.SongTitle);
 
                 entity.HasMany(p => p.Aliases)
@@ -82,7 +84,7 @@ namespace KouGamePlugin.Maimai.Models
                         $"{id}.{SongTitle} [{songType}]" +
                         difficultData +
                         SongGenre?.Be($"\n分类：{SongGenre}") +
-                        Version?.Be($"\n版本：{Version.Value.GetKouEnumName()}") + SongArtist?.Be($"\n曲师：{SongArtist}") +
+                        chartInfo.Version?.Be($"\n版本：{chartInfo.Version.Value.GetKouEnumName()}") + SongArtist?.Be($"\n曲师：{SongArtist}") +
                         SongBpm?.Be($"\nBPM：{SongBpm}") + SongLength?.Be($"\n歌曲长度：{SongLength}") +
                         Remark?.Be($"\n注：{Remark}") +
                         Aliases?.ToKouSetString(FormatType.Customize1, "，", false)?.Be("\n别名：{0}", true) +

@@ -46,12 +46,22 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
         AddCustomFunc(nameof(SongChart.ChartRating), (song, o) => BaseCompare(song.CorrespondingChart.GetChartRatingOfSpecificColor(song.RatingColor), o));
         AddCustomFunc(nameof(SongChart.ChartConstant), (song, o) => BaseCompare(song.CorrespondingChart.GetChartConstantOfSpecificColor(song.RatingColor), o));
     }
+    public static List<SongRecord> GetB50Charts(UserAccount user)
+    {
+        var list = DbWhere(p => p.User == user);
+        if (list.IsNullOrEmptySet()) return new List<SongRecord>();
+        var newSong = list.Where(p => p.CorrespondingChart.BasicInfo.IsNew is true).OrderByDescending(p => p.B40Rating).Take(15);
+        var oldSong = list.Where(p => p.CorrespondingChart.BasicInfo.IsNew is false).OrderByDescending(p => p.B40Rating).Take(35);
+        var b50Charts = newSong.ToList();
+        b50Charts.AddRange(oldSong);
+        return b50Charts;
+    }
     public static List<SongRecord> GetB40Charts(UserAccount user)
     {
         var list = DbWhere(p => p.User == user);
         if (list.IsNullOrEmptySet()) return new List<SongRecord>();
-        var newSong = list.Where(p => p.CorrespondingChart.BasicInfo.IsNew is true).OrderByDescending(p => p.Rating).Take(15);
-        var oldSong = list.Where(p => p.CorrespondingChart.BasicInfo.IsNew is false).OrderByDescending(p => p.Rating).Take(25);
+        var newSong = list.Where(p => p.CorrespondingChart.BasicInfo.IsNew is true).OrderByDescending(p => p.B40Rating).Take(15);
+        var oldSong = list.Where(p => p.CorrespondingChart.BasicInfo.IsNew is false).OrderByDescending(p => p.B40Rating).Take(25);
         var b40Song = newSong.ToList();
         b40Song.AddRange(oldSong);
         return b40Song;
@@ -88,21 +98,34 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
         ruleDictionary.Add($"{nameof(CorrespondingChart)}.{nameof(CorrespondingChart.SongAlias)}", userInput);
         return true;
     }
-
     /// <summary>
     /// 当前成绩Rating
     /// </summary>
-    [AutoField(ActivateKeyword = "rating")]
-    public int Rating
+    [AutoField(ActivateKeyword = "b50rating")]
+    public int B50Rating
     {
         get
         {
-            _rating ??= CorrespondingChart.CalRating(RatingColor, Achievements) ?? 0;
-            return _rating.Value;
+            _b50Rating ??= CorrespondingChart.CalRating(RatingColor, Achievements, true) ?? 0;
+            return _b50Rating.Value;
         }
     }
 
-    private int? _rating;
+    private int? _b50Rating;
+    /// <summary>
+    /// 当前成绩Rating
+    /// </summary>
+    [AutoField(ActivateKeyword = "b40rating")]
+    public int B40Rating
+    {
+        get
+        {
+            _b40Rating ??= CorrespondingChart.CalRating(RatingColor, Achievements) ?? 0;
+            return _b40Rating.Value;
+        }
+    }
+
+    private int? _b40Rating;
 
 
     protected override dynamic? ConfigModelInclude(IQueryable<SongRecord> set)
@@ -145,7 +168,7 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
                                    $"\nRating：{CorrespondingChart.CalRating(RatingColor, Achievements)}",
             FormatType.Brief =>
                 $"{CorrespondingChart.ToSpecificRatingString(RatingColor)}({Achievements / 100.0:P4}{FcStatus?.Be($"{FcStatus.GetDescription()}")}{FsStatus?.Be($" {FsStatus.GetDescription()}")})" +
-                $"——{Rating}",
+                $"——{B40Rating}",
             FormatType.Detail =>
                                  //$"{CorrespondingChart.BasicInfo.JacketUrl?.Be(new KouImage(CorrespondingChart.BasicInfo.JacketUrl, CorrespondingChart).ToKouResourceString())}" +
                                  $"{CorrespondingChart.ToSpecificRatingString(RatingColor)}" +
@@ -181,7 +204,7 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
                         ChartType = p.CorrespondingChart.SongChartType.ToString(),
                         ChartConstant = p.CorrespondingChart.GetChartConstantOfSpecificColor(p.RatingColor)?.ToString("F1"),
                         ChartLabel = p.CorrespondingChart.DifficultTag.ToString(),
-                        Rating = p.Rating,
+                        Rating = p.B40Rating,
                     }).ToList()};
                 }),
                 new KouTemplate(TemplateResources.MaimaiRecordListTemplate).AppendModel(new ModelPage(pageSetting))){DpiRank = 2}

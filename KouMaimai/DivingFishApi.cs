@@ -20,10 +20,10 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
         [Description("登录失败，用户名或密码错误")]
         LoginFailed,
     }
-    public string Username { get; }
-    public string Password { get; }
-    public string TokenValue { get; private set; }
-    public string BindQQ { get; }
+    public string? Username { get; }
+    public string? Password { get; }
+    public string? TokenValue { get; private set; }
+    public string? BindQQ { get; }
     public DivingFishApi(string username, string password, string? tokenValue, string? bindQQ)
     {
         Username = username;
@@ -32,6 +32,10 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
         BindQQ = bindQQ;
     }
 
+    public DivingFishApi(string qq)
+    {
+        BindQQ = qq;
+    }
     public DivingFishApi(MaiUserConfig config)
     {
         Username = config.Username;
@@ -43,14 +47,12 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
     public static DivingFishChartStatusDto? GetChartStatusList()
     {
         var response = KouHttp.Create("https://www.diving-fish.com/api/maimaidxprober/chart_stats").SetBody().SendRequest(HttpMethods.GET);
-        if (response == null) return null;
         var body = response.Body;
         return JsonSerializer.Deserialize<DivingFishChartStatusDto>(body);
     }
     public static DivingFishChartInfoDto.Root? GetChartInfoList()
     {
         var response = KouHttp.Create("https://www.diving-fish.com/api/maimaidxprober/music_data").SetBody().SendRequest(HttpMethods.GET);
-        if (response == null) return null;
         var body = response.Body;
         return new DivingFishChartInfoDto.Root()
             { Infos = JsonSerializer.Deserialize<List<DivingFishChartInfoDto.ChartInfo>>(body) };
@@ -94,25 +96,44 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
     /// 获取当前用户资料
     /// </summary>
     /// <returns></returns>
-    public UserProfile? GetProfile()
+    public DetailProfile? GetProfile()
     {
-        if (TokenValue is null)
+        if (BindQQ == null)
         {
-            if (!Login()) return null;
+            return this.ReturnNullWithError("未绑定QQ");
         }
-
-        var response = KouHttp.Create("https://www.diving-fish.com/api/maimaidxprober/player/profile")
-            .AddCookie(_tokenKey, TokenValue).SetQPS(1).SetBody().SendRequest(HttpMethods.GET);
-
-        var profile = response.Body.DeserializeJson<UserProfile>();
-        if (profile == null)
+        var response = KouHttp.Create("https://www.diving-fish.com/api/maimaidxprober/query/player").SetQPS(1).SetJsonBody(new
         {
-            var node = JsonNode.Parse(response.Body)!;
-            return this.ReturnNullWithError(node["message"]!.GetValue<string>());
-        }
+            qq = BindQQ,
+        }, o => o.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull).SendRequest(HttpMethods.POST);
+        return response.HasError ? this.ReturnNullWithError(response.Body) : response.Body.DeserializeJson<DetailProfile>(new JsonSerializerOptions(){ NumberHandling = JsonNumberHandling.AllowReadingFromString |
+            JsonNumberHandling.WriteAsString});
 
-        return profile;
+        //if (TokenValue is null)
+        //{
+        //    if (!Login()) return null;
+        //}
+
+        //var response = KouHttp.Create("https://www.diving-fish.com/api/maimaidxprober/player/profile")
+        //    .AddCookie(_tokenKey, TokenValue).SetQPS(1).SetBody().SendRequest(HttpMethods.GET);
+
+        //var profile = response.Body.DeserializeJson<UserProfile>();
+        //if (profile == null)
+        //{
+        //    var node = JsonNode.Parse(response.Body)!;
+        //    return this.ReturnNullWithError(node["message"]!.GetValue<string>());
+        //}
+        //return profile;
     }
+    //public class UserProfile
+    //{
+    //    public int additional_rating { get; set; }
+    //    public string bind_qq { get; set; }
+    //    public string nickname { get; set; }
+    //    public string plate { get; set; }
+    //    public bool privacy { get; set; }
+    //    public string username { get; set; }
+    //}
     /// <summary>
     /// 获取用户所有成绩
     /// </summary>
@@ -144,15 +165,7 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
     
 
 
-    public class UserProfile
-    {
-        public int additional_rating { get; set; }
-        public string bind_qq { get; set; }
-        public string nickname { get; set; }
-        public string plate { get; set; }
-        public bool privacy { get; set; }
-        public string username { get; set; }
-    }
+  
 
     public string? ErrorMsg { get; set; }
     public ErrorCodes ErrorCode { get; set; }

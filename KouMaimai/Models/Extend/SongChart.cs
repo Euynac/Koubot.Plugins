@@ -22,6 +22,13 @@ namespace KouGamePlugin.Maimai.Models
 {
     public partial class SongChart : KouFullAutoModel<SongChart>
     {
+        public SongVersion? Version => SongChartType switch
+            {
+                ChartType.DX => BasicInfo.DxVersion,
+                ChartType.SD => BasicInfo.Version,
+                _ => null
+            };
+        
         /// <summary>
         /// 谱面类型
         /// </summary>
@@ -359,9 +366,10 @@ namespace KouGamePlugin.Maimai.Models
         /// </summary>
         /// <param name="type"></param>
         /// <param name="achievement"></param>
+        /// <param name="b50"></param>
         /// <returns>不存在相关定数时返回null</returns>
-        public int? CalRating(RatingColor type, double achievement) =>
-            GetChartConstantOfSpecificColor(type) is { } constant ? DxCalculator.CalSongRating(achievement, constant) : null;
+        public int? CalRating(RatingColor type, double achievement, bool? b50 = null) =>
+            GetChartConstantOfSpecificColor(type) is { } constant ? DxCalculator.CalSongRating(achievement, constant, b50) : null;
 
         /// <summary>
         /// 获取指定难度的谱面数据

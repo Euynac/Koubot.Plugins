@@ -21,9 +21,14 @@
         font-family: Impact, sans-serif, "Microsoft YaHei";
         /* color: white; */
     }
+    .append_info{
+        margin: 15px auto;
+        width: 89%;
+    }
 </style>
 <body>
 <h1 class="font-border ">{{Header}}</h1>
+<p class="append_info">{{AppendInfo}}</p>
 <div class="parent">
     {{ for container in Containers }}
     <div class="container">

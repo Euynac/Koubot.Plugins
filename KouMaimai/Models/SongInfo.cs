@@ -39,6 +39,8 @@ namespace KouGamePlugin.Maimai.Models
         [AutoField(ActivateKeyword = "版本")]
         [Column("version")]
         public SongVersion? Version { get; set; }
+        [Column("dx_version")]
+        public SongVersion? DxVersion { get; set; }
         [Column("remark")]
         [StringLength(2000)]
         [AutoField(ActivateKeyword = "注|评论")]

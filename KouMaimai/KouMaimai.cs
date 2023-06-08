@@ -121,66 +121,7 @@ namespace KouGamePlugin.Maimai
 
         #endregion
 
-        #region Diving-Fish
-
-        private bool HasBindError(MaiUserConfig config, out string reply)
-        {
-            if (config.Username.IsNullOrEmpty())
-            {
-                reply = $"{CurUser.Name}暂未绑定Diving-Fish账号呢，私聊Kou使用/mai bind 用户名 密码绑定";
-                return true;
-            }
-
-            if ((DateTime.Now - config.TokenRefreshTime).Days >= 29)//29天刷新一次Token
-            {
-                var api = new DivingFishApi(config);
-                if (!api.Login())
-                {
-                    reply = $"刷新Token时，{CurUser.Name}登录失败了呢，Diving-Fish说：{api.ErrorMsg}";
-                    return true;
-                }
-
-                config.LoginTokenValue = api.TokenValue;
-                config.TokenRefreshTime = DateTime.Now;
-                config.SaveChanges();
-            }
-
-            reply = "";
-            return false;
-        }
         //private static readonly KouColdDown<UserAccount> _getRecordsCd = new();
-
-        [PluginFunction(ActivateKeyword = "刷新", Name = "重新获取所有成绩", NeedCoin = 10)]
-        public object RefreshRecords()
-        {
-            var config = this.UserConfig();
-            if (HasBindError(config, out var reply)) return reply;
-            var api = new DivingFishApi(config);
-            if (!CurKouUser.HasEnoughFreeCoin(10))
-            {
-                return FormatNotEnoughCoin(10);
-            }
-            if (CDOfFunctionKouUserIsIn(_refreshCD, new TimeSpan(0, 1, 0), out var remaining))
-            {
-                return FormatIsInCD(remaining);
-            }
-            Reply($"正在刷新中...请稍后\n[{FormatConsumeFreeCoin(10)}]");
-
-            if (!api.FetchUserRecords(CurKouUser))
-            {
-                CDOfUserFunctionReset(_refreshCD);
-                return $"获取成绩失败：{api.ErrorMsg}";
-            }
-
-            CurKouUser.ConsumeCoinFree(10);
-            config.GetRecordsTime = DateTime.Now;
-            config.SaveChanges();
-            return $"{config.Nickname}记录刷新成功！";
-        }
-
-        private const string _refreshCD = "RefreshRecords";
-
-        #endregion
 
         #region 计算
 
@@ -242,7 +183,8 @@ namespace KouGamePlugin.Maimai
                            $"达成分数线 {100.5 / 100:P4} 允许的最多 TAP GREAT 数量为 {(101 - 100.5) / 100 / -tapGreatReduce:F3}个");
             if (constant != 0)
             {
-                remarkList.Add($"定数{constant}，100% Rating {DxCalculator.CalSongRating(100, constant)}，100.5% Rating {DxCalculator.CalSongRating(100.5, constant)}");
+                remarkList.Add($"[B40]定数{constant}，100% Rating {DxCalculator.CalSongRating(100, constant)}，100.5% Rating {DxCalculator.CalSongRating(100.5, constant)}\n[B50]定数{constant}，100% Rating {DxCalculator.CalSongRating(100, constant, true)}，100.5% Rating {DxCalculator.CalSongRating(100.5, constant, true)}");
+
             }
             
 
@@ -336,20 +278,6 @@ namespace KouGamePlugin.Maimai
         #endregion
 
         #region 数据采集
-
-        [PluginFunction(Name = "更新谱面统计数据", Authority = Authority.BotManager)]
-        public object UpdateChartStatus()
-        {
-            var statusData = DivingFishApi.GetChartStatusList();
-            return $"影响到{statusData?.SaveToDb()}条记录";
-        }
-
-        [PluginFunction(Name = "更新谱面数据", Authority = Authority.BotManager)]
-        public object UpdateChartInfos()
-        {
-            var statusData = DivingFishApi.GetChartInfoList();
-            return $"影响到{statusData?.SaveToDb()}条记录";
-        }
 
         [PluginFunction(Name = "更新歌曲封面到本地图片路径", Authority = Authority.BotManager)]
         public object? UpdateSongInfoImg()

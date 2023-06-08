@@ -7,6 +7,9 @@ using System.Linq;
 using Koubot.Tool.General;
 using Koubot.Tool.String;
 using Microsoft.EntityFrameworkCore;
+using static KouGamePlugin.Maimai.Models.DivingFishBest40ResponseDto;
+using static Org.BouncyCastle.Math.EC.ECCurve;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KouGamePlugin.Maimai.Models;
 
@@ -59,7 +62,7 @@ public class DivingFishBest40ResponseDto
 
 public class DivingFishChartStatusDto
 {
-    public Dictionary<string,List<ChartStatus>> charts { get; set; }
+    public Dictionary<string, List<ChartStatus>> charts { get; set; }
 
     public class ChartStatus
     {
@@ -89,7 +92,7 @@ public class DivingFishChartStatusDto
                 //SSSRankOfSameDifficult = v,
                 //SameDifficultCount = t,
                 ChartRating = diff,
-                SSSCount =  dist?.TakeLast(2).Sum() ?? 0,
+                SSSCount = dist?.TakeLast(2).Sum() ?? 0,
                 TotalCount = (int)cnt,
                 AverageDxScore = avg_dx,
                 FitConstant = fit_diff,
@@ -106,33 +109,33 @@ public class DivingFishChartStatusDto
         {
             if (!id.IsInt(out var idInt)) continue;
             var chart = chartsInDb.SingleOrDefault(p => p.OfficialId == idInt);
-            if(chart == null)
+            if (chart == null)
             {
                 statusList.PrintLn($"No data:{idInt}");
                 continue;
             }
-            chart.ChartStatusList = statusList.Select(p => p.ToDbChartStatus()).Where(p => p!=null).ToList();
+            chart.ChartStatusList = statusList.Select(p => p.ToDbChartStatus()).Where(p => p != null).ToList();
             //context.Set<SongChart>().Update(chart);
         }
 
-        var sameDiffChartStatus = chartsInDb.Where(p=>p.ChartStatusList != null).SelectMany(p => p.ChartStatusList).OrderByDescending(p=>p.SSSPeopleRatio).GroupBy(p=>p.ChartRating).ToList();
+        var sameDiffChartStatus = chartsInDb.Where(p => p.ChartStatusList != null).SelectMany(p => p.ChartStatusList).OrderByDescending(p => p.SSSPeopleRatio).GroupBy(p => p.ChartRating).ToList();
         foreach (var (id, statusList) in charts)
         {
             if (!id.IsInt(out var idInt)) continue;
             var chart = chartsInDb.SingleOrDefault(p => p.OfficialId == idInt);
-            if(chart?.ChartStatusList == null)
+            if (chart?.ChartStatusList == null)
             {
                 continue;
             }
 
-            foreach (var status in  chart.ChartStatusList)
+            foreach (var status in chart.ChartStatusList)
             {
                 var difficult = status.ChartRating;
                 status.SameDifficultCount = sameDiffChartStatus.SingleOrDefault(p => p.Key == difficult)?.Count() ?? 0;
                 status.SSSRankOfSameDifficult = sameDiffChartStatus.SingleOrDefault(p => p.Key == difficult)?.ToList().IndexOf(status) + 1 ?? 0;
                 status.DifficultTag =
                     (SongChart.ChartStatus.Tag)
-                    ((status.SSSRankOfSameDifficult / (double) status.SameDifficultCount) * 5).Ceiling() - 1;
+                    ((status.SSSRankOfSameDifficult / (double)status.SameDifficultCount) * 5).Ceiling() - 1;
             }
             //context.Set<SongChart>().Update(chart);
         }
@@ -227,7 +230,14 @@ public class DivingFishChartInfoDto
                     dbInfo.IsNew = item.basic_info.is_new;
                     dbInfo.SongBpm = item.basic_info.bpm.ToString().BeNullIfWhiteSpace() ?? dbInfo.SongBpm;
                     dbInfo.SongGenre = item.basic_info.genre.BeNullIfWhiteSpace() ?? dbInfo.SongGenre;
-                    dbInfo.Version = item.basic_info.@from.ToKouEnum<SongVersion>();
+                    if (item.type == "DX")
+                    {
+                        dbInfo.DxVersion = item.basic_info.@from.ToKouEnum<SongVersion>();
+                    }
+                    else
+                    {
+                        dbInfo.Version = item.basic_info.@from.ToKouEnum<SongVersion>();
+                    }
                     dbInfo.SongArtist = item.basic_info.artist.BeNullIfWhiteSpace() ?? dbInfo.SongArtist;
                     dbChartInfo.OfficialId = int.Parse(item.id);
                     for (var i = 0; i < 5; i++)
@@ -281,13 +291,15 @@ public class DivingFishChartInfoDto
                     {
                         var tmp = new List<SongChart.ChartData>();
                         tmp.AddRange(dbChartInfo.ChartDataList);
-                        dbChartInfo.ChartDataList = tmp; 
+                        dbChartInfo.ChartDataList = tmp;
                     }
                     context.Update(dbInfo);
                 }
                 catch (Exception e)
                 {
-                    KouLog.QuickAdd($"更新ID{item.id}.{item.title}时出错：{e.Message}");
+                    var log = $"更新ID{item.id}.{item.title}时出错：{e.Message}";
+                    log.PrintLn();
+                    KouLog.QuickAdd(log);
                 }
             }
             var row = context.SaveChanges();
@@ -332,8 +344,8 @@ public class DivingFishRecordResponseDto
                 User = user.FindThis(context),
                 DxScore = chart.dxScore,
             };
-         
-            var oldRecord = oldRecords.SingleOrDefault(p=>p.CorrespondingChart.OfficialId == chart.song_id && p.RatingColor == (SongChart.RatingColor) chart.level_index);
+
+            var oldRecord = oldRecords.SingleOrDefault(p => p.CorrespondingChart.OfficialId == chart.song_id && p.RatingColor == (SongChart.RatingColor)chart.level_index);
             if (oldRecord != null)
             {
                 record.Id = oldRecord.Id;
@@ -383,4 +395,47 @@ public class DivingFishRecord
     public int song_id { get; set; }
     public string title { get; set; }
     public string type { get; set; }
+}
+
+public class DetailProfile
+{
+    public int additional_rating { get; set; }
+    //public Charts charts { get; set; }
+    public string nickname { get; set; }
+    public string plate { get; set; }
+    public int rating { get; set; }
+    public UserData? user_data { get; set; }
+    public string username { get; set; }
+
+    public void FillInfo(MaiUserConfig config)
+    {
+        config.Nickname = nickname;
+        config.Plate = plate;
+        config.AdditionalRating = additional_rating;
+        config.OfficialRating = rating;
+        if (user_data != null)
+        {
+            config.Nickname = user_data.userName;
+            config.PlayCount = user_data.playCount;
+            config.FirstPlayDate = DateTime.Parse(user_data.firstPlayDate);
+            config.LastPlayDate = DateTime.Parse(user_data.lastPlayDate);
+            config.LastRegionId = user_data.lastRegionId;
+            config.LastRegionName = user_data.lastRegionName;
+            config.FirstGameId = user_data.firstGameId;
+        }
+    }
+}
+
+public class UserData
+{
+    public string firstGameId { get; set; }
+    public string firstPlayDate { get; set; }
+    public string lastPlayDate { get; set; }
+    public int lastRegionId { get; set; }
+    public string lastRegionName { get; set; }
+    public int playCount { get; set; }
+    /// <summary>
+    /// DX用户名
+    /// </summary>
+    public string userName { get; set; }
 }

@@ -14,6 +14,10 @@ public class MaiGlobalConfig : PluginGlobalConfig
     /// DxMap上一次更新时间
     /// </summary>
     public DateTime DxMapLastUpdateTime { get; set; }
+    /// <summary>
+    /// 开启自动刷新
+    /// </summary>
+    public bool EnableAutoRefresh { get; set; }
 }
 
 public class MaiGroupConfig : PluginGroupConfig<MaiGroupConfig>
@@ -149,9 +153,17 @@ public class MaiUserConfig : PluginUserConfig<MaiUserConfig>
     /// </summary>
     public int AdditionalRating { get; set; }
     /// <summary>
+    /// 官方段位分（用于检测是否更新）
+    /// </summary>
+    public int OfficialRating { get; set; }
+    /// <summary>
+    /// 游玩PC数
+    /// </summary>
+    public int PlayCount { get; set; }
+    /// <summary>
     /// 上一次获取成绩时间
     /// </summary>
-    public DateTime GetRecordsTime { get; set; }
+    public DateTime LastGetRecordsTime { get; set; }
     /// <summary>
     /// Token刷新时间
     /// </summary>
@@ -160,6 +172,13 @@ public class MaiUserConfig : PluginUserConfig<MaiUserConfig>
     /// 使用皮肤
     /// </summary>
     public bool? UseHtml { get; set; }
+
+    public string? FirstGameId { get; set; }
+    public string? LastRegionName { get; set; }
+    public int? LastRegionId { get; set; }
+    public DateTime? LastPlayDate { get; set; }
+    public DateTime? FirstPlayDate { get; set; }
+
     /// <summary>
     /// 获取用户当前资料
     /// </summary>
@@ -169,8 +188,12 @@ public class MaiUserConfig : PluginUserConfig<MaiUserConfig>
         if (Username == null) return null;
         return $"{Nickname}" +
                Plate.BeIfNotEmpty($"【{Plate}】") + $"(段位分{AdditionalRating})" +
-               $"\nB40 Rating：{SongRecord.GetB40Charts(user).Sum(p => p.Rating)}" +
-               $"\n上次成绩刷新时间：{GetRecordsTime}" +
+               $"\nB40 Rating：{SongRecord.GetB40Charts(user).Sum(p => p.B40Rating)}" +
+               $"\nB50 Rating：{SongRecord.GetB50Charts(user).Sum(p=>p.B50Rating)}" +
+               $"\n上次成绩刷新时间：{LastGetRecordsTime}" +
+               //$"\nPC数：{PlayCount}" +
+               //$"\n初次游玩日期：{FirstPlayDate}" +
+               //$"\n最近游玩日期：{LastPlayDate}" +
                $"\nDiving-Fish用户名：{Username}";
     }
 }
