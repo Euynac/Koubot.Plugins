@@ -43,28 +43,73 @@ public partial class SongRecord : KouFullAutoModel<SongRecord>
     {
         AddCustomFunc(nameof(SongTitle), (song, o) => BaseCompare(song.CorrespondingChart.BasicInfo.SongTitle, o));
         AddCustomFunc(nameof(SongChart.DifficultTag), (song, o) => BaseCompare(song.CorrespondingChart.GetChartStatus(song.RatingColor), o));
-        AddCustomFunc(nameof(SongChart.ChartRating), (song, o) => BaseCompare(song.CorrespondingChart.GetChartRatingOfSpecificColor(song.RatingColor), o));
+        AddCustomFunc(nameof(SongChart.ChartRating), (song, o) => BaseCompare(song.CorrespondingChart.GetChartDifficultOfSpecificColor(song.RatingColor), o));
         AddCustomFunc(nameof(SongChart.ChartConstant), (song, o) => BaseCompare(song.CorrespondingChart.GetChartConstantOfSpecificColor(song.RatingColor), o));
     }
-    public static List<SongRecord> GetB50Charts(UserAccount user)
+
+    public int GetAccurateStar()
     {
-        var list = DbWhere(p => p.User == user);
+        var fullScore = CorrespondingChart.GetFullDxScore(RatingColor);
+        if (fullScore == null) return 0;
+        var percentage = DxScore / (double)fullScore;
+        //DX分数评级	DX分数占比
+        // -	0.00% - 84.99%
+        // ✦	85.00% - 89.99%
+        // ✦✦	90.00% - 92.99%
+        // ✦✦✦	93.00% - 94.99%
+        // ✦✦✦✦	95.00% - 96.99%
+        // ✦✦✦✦✦	97.00% - 100.00%
+        return percentage switch
+        {
+            < 0.85 => 0,
+            < 0.9 => 1,
+            < 0.93 => 2,
+            < 0.95 => 3,
+            < 0.97 => 4,
+            _ => 5
+        };
+    }
+
+    public static (int, int)? GetGroundRating(UserAccount account, bool isB40 = false)
+    {
+        var list = isB40 ? GetB40Charts(account) : GetB50Charts(account);
+        return GetGroundRating(list, isB40);
+    }
+    public static (int, int)? GetGroundRating(IReadOnlyList<SongRecord> list, bool isB40 = false)
+    {
+        if (list.IsNullOrEmptySet()) return null;
+        var newSongGround = list.Where(p => p.CorrespondingChart.IsNew is true)
+            .DefaultIfEmpty().Min(p => isB40 ? p?.B40Rating ?? 0 : p?.B50Rating ?? 0);
+        var oldSongGround = list.Where(p => p.CorrespondingChart.IsNew is false).DefaultIfEmpty().Min(p => isB40 ? p?.B40Rating ?? 0: p?.B50Rating ?? 0);
+        return (newSongGround, oldSongGround);
+    }
+    public static List<SongRecord> GetB50Charts(IReadOnlyList<SongRecord> list)
+    {
         if (list.IsNullOrEmptySet()) return new List<SongRecord>();
-        var newSong = list.Where(p => p.CorrespondingChart.BasicInfo.IsNew is true).OrderByDescending(p => p.B40Rating).Take(15);
-        var oldSong = list.Where(p => p.CorrespondingChart.BasicInfo.IsNew is false).OrderByDescending(p => p.B40Rating).Take(35);
+        var newSong = list.Where(p => p.CorrespondingChart.IsNew is true).OrderByDescending(p => p.B50Rating).Take(15);
+        var oldSong = list.Where(p => p.CorrespondingChart.IsNew is false).OrderByDescending(p => p.B50Rating).Take(35);
         var b50Charts = newSong.ToList();
         b50Charts.AddRange(oldSong);
         return b50Charts;
     }
-    public static List<SongRecord> GetB40Charts(UserAccount user)
+    public static List<SongRecord> GetB50Charts(UserAccount user)
     {
         var list = DbWhere(p => p.User == user);
+        return GetB50Charts(list);
+    }
+    public static List<SongRecord> GetB40Charts(IReadOnlyList<SongRecord> list)
+    {
         if (list.IsNullOrEmptySet()) return new List<SongRecord>();
-        var newSong = list.Where(p => p.CorrespondingChart.BasicInfo.IsNew is true).OrderByDescending(p => p.B40Rating).Take(15);
-        var oldSong = list.Where(p => p.CorrespondingChart.BasicInfo.IsNew is false).OrderByDescending(p => p.B40Rating).Take(25);
+        var newSong = list.Where(p => p.CorrespondingChart.IsNew is true).OrderByDescending(p => p.B40Rating).Take(15);
+        var oldSong = list.Where(p => p.CorrespondingChart.IsNew is false).OrderByDescending(p => p.B40Rating).Take(25);
         var b40Song = newSong.ToList();
         b40Song.AddRange(oldSong);
         return b40Song;
+    }
+    public static List<SongRecord> GetB40Charts(UserAccount user)
+    {
+        var list = DbWhere(p => p.User == user);
+        return GetB40Charts(list);
     }
     public override bool UseCustomDefaultFieldSplit(string userInput, out Dictionary<string, string> ruleDictionary, out string relationStr)
     {

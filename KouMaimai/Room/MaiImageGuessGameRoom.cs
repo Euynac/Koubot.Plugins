@@ -37,7 +37,7 @@ public class MaiImageGuessLeaderBoard : IGameRoomLeaderBoardInfo<MaiImageGuessLe
 
 public class MaiImageGuessGameRoom : KouGameRoom<MaiImageGuessLeaderBoard>
 {
-    public const string Help = "maimai歌曲猜图，每轮不定时放出随机裁切过的歌曲图片，玩家需要猜出图片对应的歌曲名称或别名，最先猜对的计分。开始游戏后，默认10分钟后结算成绩。每10轮难度升级（包含缩小、翻转、旋转、灰度等），并增益15%奖池。";
+    public const string Help = "maimai歌曲猜图，每轮不定时放出随机裁切过的歌曲图片，玩家需要猜出图片对应的歌曲名称或别名，最先猜对的计分。开始游戏后，默认10分钟后结算成绩。每10轮难度升级（包含缩小、翻转、旋转、灰度等），并增益15%奖池。图片范围为国服歌曲范围。";
     public static Lazy<HashSet<int>> NotExistSet { get; set; } = new(() =>
     {
         var list = new List<int>();
@@ -126,7 +126,7 @@ public class MaiImageGuessGameRoom : KouGameRoom<MaiImageGuessLeaderBoard>
     public override void NewRound(bool isRenew = false)
     {
         var hash = NotExistSet.Value;
-        var info = SongChart.GetCache()!.Where(p => !hash.Contains(p.ChartId)).ToList().RandomGetOne()?.BasicInfo;
+        var info = SongChart.GetCache()!.Where(p=>p.OfficialId is { } id && id != 0).Where(p => !hash.Contains(p.ChartId)).ToList().RandomGetOne()?.BasicInfo;
         if (info == null) return;
         CurAnswer = info;
         CurImage = null;

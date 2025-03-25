@@ -43,6 +43,7 @@ public partial class KouMaimai
     public object RefreshRecords()
     {
         var config = this.UserConfig();
+        var preRating = config.B50Rating;
         if (HasBindError(config, out var reply)) return reply;
         var api = new DivingFishApi(config);
         if (!CurKouUser.HasEnoughFreeCoin(10))
@@ -57,16 +58,17 @@ public partial class KouMaimai
 
         Reply($"正在刷新中...请稍后\n[{FormatConsumeFreeCoin(10)}]");
 
-        if (!api.FetchUserRecords(CurKouUser))
+        if (!api.FetchUserRecords(CurKouUser, out var updatedList))
         {
             CDOfUserFunctionReset(_refreshCD);
             return $"获取成绩失败：{api.ErrorMsg}";
         }
 
+        config.UpdateRecordInfo(updatedList);
         CurKouUser.ConsumeCoinFree(10);
         config.LastGetRecordsTime = DateTime.Now;
         config.SaveChanges();
-        return $"{config.Nickname}记录刷新成功！";
+        return $"{config.Nickname}记录刷新成功！{preRating?.Be($"(Rating +{(config.B50Rating??0)-preRating})")}";
     }
 
     private const string _refreshCD = "RefreshRecords";
@@ -75,18 +77,13 @@ public partial class KouMaimai
 
     #region 数据采集
 
-    [PluginFunction(Name = "更新谱面统计数据", Authority = Authority.BotManager)]
-    public object UpdateChartStatus()
-    {
-        var statusData = DivingFishApi.GetChartStatusList();
-        return $"影响到{statusData?.SaveToDb()}条记录";
-    }
-
     [PluginFunction(Name = "更新谱面数据", Authority = Authority.BotManager)]
-    public object UpdateChartInfos()
+    public object UpdateChart()
     {
-        var statusData = DivingFishApi.GetChartInfoList();
-        return $"影响到{statusData?.SaveToDb()}条记录";
+        var infoData = DivingFishApi.GetChartInfoList();
+        var statusData = DivingFishApi.GetChartStatusList();
+        return $"谱面信息影响到{infoData?.SaveToDb()}条记录\n" +
+               $"谱面数据影响到{statusData?.SaveToDb()}条记录";
     }
 
     #endregion
@@ -106,14 +103,15 @@ public partial class KouMaimai
         {
             Reply("已自动检测到成绩更新（Rating变化）");
             Reply(RefreshRecords() as string, 100);
+            p.FillInfo(config);
+            config.SaveChanges();
         }
         //if (p.user_data?.playCount > config.PlayCount)
         //{
         //    Reply("已自动检测到成绩更新");
         //    Reply(RefreshRecords() as string, 100);
         //}
-        p.FillInfo(config);
-        config.SaveChanges();
+        
     }
 
     [PluginFunction(ActivateKeyword = "info", Name = "获取用户信息")]
@@ -142,10 +140,10 @@ public partial class KouMaimai
             return $"{CurUser.Name}登录成功，但获取用户信息失败：{api.ErrorMsg}";
         }
 
-        if (CDOfFunctionKouUserIsIn(_refreshCD, new TimeSpan(0, 0, 1, 0), out var remaining))
-        {
-            return FormatIsInCD(remaining);
-        }
+        //if (CDOfFunctionKouUserIsIn(_refreshCD, new TimeSpan(0, 0, 1, 0), out var remaining))
+        //{
+        //    return FormatIsInCD(remaining);
+        //}
 
         var config = this.UserConfig();
         var isFirstTime = config.Username == null;
@@ -155,22 +153,23 @@ public partial class KouMaimai
         config.TokenRefreshTime = DateTime.Now;
         config.LastGetRecordsTime = DateTime.Now;
         profile.FillInfo(config);
+        config.OfficialRating = 0;
         config.SaveChanges();
         var bindSuccessFormat = $"{CurUser.Name}绑定成功！";
-        var profileAppend = $"\n{config.ToUserProfileString(CurKouUser)}";
-        if (isFirstTime)
-        {
-            Reply(bindSuccessFormat + "初次绑定，正在获取所有成绩..." + profileAppend);
-            if (!api.FetchUserRecords(CurKouUser))
-            {
-                CDOfUserFunctionReset(_refreshCD);
-                return $"获取成绩失败：{api.ErrorMsg}";
-            }
+        //var profileAppend = $"\n{config.ToUserProfileString(CurKouUser)}";
+        //if (isFirstTime)
+        //{
+        //    Reply(bindSuccessFormat + "初次绑定，正在获取所有成绩..." + profileAppend);
+        //    if (!api.FetchUserRecords(CurKouUser, out _))
+        //    {
+        //        CDOfUserFunctionReset(_refreshCD);
+        //        return $"获取成绩失败：{api.ErrorMsg}";
+        //    }
 
-            return $"{config.Nickname}记录刷新成功！";
-        }
+        //    return $"{config.Nickname}记录刷新成功！";
+        //}
 
-        return bindSuccessFormat + profileAppend;
+        return bindSuccessFormat;
     }
 
     #endregion

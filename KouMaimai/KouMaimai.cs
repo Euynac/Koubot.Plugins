@@ -200,7 +200,7 @@ namespace KouGamePlugin.Maimai
             return new HtmlMessage(new
             {
                 chart.ChartId,
-                CurDifficult = chart.GetChartRatingOfSpecificColor(color),
+                CurDifficult = chart.GetChartDifficultOfSpecificColor(color),
                 RemarkList = remarkList,
                 Song = song,
                 ImageUrl = imageUrl,
@@ -294,12 +294,12 @@ namespace KouGamePlugin.Maimai
         }
 
         [PluginFunction(Name = "更新歌曲数据", Authority = Authority.BotMaster)]
-        public object? UpdateSongInfos()
+        public object? UpdateSong()
         {
             var updater = new SongInfoUpdater();
             if (!updater.StartUpdate(out var changedRow))
             {
-                return updater.ErrorMsg;
+                return "更新失败：" + updater.ErrorMsg;
             }
 
             var sb = new StringBuilder();
@@ -413,7 +413,7 @@ namespace KouGamePlugin.Maimai
                 LastTime = CurCommand.CustomTimeSpan ?? new TimeSpan(0,10,0)
             };
             ConnectRoom(
-                $"{CurUserName}消耗{CurKouGlobalConfig.CoinFormat(fee.Value)}创建了游戏房间：{room.RoomName}，后续收到的入场费({CurKouGlobalConfig.CoinFormat(fee.Value)})将累计在奖池中，按排名发放奖励",
+                $"{CurUserName}消耗{CurKouGlobalConfig.CoinFormat(fee.Value)}创建了游戏房间：{room.RoomName}，后续收到的入场费({CurKouGlobalConfig.CoinFormat(fee.Value)})将累计在奖池中，按排名发放奖励。使用`/room`查看房间帮助",
                 room);
             return null;
         }

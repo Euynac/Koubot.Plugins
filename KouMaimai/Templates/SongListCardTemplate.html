@@ -13,58 +13,197 @@
         font-family: consolas;
         margin: 1rem;
     }
+
     h1 {
         font-family: "Microsoft YaHei";
     }
+
     body {
         background: #f1f1f1;
         font-family: Impact, sans-serif, "Microsoft YaHei";
         /* color: white; */
     }
-    .append_info{
+
+    .append_info {
         margin: 15px auto;
         width: 89%;
     }
+
+    .container_sss_tag p {
+        background: -webkit-linear-gradient(0deg, transparent 0%, rgba(238,105,40,0.29) 45.786%, rgba(235,161,43,0.48) 77.15%, #f84a14 93.964%, #f05b1a 100%), -webkit-linear-gradient(184deg, #fc8909 0%, #ed9818 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .container_sssplus_tag p {
+        background: -webkit-linear-gradient(45deg, #ff0000 0%, #ffff00 16.67%, #00ff00 33.33%, #00ffff 50%, #0000ff 66.67%, #ff00ff 83.33%, #ff0000 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: #000000;
+        -webkit-text-fill-color: rgba(0,0,0,0.2);
+    }
+
+    .sss p {
+        background: -webkit-linear-gradient(0deg, transparent 0%, rgba(238,105,40,0.29) 45.786%, rgba(235,161,43,0.48) 77.15%, #f84a14 93.964%, #f05b1a 100%), -webkit-linear-gradient(184deg, #fc8909 0%, #ed9818 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .sssp p {
+        background: -webkit-linear-gradient(45deg, #ff0000 0%, #ffff00 16.67%, #00ff00 33.33%, #00ffff 50%, #0000ff 66.67%, #ff00ff 83.33%, #ff0000 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: #000000;
+        -webkit-text-fill-color: rgba(0,0,0,0.2);
+    }
+
+    .new_tag {
+        position: absolute;
+        text-align: center;
+        bottom: -12px;
+        right: -15px;
+        font-weight: 600;
+        font-family: Impact, sans-serif;
+        -webkit-text-stroke: 0.1px white;
+        font-size: 13px;
+        background: transparent;
+        color: red;
+    }
+
+    .star_tag {
+        position: absolute;
+        text-align: center; 
+        bottom: -9px;
+        left: -4px;
+        background-color: white;
+        font-weight: 800;
+        font-family: Impact, sans-serif;
+        font-size: 13px;
+        box-sizing: border-box;
+        color: black;
+        background: transparent;
+        text-shadow: 0 1px 2px #000000, 
+                     0 2px 8px #000000, 
+                     0 4px 16px #000000;
+        text-shadow: 0 1px 2px hsla(0,0%,0%,0.5), 
+                     0 2px 8px hsla(0, 0%, 0%, 0.3), 
+                     0 4px 16px hsla(0, 0%, 0%, 0.1);
+    }
+
+    .container_sss_tag {
+        position: absolute;
+        text-align: center;
+        top: 2px;
+        width: 100px;
+        background-color: white;
+        font-weight: 800;
+        font-family: Impact, sans-serif;
+        font-size: 11px;
+        box-sizing: border-box;
+        color: black;
+        border-radius: 10px;
+        box-shadow: 0 1px 1px #ccc, 0 2px 1px #c9c9c9;
+    }
+
+    .container_sssplus_tag {
+        position: absolute;
+        text-align: center;
+        top: 18px;
+        width: 100px;
+        background-color: white;
+        font-weight: 800;
+        font-family: Impact, sans-serif;
+        font-size: 11px;
+        box-sizing: border-box;
+        color: black;
+        border-radius: 10px;
+        box-shadow: 0 1px 1px #ccc, 0 2px 1px #c9c9c9;
+    }
 </style>
 <body>
-<h1 class="font-border ">{{Header}}</h1>
-<p class="append_info">{{AppendInfo}}</p>
-<div class="parent">
-    {{ for container in Containers }}
-    <div class="container">
-        <div class="left-bar">
-            {{ container.Constant }}
-        </div>
-        <div class="cards-list">
-            {{ for item in container.Items }}
-            <div class="card {{item.DenseDegree}} {{item.Color}}">
-                <div class="card_image {{ if item.IsDiscarded }}obsolete{{else}} {{end}}"> <img src="{{item.ImageUrl}}" /> </div>
-                {{ if item.Achievement }}
-                <div class="card_title title-white">
-                    <p>{{item.Achievement}}</p>
+    <h1 class="font-border ">{{Header}}</h1>
+    <p class="append_info">{{AppendInfo}}</p>
+    <div class="parent">
+        {{ for container in Containers }}
+        <div class="container">
+            <div style="position: relative;">
+                {{ if container.SSSRating > 0 }}
+                <div class="container_sss_tag">
+                    <p style="display: inline">
+                        {{ container.SSSRating }}
+                    </p>
+                    {{ if container.SSSRatingSpace > -1 }}
+                    <bold style="color: #63acf8">(+{{ container.SSSRatingSpace }})</bold>
+                    {{ end }}
+                    {{ if container.SSSRatingDxSpace > -1 }}
+                    <bold style="color: red">(+{{ container.SSSRatingDxSpace }})</bold>
+                    {{ end }}
                 </div>
                 {{ end }}
-                {{ if item.IsDiscarded }}
-                <div class="discard_overlay">
-                    <span class="discard_cross">&#10060;</span>
-                </div>
-                {{ end }}
-                <div class="card_id_tag">
-                    <p>{{ item.Id }}</p>
-                </div>
-                {{ if item.IsDx}}
-                <div class="card_tag">
-                    <p>DX</p>
+                {{ if container.SSSPlusRating > 0 }}
+                <div class="container_sssplus_tag">
+                    <p style="display: inline">
+                        {{ container.SSSPlusRating }}
+                    </p>
+                    {{ if container.SSSPlusRatingSpace > -1 }}
+                    <bold style="color: #63acf8">(+{{ container.SSSPlusRatingSpace }})</bold>
+                    {{ end }}
+                    {{ if container.SSSPlusRatingDxSpace > -1 }}
+                    <bold style="color: red">(+{{ container.SSSPlusRatingDxSpace }})</bold>
+                    {{ end }}
                 </div>
                 {{ end }}
             </div>
-            {{ end }}
+            <div class="left-bar">
+                {{ container.Constant }}
+            </div>
+            <div class="cards-list">
+                {{ for item in container.Items }}
+                <div class="card {{item.DenseDegree}} {{item.Color}}">
+                    <div class="card_image {{ if item.IsDiscarded }}obsolete{{else}} {{end}}"> <img src="{{item.ImageUrl}}" /> </div>
+                    {{ if item.Achievement }}
+                    <div class="card_title {{item.AchievementColor}}">
+                        <p>{{item.Achievement}}</p>
+                    </div>
+                    {{ end }}
+                    {{ if item.IsDiscarded }}
+                    <div class="discard_overlay">
+                        <span class="discard_cross">&#10060;</span>
+                    </div>
+                    {{ end }}
+                    <div class="card_id_tag">
+                        <p>{{ item.Id }}</p>
+                    </div>
+                    {{ if item.IsDx}}
+                    <div class="card_tag">
+                        <p>DX</p>
+                    </div>
+                    {{ end }}
+                    {{ if item.IsNew }}
+                    <div class="new_tag">
+                        <p>NEW!!</p>
+                    </div>
+                    {{ end }}
+                    {{ if item.Star > 0 }}
+                    {{ case item.Star }}
+                        {{when 5}}
+                        <span class="star_tag" style="color:orange;"><b>✦✦✦✦✦</b></span>
+                        {{when 4}}
+                        <span class="star_tag" style="color:gold;"><b>✦✦✦✦</b></span>
+                        {{when 3}}
+                        <span class="star_tag" style="color:gold;"><b>✦✦✦</b></span>
+                        {{when 2}}
+                        <span class="star_tag" style="color:green;"><b>✦✦</b></span>
+                        {{when 1}}
+                        <span class="star_tag" style="color:green;"><b>✦</b></span>
+                    {{ end }}
+                    {{ end }}
+                </div>
+                {{ end }}
+            </div>
         </div>
+        {{ end }}
     </div>
-    {{ end }}
-</div>
-<footer>
-    Copyright © 2023 Koubot
-</footer>
+    <footer>
+        Copyright © 2023 Koubot
+    </footer>
 </body>
 </html>

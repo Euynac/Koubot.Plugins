@@ -98,6 +98,13 @@ namespace KouGamePlugin.Maimai.Models
         public int? SSSRankOfSameDifficult =>
             ChartStatusList?.ElementAtOrDefault((int)SongRatingColor.Value)?.SSSRankOfSameDifficult;
 
+        public int? GetFullDxScore(RatingColor color)
+        {
+            var chartData = GetChartData(color);
+            var totalNotes = chartData?.Notes.Sum();
+            return totalNotes * 3;
+        }
+
         public static string GetCssColorClass(RatingColor color)
         {
             return color switch
@@ -258,7 +265,7 @@ namespace KouGamePlugin.Maimai.Models
             };
         }
 
-        public string GetChartRatingOfSpecificColor(RatingColor color)
+        public string GetChartDifficultOfSpecificColor(RatingColor color)
         {
             return color switch
             {
@@ -368,7 +375,7 @@ namespace KouGamePlugin.Maimai.Models
         /// <param name="achievement"></param>
         /// <param name="b50"></param>
         /// <returns>不存在相关定数时返回null</returns>
-        public int? CalRating(RatingColor type, double achievement, bool? b50 = null) =>
+        public int? CalRating(RatingColor type, double achievement, bool b50 = false) =>
             GetChartConstantOfSpecificColor(type) is { } constant ? DxCalculator.CalSongRating(achievement, constant, b50) : null;
 
         /// <summary>

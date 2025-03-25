@@ -137,8 +137,9 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
     /// <summary>
     /// 获取用户所有成绩
     /// </summary>
-    public bool FetchUserRecords(UserAccount user)
+    public bool FetchUserRecords(UserAccount user, out IReadOnlyList<SongRecord>? updatedList)
     {
+        updatedList = null;
         if (TokenValue is null)
         {
             if (!Login()) return false;
@@ -158,7 +159,7 @@ public class DivingFishApi : IKouError<DivingFishApi.ErrorCodes>
             return this.ReturnFalseWithError(node["message"]!.GetValue<string>());
         }
 
-        records.SaveToDb(user);
+        updatedList = records.SaveToDb(user);
         return true;
     }
 

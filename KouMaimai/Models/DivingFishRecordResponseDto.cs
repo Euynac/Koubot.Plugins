@@ -7,9 +7,6 @@ using System.Linq;
 using Koubot.Tool.General;
 using Koubot.Tool.String;
 using Microsoft.EntityFrameworkCore;
-using static KouGamePlugin.Maimai.Models.DivingFishBest40ResponseDto;
-using static Org.BouncyCastle.Math.EC.ECCurve;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KouGamePlugin.Maimai.Models;
 
@@ -108,13 +105,21 @@ public class DivingFishChartStatusDto
         foreach (var (id, statusList) in charts)
         {
             if (!id.IsInt(out var idInt)) continue;
-            var chart = chartsInDb.SingleOrDefault(p => p.OfficialId == idInt);
-            if (chart == null)
+            try
             {
-                statusList.PrintLn($"No data:{idInt}");
+                var chart = chartsInDb.SingleOrDefault(p => p.OfficialId == idInt);
+                if (chart == null)
+                {
+                    statusList.PrintLn($"No data:{idInt}");
+                    continue;
+                }
+                chart.ChartStatusList = statusList.Select(p => p.ToDbChartStatus()).Where(p => p != null).ToList();
+            }
+            catch (Exception e)
+            {
+                idInt.PrintLn("存在错误：" + e.Message);
                 continue;
             }
-            chart.ChartStatusList = statusList.Select(p => p.ToDbChartStatus()).Where(p => p != null).ToList();
             //context.Set<SongChart>().Update(chart);
         }
 
@@ -204,6 +209,7 @@ public class DivingFishChartInfoDto
         {
             using var context = new KouContext();
             var dbInfos = context.Set<SongInfo>().Include(p => p.ChartInfo).ToList();
+            var hasUpdatedDict = new Dictionary<int, bool>();
             foreach (var item in Infos)
             {
                 try
@@ -217,17 +223,18 @@ public class DivingFishChartInfoDto
                         continue;
                     }
 
+                    
                     var dbChartInfo = dbInfo.ChartInfo.FirstOrDefault(p => p.SongChartType.ToString() == item.type);
                     if (dbChartInfo == null)
                     {
                         KouLog.QuickAdd($"不存在{item.ToJsonString()}相关{item.type} Chart记录，更新失败", KouLog.LogLevel.Warning);
                         continue;
                     }
-
+                    hasUpdatedDict.Add(dbChartInfo.ChartId, true);
                     dbChartInfo.Date = item.basic_info.release_date.IsNullOrWhiteSpace()
                         ? dbChartInfo.Date
                         : int.Parse(item.basic_info.release_date);
-                    dbInfo.IsNew = item.basic_info.is_new;
+                    dbChartInfo.IsNew = item.basic_info.is_new;
                     dbInfo.SongBpm = item.basic_info.bpm.ToString().BeNullIfWhiteSpace() ?? dbInfo.SongBpm;
                     dbInfo.SongGenre = item.basic_info.genre.BeNullIfWhiteSpace() ?? dbInfo.SongGenre;
                     if (item.type == "DX")
@@ -302,6 +309,14 @@ public class DivingFishChartInfoDto
                     KouLog.QuickAdd(log);
                 }
             }
+
+            foreach (var chart in dbInfos.SelectMany(p=>p.ChartInfo))
+            {
+                if(hasUpdatedDict.ContainsKey(chart.ChartId)) continue;
+                if (chart.OfficialId == null) continue;
+                chart.OfficialId = 0;
+            }
+            
             var row = context.SaveChanges();
             KouLog.QuickAdd($"更新完maimai chartInfo，{row}行影响到");
             return row;
@@ -317,11 +332,11 @@ public class DivingFishRecordResponseDto
     public List<DivingFishRecord> records { get; set; }
     public string username { get; set; }
 
-    public void SaveToDb(UserAccount user)
+    public IReadOnlyList<SongRecord>? SaveToDb(UserAccount user)
     {
-        if (records == null) return;
+        if (records == null) return null;
         using var context = new KouContext();
-        var oldRecords = context.Set<SongRecord>().AsNoTracking().Include(p => p.CorrespondingChart)
+        var oldRecords = context.Set<SongRecord>().AsNoTracking().Include(p => p.CorrespondingChart).ThenInclude(p=>p.BasicInfo)
             .Include(p => p.User).Where(p => p.User == user).ToList();
         var charts = context.Set<SongChart>().ToList();
         foreach (var chart in records)
@@ -378,6 +393,7 @@ public class DivingFishRecordResponseDto
 
         context.SaveChanges();
         //SongRecord.UpdateCache();
+        return oldRecords;
     }
 }
 public class DivingFishRecord

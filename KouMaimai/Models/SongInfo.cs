@@ -51,11 +51,5 @@ namespace KouGamePlugin.Maimai.Models
         [Column("song_genre_old")]
         [AutoField(ActivateKeyword = "旧分类")]
         public string SongGenreOld { get; set; }
-        /// <summary>
-        /// 判断是否是新曲，用于计算DX b15
-        /// </summary>
-        [AutoField(ActivateKeyword = "新曲")]
-        [Column("is_new")]
-        public bool? IsNew { get; set; }
     }
 }

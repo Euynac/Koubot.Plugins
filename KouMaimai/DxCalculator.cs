@@ -4,7 +4,7 @@ namespace KouGamePlugin.Maimai
 {
     public static class DxCalculator
     {
-        public static int CalSongRating(double achievement, double ds, bool? b50 = null)
+        public static int CalSongRating(double achievement, double ds, bool b50 = false)
         {
             if (achievement <= 1.01) achievement *= 100.0;
             if (achievement < 0) return 0;

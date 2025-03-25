@@ -52,7 +52,7 @@ public class SongInfoUpdater : IKouError
         var res = KouHttp.Create("https://maimai.sega.jp/data/maimai_songs.json").SendRequest(HttpMethods.GET);
         if (res.HasError)
         {
-            return this.ReturnFalseWithError(res.Body);
+            return this.ReturnFalseWithError("请求出错："+res.ErrorMsg);
         }
 
         var list = JsonSerializer.Deserialize<List<Root>>(res.Body);
@@ -70,7 +70,7 @@ public class SongInfoUpdater : IKouError
                     continue;
                 }
 
-                var newSong = new SongInfo()
+                var newSong = AddedList.FirstOrDefault(p=>p.SongTitleKaNa == song.title_kana) ?? new SongInfo()
                 {
                     SongTitle = song.title,
                     SongTitleKaNa = song.title_kana,
@@ -93,7 +93,11 @@ public class SongInfoUpdater : IKouError
             }
             else
             {
-                if(NeedUpdate(song, originSong)) UpdatedList.Add(originSong);
+                if (NeedUpdate(song, originSong))
+                {
+                    context.Attach(originSong);
+                    UpdatedList.Add(originSong);
+                }
             }
         }
         context.Set<SongInfo>().AddRange(AddedList);

@@ -2,9 +2,12 @@
 using Koubot.Tool.Extensions;
 using Koubot.Tool.String;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text.Json.Serialization;
+using static OpenAI.GPT3.ObjectModels.SharedModels.IOpenAiModels;
 
 namespace KouGamePlugin.Maimai.Models;
 
@@ -90,6 +93,12 @@ public enum SongVersion
 
     [KouEnumName("maimai でらっくす Splash PLUS", "煌")]
     maimaiでらっくすSplashPLUS = 1 << 16,
+    [KouEnumName("maimai でらっくす UNiVERSE", "宙")]
+    maimaiでらっくすUNiVERSE= 1 << 17,
+    [KouEnumName("maimai でらっくす UNiVERSE PLUS", "星")]
+    maimaiでらっくすUNiVERSEPLUS= 1 << 18,
+    [KouEnumName("maimai でらっくす FESTiVAL")]
+    maimaiでらっくすFESTiVAL = 1 << 19,
 }
 
 public enum PlateType
@@ -177,7 +186,27 @@ public class MaiUserConfig : PluginUserConfig<MaiUserConfig>
     public string? LastRegionName { get; set; }
     public int? LastRegionId { get; set; }
     public DateTime? LastPlayDate { get; set; }
-    public DateTime? FirstPlayDate { get; set; }
+    public DateTime? FirstPlayDate { get; set; }    
+    /// <summary>
+    /// new,old
+    /// </summary>
+    public (int, int)? B40GroundRating { get; set; }
+    /// <summary>
+    /// new,old
+    /// </summary>
+    public (int, int)? B50GroundRating { get; set; }
+    public int? B40Rating { get; set; }
+    public int? B50Rating { get; set; }
+
+    public void UpdateRecordInfo(IReadOnlyList<SongRecord> records)
+    {
+        var b40Charts = SongRecord.GetB40Charts(records);
+        var b50Charts = SongRecord.GetB50Charts(records);
+        B40Rating = b40Charts.Sum(p => p.B40Rating);
+        B50Rating = b50Charts.Sum(p => p.B50Rating);
+        B40GroundRating = SongRecord.GetGroundRating(b40Charts, true);
+        B50GroundRating = SongRecord.GetGroundRating(b50Charts);
+    }
 
     /// <summary>
     /// 获取用户当前资料
@@ -188,8 +217,10 @@ public class MaiUserConfig : PluginUserConfig<MaiUserConfig>
         if (Username == null) return null;
         return $"{Nickname}" +
                Plate.BeIfNotEmpty($"【{Plate}】") + $"(段位分{AdditionalRating})" +
-               $"\nB40 Rating：{SongRecord.GetB40Charts(user).Sum(p => p.B40Rating)}" +
-               $"\nB50 Rating：{SongRecord.GetB50Charts(user).Sum(p=>p.B50Rating)}" +
+               $"\nB40 Rating：{B40Rating}" +
+               $"\nB50 Rating：{B50Rating}" +
+               B40GroundRating?.Be($"\nB40地板：{B40GroundRating.Value.Item2}(Old) {B40GroundRating.Value.Item1}(New)") +
+               B50GroundRating?.Be($"\nB50地板：{B50GroundRating.Value.Item2}(Old) {B50GroundRating.Value.Item1}(New)") +
                $"\n上次成绩刷新时间：{LastGetRecordsTime}" +
                //$"\nPC数：{PlayCount}" +
                //$"\n初次游玩日期：{FirstPlayDate}" +
